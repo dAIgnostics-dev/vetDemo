@@ -43,6 +43,7 @@ S3_KEY = os.environ.get("BAZA_S3_KEY", "semantic-router/baza.json")
 
 COMPONENT_TOP_K = 30
 DEFAULT_TOP_K = 5
+MIN_BM25_SCORE = 1.5
 
 _STOPWORDS = {
     "a", "e", "i", "o", "u", "s", "z", "k", "n",
@@ -160,7 +161,7 @@ class HybridRetriever:
 
         out: list[dict] = []
         for rank, (idx, score) in enumerate(ranked_idx, 1):
-            if score <= 0:
+            if score < MIN_BM25_SCORE:
                 break
             entry = self.entries[idx]
             out.append({

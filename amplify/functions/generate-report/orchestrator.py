@@ -36,6 +36,11 @@ from hybrid_router import (
 
 SONNET_MODEL_ID = os.environ.get("SONNET_MODEL_ID", "us.anthropic.claude-haiku-4-5-20251001-v1:0")
 
+
+def _strip_dg_suffix(opis: str) -> str:
+    """Ukloni 'Dg.:...' s kraja opisa ako postoji (duplikat jer se dg prikazuje odvojeno)."""
+    return re.split(r'\s*\n\s*\nDg\.', opis, flags=re.IGNORECASE)[0].strip()
+
 SYSTEM_PROMPT = """
 Ti si iskusan veterinarski patolog koji piše histopatološke i citološke nalaze na hrvatskom jeziku. Tvoj zadatak je iz zadane liste ključnih riječi (lematizirani medicinski pojmovi izvučeni iz originalnog nalaza) rekonstruirati:
     1) "opis" — strukturirani makroskopski/mikroskopski opis nalaza,
@@ -82,31 +87,22 @@ class Orchestrator:
         if matches:
             return {
                 "source": "router",
-                "results": [{"dg": m["dg"], "opis": m["opis"]} for m in matches],
+                "results": [{"dg": m["dg"], "opis": _strip_dg_suffix(m["opis"] or "")} for m in matches],
             }
         print("[orchestrator] Router nije pronašao podudaranje — search_only mod, nema fallbacka.")
         return {"source": "none", "results": []}
 
-    def query(self, keywords: list[str], k: int = 5) -> dict:
+    def query(self, keywords: list[str]) -> dict:
         """
-        Vrati relevantne rezultate iz routera ili jedan Sonnet-generirani nalaz.
+        Generiraj nalaz direktno putem Sonneta (bez pretraživanja baze).
 
         Returns:
             {
-                "source":  "router" | "sonnet",
-                "results": [{"dg": str, "opis": str}, ...]
+                "source":  "sonnet",
+                "results": [{"dg": str, "opis": str}]
             }
         """
-        query_text = ", ".join(kw.strip() for kw in keywords if kw.strip())
-        matches = self.retriever.query(query_text, k=k)
-
-        if matches:
-            return {
-                "source": "router",
-                "results": [{"dg": m["dg"], "opis": m["opis"]} for m in matches],
-            }
-
-        print("[orchestrator] Router nije pronašao podudaranje — pozivam Sonnet...")
+        print("[orchestrator] Generiram nalaz putem Sonneta...")
         dg, opis = self._call_sonnet(keywords)
 
         new_entry = self._write_back(keywords, dg, opis)
