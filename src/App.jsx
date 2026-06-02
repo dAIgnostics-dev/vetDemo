@@ -167,14 +167,16 @@ function GeneratorContent({ signOut, user }) {
     setEditedOpis('');
     setEditedDg('');
     try {
-      const { data, errors } = await client.mutations.searchDatabase({
-        keywords: keywords.filter(k => k.trim() !== '')
+      const { data, errors } = await client.graphql({
+        query: `mutation SearchDatabase($keywords: [String]) { searchDatabase(keywords: $keywords) }`,
+        variables: { keywords: keywords.filter(k => k.trim() !== '') }
       });
       if (errors) {
         console.error('GraphQL errors:', errors);
         setReport("Error: " + errors[0].message);
       } else {
-        const parsed = typeof data === 'string' ? JSON.parse(data) : data;
+        const raw = data?.searchDatabase ?? data;
+        const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
         if (parsed.source === 'none' || !parsed.results || parsed.results.length === 0) {
           setNoDbResults(true);
         } else {
