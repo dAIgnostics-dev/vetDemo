@@ -217,8 +217,13 @@ def lambda_handler(event, context):
     else:
         keywords = event.get("keywords") or []
 
-    field_name = event.get("info", {}).get("fieldName", "generateReport")
-    if field_name == "searchDatabase":
+    action = ""
+    if "arguments" in event:
+        action = event["arguments"].get("action") or ""
+    if not action:
+        action = event.get("info", {}).get("fieldName", "")
+
+    if action == "search" or action == "searchDatabase":
         result = _get_orchestrator().search(keywords)
     else:
         result = _get_orchestrator().query(keywords)

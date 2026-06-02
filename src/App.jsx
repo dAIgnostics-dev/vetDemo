@@ -168,8 +168,8 @@ function GeneratorContent({ signOut, user }) {
     setEditedDg('');
     try {
       const { data, errors } = await client.graphql({
-        query: `mutation SearchDatabase($keywords: [String]) { searchDatabase(keywords: $keywords) }`,
-        variables: { keywords: keywords.filter(k => k.trim() !== '') }
+        query: `mutation SearchDatabase($keywords: [String], $action: String) { searchDatabase(keywords: $keywords, action: $action) }`,
+        variables: { keywords: keywords.filter(k => k.trim() !== ''), action: 'search' }
       });
       if (errors) {
         console.error('GraphQL errors:', errors);
