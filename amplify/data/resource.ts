@@ -24,6 +24,15 @@ const schema = a.schema({
     .returns(a.string())
     .handler(a.handler.function(generateReport))
     .authorization((allow) => [allow.authenticated()]),
+
+  searchDatabase: a
+    .mutation()
+    .arguments({
+      keywords: a.string().array(),
+    })
+    .returns(a.string())
+    .handler(a.handler.function(generateReport))
+    .authorization((allow) => [allow.authenticated()]),
 });
 
 export type Schema = ClientSchema<typeof schema>;

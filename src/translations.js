@@ -1,7 +1,7 @@
 export const translations = {
   en: {
     app_title: "dAIgnostics Studio",
-    app_subtitle: "VetNarrative Diagnostic Toolkit",
+    app_subtitle: "Diagnostic Toolkit",
     history: "History",
     sign_out: "Sign Out",
     clinical_input: "Clinical Input",
@@ -20,8 +20,8 @@ export const translations = {
     delete_confirm: "Are you sure you want to delete this diagnosis?",
     delete_success: "🗑️ Diagnosis deleted from your history.",
     save_success: "✅ Diagnosis successfully saved to your history!",
-    footer_text: "© 2026 dAIgnostics Studio VetNarrative | Daignostics d.o.o",
-    login_footer: "© 2026 dAIgnostics Studio VetNarrative | Daignostics d.o.o",
+    footer_text: "© 2026 dAIgnostics Studio | Daignostics d.o.o",
+    login_footer: "© 2026 dAIgnostics Studio | Daignostics d.o.o",
     profile_title: "User Profile",
     first_name: "First Name",
     last_name: "Last Name",
@@ -35,11 +35,13 @@ export const translations = {
     profile_update_success: "✅ Profile successfully updated!",
     doctor_prefix: "Dr.",
     profile_instructions: "Update your name and change your password below.",
-    close: "Close"
+    close: "Close",
+    search_btn: "Search Database",
+    no_db_results: "No matching records found in the database."
   },
   hr: {
     app_title: "dAIgnostics Studio",
-    app_subtitle: "VetNarrative Dijagnostički Alat",
+    app_subtitle: "Dijagnostički Alat",
     history: "Povijest",
     sign_out: "Odjava",
     clinical_input: "Klinički Unos",
@@ -58,8 +60,8 @@ export const translations = {
     delete_confirm: "Jeste li sigurni da želite obrisati ovu dijagnozu?",
     delete_success: "🗑️ Dijagnoza je obrisana iz vaše povijesti.",
     save_success: "✅ Dijagnoza je uspješno spremljena u vašu povijest!",
-    footer_text: "© 2026 dAIgnostics Studio VetNarrative | Daignostics d.o.o",
-    login_footer: "© 2026 dAIgnostics Studio VetNarrative | Daignostics d.o.o",
+    footer_text: "© 2026 dAIgnostics Studio | Daignostics d.o.o",
+    login_footer: "© 2026 dAIgnostics Studio | Daignostics d.o.o",
     profile_title: "Korisnički Profil",
     first_name: "Ime",
     last_name: "Prezime",
@@ -73,6 +75,8 @@ export const translations = {
     profile_update_success: "✅ Profil je uspješno ažuriran!",
     doctor_prefix: "Dr.",
     profile_instructions: "Ažurirajte svoje ime i promijenite lozinku ispod.",
-    close: "Zatvori"
+    close: "Zatvori",
+    search_btn: "Pretraži Bazu",
+    no_db_results: "Nema odgovarajućih nalaza u bazi podataka."
   }
 };

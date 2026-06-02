@@ -67,9 +67,29 @@ class Orchestrator:
         self.retriever: HybridRetriever = build_hybrid(self.local_path)
         self.bedrock = boto3.client("bedrock-runtime", region_name=BEDROCK_REGION)
 
-    def query(self, keywords: list[str], k: int = 3) -> dict:
+    def search(self, keywords: list[str], k: int = 5) -> dict:
         """
-        Vrati top-k rezultata iz routera ili jedan Sonnet-generirani nalaz.
+        Pretraži samo bazu (bez Sonnet fallbacka).
+
+        Returns:
+            {
+                "source":  "router" | "none",
+                "results": [{"dg": str, "opis": str}, ...]
+            }
+        """
+        query_text = ", ".join(kw.strip() for kw in keywords if kw.strip())
+        matches = self.retriever.query(query_text, k=k)
+        if matches:
+            return {
+                "source": "router",
+                "results": [{"dg": m["dg"], "opis": m["opis"]} for m in matches],
+            }
+        print("[orchestrator] Router nije pronašao podudaranje — search_only mod, nema fallbacka.")
+        return {"source": "none", "results": []}
+
+    def query(self, keywords: list[str], k: int = 5) -> dict:
+        """
+        Vrati relevantne rezultate iz routera ili jedan Sonnet-generirani nalaz.
 
         Returns:
             {
@@ -201,6 +221,11 @@ def lambda_handler(event, context):
     else:
         keywords = event.get("keywords") or []
 
-    result = _get_orchestrator().query(keywords)
+    field_name = event.get("info", {}).get("fieldName", "generateReport")
+    if field_name == "searchDatabase":
+        result = _get_orchestrator().search(keywords)
+    else:
+        result = _get_orchestrator().query(keywords)
+
 
     return json.dumps(result, ensure_ascii=False)

@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Amplify } from 'aws-amplify';
 import { generateClient } from 'aws-amplify/data';
 import { Authenticator } from '@aws-amplify/ui-react';
-import { 
-  Plus, 
-  Send, 
-  Save, 
-  Download, 
-  History, 
-  LogOut, 
-  Stethoscope, 
+import {
+  Plus,
+  Send,
+  Save,
+  Download,
+  History,
+  LogOut,
+  Stethoscope,
   X,
   ChevronRight,
   Clock,
@@ -18,7 +18,8 @@ import {
   User,
   Globe,
   Lock,
-  ShieldCheck
+  ShieldCheck,
+  Search
 } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -42,6 +43,8 @@ function GeneratorContent({ signOut, user }) {
   const [editedOpis, setEditedOpis] = useState('');
   const [editedDg, setEditedDg] = useState('');
   const [loading, setLoading] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [noDbResults, setNoDbResults] = useState(false);
   const [saving, setSaving] = useState(false);
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
@@ -102,6 +105,7 @@ function GeneratorContent({ signOut, user }) {
   const generateReport = async () => {
     setLoading(true);
     setReport('');
+    setNoDbResults(false);
     try {
       const { data, errors } = await client.mutations.generateReport({
         keywords: keywords.filter(k => k.trim() !== '')
@@ -150,6 +154,44 @@ function GeneratorContent({ signOut, user }) {
       setReport("Error: " + (error.message || "Unknown error"));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const searchDatabase = async () => {
+    setSearchLoading(true);
+    setReport('');
+    setResults([]);
+    setResultSource('');
+    setNoDbResults(false);
+    setSelectedIdx(null);
+    setEditedOpis('');
+    setEditedDg('');
+    try {
+      const { data, errors } = await client.mutations.searchDatabase({
+        keywords: keywords.filter(k => k.trim() !== '')
+      });
+      if (errors) {
+        console.error('GraphQL errors:', errors);
+        setReport("Error: " + errors[0].message);
+      } else {
+        const parsed = typeof data === 'string' ? JSON.parse(data) : data;
+        if (parsed.source === 'none' || !parsed.results || parsed.results.length === 0) {
+          setNoDbResults(true);
+        } else {
+          setResults(parsed.results);
+          setResultSource(parsed.source || 'router');
+          if (parsed.results.length === 1) {
+            setSelectedIdx(0);
+            setEditedOpis(parsed.results[0].opis || '');
+            setEditedDg(parsed.results[0].dg || '');
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error calling searchDatabase:', error);
+      setReport("Error: " + (error.message || "Unknown error"));
+    } finally {
+      setSearchLoading(false);
     }
   };
 
@@ -224,7 +266,7 @@ function GeneratorContent({ signOut, user }) {
       
       let htmlContent = `
         <div style="border-bottom: 2px solid #2563eb; padding-bottom: 20px; margin-bottom: 30px;">
-          <h1 style="color: #2563eb; margin: 0; font-size: 28px;">dAIgnostics Studio VetNarrative</h1>
+          <h1 style="color: #2563eb; margin: 0; font-size: 28px;">dAIgnostics Studio</h1>
           <p style="color: #64748b; font-size: 14px; margin: 10px 0 0 0;">
             ${t('app_subtitle')}
           </p>
@@ -347,6 +389,7 @@ function GeneratorContent({ signOut, user }) {
     setSelectedIdx(null);
     setEditedOpis('');
     setEditedDg('');
+    setNoDbResults(false);
     setShowHistory(false);
     setShowProfile(false);
   };
@@ -504,7 +547,7 @@ function GeneratorContent({ signOut, user }) {
           title={lang === 'en' ? 'New Diagnosis' : 'Novi nalaz'}
         >
           <Stethoscope size={32} color="var(--brand-red)" />
-          <h1 className="hide-mobile" style={{ fontSize: '1.25rem' }}>dAIgnostics Studio VetNarrative</h1>
+          <h1 className="hide-mobile" style={{ fontSize: '1.25rem' }}>dAIgnostics Studio</h1>
         </div>
         
         <div style={{ flex: 1 }}></div>
@@ -571,13 +614,21 @@ function GeneratorContent({ signOut, user }) {
             </div>
           </div>
 
-          <button 
-            className="btn btn-primary" 
+          <button
+            className="btn btn-primary"
             style={{ width: '100%', marginTop: '2rem' }}
             onClick={generateReport}
-            disabled={loading || (keywords.every(k => k.trim() === '') && !details)}
+            disabled={loading || searchLoading || (keywords.every(k => k.trim() === '') && !details)}
           >
             {loading ? <div className="loading-spinner"></div> : <><Send size={18} /> {t('generate_btn')}</>}
+          </button>
+          <button
+            className="btn btn-secondary"
+            style={{ width: '100%', marginTop: '0.75rem' }}
+            onClick={searchDatabase}
+            disabled={searchLoading || loading || (keywords.every(k => k.trim() === '') && !details)}
+          >
+            {searchLoading ? <div className="loading-spinner"></div> : <><Search size={18} /> {t('search_btn')}</>}
           </button>
         </section>
 
@@ -666,6 +717,14 @@ function GeneratorContent({ signOut, user }) {
                 );
               })}
             </div>
+          </section>
+        )}
+
+        {noDbResults && !results.length && (
+          <section className="card report-output">
+            <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem 0', fontSize: '1rem' }}>
+              🔍 {t('no_db_results')}
+            </p>
           </section>
         )}
 
@@ -764,14 +823,14 @@ export default function App() {
       return (
         <div style={{ textAlign: 'center', padding: '1.5rem', color: 'var(--brand-red)' }}>
           <Stethoscope size={56} style={{ marginBottom: '0.75rem' }} />
-          <h2 style={{ margin: 0, fontWeight: 800, letterSpacing: '-0.025em', color: 'var(--primary)' }}>dAIgnostics Studio VetNarrative</h2>
+          <h2 style={{ margin: 0, fontWeight: 800, letterSpacing: '-0.025em', color: 'var(--primary)' }}>dAIgnostics Studio</h2>
         </div>
       );
     },
     Footer() {
       return (
         <div style={{ textAlign: 'center', padding: '1.5rem', color: 'var(--brand-red)', fontSize: '0.75rem' }}>
-          &copy; 2026 dAIgnostics Studio VetNarrative | Daignostics d.o.o
+          &copy; 2026 dAIgnostics Studio | Daignostics d.o.o
         </div>
       );
     },

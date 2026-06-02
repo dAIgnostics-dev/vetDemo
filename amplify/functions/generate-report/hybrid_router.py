@@ -1,5 +1,5 @@
 """
-Hibridni retriever: BM25 pronalazi kandidate, Claude Haiku (Bedrock) ih rerankirá.
+BM25 retriever za veterinarsku patologiju.
 
 Podržava učitavanje baze iz lokalnog fajla (CLI) ili S3 (Lambda).
 Konfiguracija via env varijable:
@@ -9,7 +9,7 @@ Konfiguracija via env varijable:
 
 API:
   build_hybrid()  -> HybridRetriever   (koristi env var konfiguraciju)
-  retriever.query(text, k=5) -> [{id, opis, dg, keywords, score, haiku_rank, bm25_rank}]
+  retriever.query(text, k=5) -> [{id, opis, dg, keywords, score, bm25_rank}]
 """
 
 from __future__ import annotations
@@ -37,13 +37,12 @@ DEFAULT_BAZA = Path(__file__).parent / "baza.json"
 
 # Bedrock cross-region inference — Lambda je u eu-north-1, Bedrock u us-east-1
 BEDROCK_REGION = os.environ.get("BEDROCK_REGION", "us-east-1")
-HAIKU_MODEL_ID = "us.anthropic.claude-haiku-4-5-20251001-v1:0"
-
 # S3 konfiguracija — postavlja se u Lambda env varijablama
 S3_BUCKET = os.environ.get("BAZA_S3_BUCKET")
 S3_KEY = os.environ.get("BAZA_S3_KEY", "semantic-router/baza.json")
 
 COMPONENT_TOP_K = 30
+DEFAULT_TOP_K = 5
 
 _STOPWORDS = {
     "a", "e", "i", "o", "u", "s", "z", "k", "n",
@@ -114,58 +113,6 @@ class BM25:
         return scores
 
 
-# ---------- Haiku reranker ----------
-
-class HaikuReranker:
-    def __init__(self):
-        self.bedrock = boto3.client("bedrock-runtime", region_name=BEDROCK_REGION)
-
-    def rerank(self, query: str, candidates: list[dict], k: int) -> list[str]:
-        if not candidates:
-            return []
-
-        lines = []
-        for i, c in enumerate(candidates, 1):
-            dg = (c.get("dg") or "").strip()
-            kw = (c.get("keywords") or "").strip()[:120]
-            lines.append(f"[{i}] ID={c['id']} | Dg: {dg} | Keywords: {kw}")
-
-        prompt = (
-            f'Upit: "{query}"\n\n'
-            "Sortiraj sljedeće veterinarskopatološke nalaze po relevantnosti za zadani upit. "
-            f"Vrati SAMO JSON listu ID-ova (string vrijednosti), npr. [\"id1\", \"id2\"], "
-            f"top {k} najrelevantnijih. "
-            "Ako NIJEDAN kandidat nije medicinsko relevantno podudaranje za upit, vrati praznu listu []. "
-            "Bez objašnjenja.\n\n"
-            + "\n".join(lines)
-        )
-
-        body = json.dumps({
-            "anthropic_version": "bedrock-2023-05-31",
-            "max_tokens": 256,
-            "messages": [{"role": "user", "content": prompt}],
-        })
-
-        resp = self.bedrock.invoke_model(
-            modelId=HAIKU_MODEL_ID,
-            body=body,
-            contentType="application/json",
-            accept="application/json",
-        )
-        text = json.loads(resp["body"].read())["content"][0]["text"].strip()
-
-        match = re.search(r"\[.*?\]", text, re.DOTALL)
-        if match:
-            try:
-                ids = json.loads(match.group())
-                valid = {c["id"] for c in candidates}
-                return [str(i) for i in ids if str(i) in valid][:k]
-            except (json.JSONDecodeError, TypeError):
-                pass
-
-        return []
-
-
 # ---------- Učitavanje baze ----------
 
 def _load_entries(
@@ -199,9 +146,6 @@ class HybridRetriever:
         self.docs_tokens = [tokenize(_doc_text(e)) for e in entries]
         self.bm25 = BM25(self.docs_tokens)
 
-        print("Inicijaliziram Haiku reranker...")
-        self.reranker = HaikuReranker()
-
     def add_entry(self, entry: dict) -> None:
         """Dodaj novi unos u in-memory retriever (bez ponovnog čitanja diska/S3)."""
         self.entries.append(entry)
@@ -209,42 +153,23 @@ class HybridRetriever:
         self.docs_tokens.append(tokenize(_doc_text(entry)))
         self.bm25 = BM25(self.docs_tokens)
 
-    def query(self, text: str, k: int = 5) -> list[dict]:
+    def query(self, text: str, k: int = DEFAULT_TOP_K) -> list[dict]:
         toks = tokenize(text)
         bm25_scores = self.bm25.scores(toks)
-        ranked_idx = sorted(enumerate(bm25_scores), key=lambda x: x[1], reverse=True)[:COMPONENT_TOP_K]
+        ranked_idx = sorted(enumerate(bm25_scores), key=lambda x: x[1], reverse=True)[:k]
 
-        candidates = []
-        for bm25_rank, (idx, score) in enumerate(ranked_idx, 1):
+        out: list[dict] = []
+        for rank, (idx, score) in enumerate(ranked_idx, 1):
             if score <= 0:
                 break
-            candidates.append({
-                **self.entries[idx],
-                "bm25_rank": bm25_rank,
-                "bm25_score": score,
-            })
-
-        if not candidates:
-            return []
-
-        ranked_ids = self.reranker.rerank(text, candidates, k=k)
-
-        bm25_by_id = {c["id"]: c for c in candidates}
-        out: list[dict] = []
-        for haiku_rank, eid in enumerate(ranked_ids, 1):
-            entry = self.id_to_entry.get(eid)
-            if entry is None:
-                continue
-            bm = bm25_by_id.get(eid, {})
+            entry = self.entries[idx]
             out.append({
-                "id": eid,
+                "id": entry["id"],
                 "opis": entry.get("opis"),
                 "dg": entry.get("dg"),
                 "keywords": entry.get("keywords"),
-                "score": 1.0 / haiku_rank,
-                "haiku_rank": haiku_rank,
-                "bm25_rank": bm.get("bm25_rank"),
-                "bm25_score": bm.get("bm25_score"),
+                "score": score,
+                "bm25_rank": rank,
             })
         return out
 
