@@ -12,8 +12,13 @@ SHELL := /bin/bash
 
 # --- Konfiguracija ---
 VENV        := local/.venv
-PY          := $(VENV)/bin/python
-PIP         := $(VENV)/bin/pip
+ifeq ($(OS),Windows_NT)
+    PY  := $(VENV)/Scripts/python
+    PIP := $(VENV)/Scripts/pip
+else
+    PY  := $(VENV)/bin/python
+    PIP := $(VENV)/bin/pip
+endif
 OLLAMA_MODEL ?= qwen2.5:7b-instruct
 PORT        ?= 8000
 
@@ -41,8 +46,8 @@ install: install-backend install-frontend model
 install-backend:
 	@echo "==> Backend (Python venv + Flask)"
 	python3 -m venv $(VENV)
-	$(PIP) install --upgrade pip >/dev/null
-	$(PIP) install -r local/requirements.txt
+	$(PY) -m pip install --upgrade pip >/dev/null
+	$(PY) -m pip install -r local/requirements.txt
 
 .PHONY: install-frontend
 install-frontend:
@@ -59,7 +64,7 @@ model:
 .PHONY: backend
 backend:
 	@echo "==> Flask backend na http://localhost:$(PORT)"
-	cd local && PORT=$(PORT) OLLAMA_MODEL=$(OLLAMA_MODEL) .venv/bin/python server.py
+	cd local && PORT=$(PORT) OLLAMA_MODEL=$(OLLAMA_MODEL) ../$(PY) server.py
 
 .PHONY: frontend
 frontend:
@@ -72,7 +77,7 @@ frontend:
 run:
 	@echo "==> Pokrećem backend + frontend (Ctrl-C za zaustavljanje)"
 	@trap 'kill 0' EXIT INT TERM; \
-	( cd local && PORT=$(PORT) OLLAMA_MODEL=$(OLLAMA_MODEL) .venv/bin/python server.py ) & \
+	( cd local && PORT=$(PORT) OLLAMA_MODEL=$(OLLAMA_MODEL) ../$(PY) server.py ) & \
 	npm run dev; \
 	wait
 

@@ -1,0 +1,179 @@
+================================================================================
+  dAIgnostics Studio — Testovi za Semantic Router i Generiranje
+================================================================================
+
+Legenda:
+  Ulaz     : ključne riječi koje se šalju sustavu (lista pojmova)
+  Ruta     : "search" (traži u bazi) ili "generate" (LLM generira novo)
+  Očekivano: opis očekivanog izlaza
+
+================================================================================
+  BLOK A — SEARCH RUTA (pretraga baze)
+  Cilj: ulazi koji bi trebali pronaći podudaranje u bazi (action=search)
+================================================================================
+
+A-01
+  Ulaz    : karcinom, mliječna žlijezda, tubul, papil, malignost II
+  Ruta    : search
+  Očekivano: jedan ili više rezultata s poljem "dg" koji sadrži "karcinom"
+             i "opis" koji počinje s "Dostavljen je uzorak..."
+
+A-02
+  Ulaz    : limfom, limfni čvor, limfocit, B-stanični, difuzni
+  Ruta    : search
+  Očekivano: rezultat s dijagnozom difuznog B-staničnog limfoma;
+             opis opisuje infiltraciju limfnih čvorova
+
+A-03
+  Ulaz    : skvamozni karcinom, koža, keratinizacija, invazija
+  Ruta    : search
+  Očekivano: dijagnoza planocelularnog karcinoma kože;
+             opis navodi keratinski biser ili sl.
+
+A-04
+  Ulaz    : hepatocelularni karcinom, jetra, hepatocit, nuklearna atipija
+  Ruta    : search
+  Očekivano: dijagnoza hepatocelularnog karcinoma;
+             makroskopski opis mase u jetri
+
+A-05
+  Ulaz    : osteosarkom, kost, osteoid, pleomorfizam, mitoze
+  Ruta    : search
+  Očekivano: dijagnoza osteosarkoma; opis koštanog tkiva s atipičnim osteoidom
+
+A-06
+  Ulaz    : mastocitom, koža, mastocit, granule, stupanj II
+  Ruta    : search
+  Očekivano: dijagnoza mastocitoma stupnja II (Patnaik);
+             opis mikroskopskog nalaza mastocita
+
+A-07
+  Ulaz    : fibroadenom, mliječna žlijezda, fibrozna stroma, žljezdane
+  Ruta    : search
+  Očekivano: dijagnoza fibroadenoma; benigni nalaz sa žljezdanim i
+             fibroznim komponentama
+
+A-08
+  Ulaz    : melanom, sluznica, melanocit, pigment, metastaza
+  Ruta    : search
+  Očekivano: dijagnoza melanoma; opis pigmentiranih stanica i
+             mogućeg zahvaćanja limfnih žila
+
+A-09
+  Ulaz    : adenokarcinom, prostata, žljezdane strukture, infiltracija
+  Ruta    : search
+  Očekivano: dijagnoza adenokarcinoma prostate;
+             opis infiltrativnih žljezdanih nakupina
+
+A-10
+  Ulaz    : tranzicijski karcinom, mokraćni mjehur, urotelij, papilaran
+  Ruta    : search
+  Očekivano: dijagnoza urotelnog (tranzicijskog) karcinoma mjehura;
+             papilarni rast urotelnih stanica
+
+================================================================================
+  BLOK B — GENERATE RUTA (LLM generira novi nalaz)
+  Cilj: ulazi za koje u bazi vjerojatno nema podudaranja (action=generate)
+       ili se kombinacija pojmova nikad nije pojavila
+================================================================================
+
+B-01
+  Ulaz    : perikarditis, fibrin, neutrofil, eksudativni, pas
+  Ruta    : generate
+  Očekivano: dg — nešto poput "Fibrinozni eksudativni perikarditis"
+             opis — makroskopski fibrinozni naslagi na perikardu,
+             mikroskopski neutrofili i fibrin
+
+B-02
+  Ulaz    : granulomatozni hepatitis, makrofag, epiteloidna stanica, mačka
+  Ruta    : generate
+  Očekivano: dg — granulomatozni hepatitis
+             opis — jetreni parenhim s granulomima od epiteloidnih makrofaga
+
+B-03
+  Ulaz    : intersticijalni nefritis, limfocit, plazma stanica, kronični
+  Ruta    : generate
+  Očekivano: dg — kronični intersticijalni nefritis
+             opis — bubrežni intersticij s limfoplazmocitnom infiltracijom
+
+B-04
+  Ulaz    : alveolarna pneumonija, makrofag, fibrin, konsolidacija, pas
+  Ruta    : generate
+  Očekivano: dg — akutna fibrinozna alveolarna pneumonija
+             opis — plućni alveoli ispunjeni fibrinoznim eksudatom i makrofagima
+
+B-05
+  Ulaz    : eozinofilni gastritis, eozinofil, mukozan, kronični, mačka
+  Ruta    : generate
+  Očekivano: dg — kronični eozinofilni gastritis
+             opis — sluznica želuca s gustom eozinofilnom infiltracijom
+
+B-06
+  Ulaz    : perineuralna invazija, periferni živac, karcinom, trepanobiopsija
+  Ruta    : generate
+  Očekivano: dg — karcinom s perineralnom invazijom
+             opis — maligno tkivo uz/oko perifernih živčanih vlakana
+
+B-07
+  Ulaz    : hidronefrotski bubreg, dilatacija, kalicesi, atrofija korteksa
+  Ruta    : generate
+  Očekivano: dg — hidronefrotska atrofija bubrega
+             opis — makroskopski jako dilatiran bubreg, korteks stanjela
+
+B-08
+  Ulaz    : kronični aktivni enteritis, kriptitis, apscesi, neutrofil, limfocit
+  Ruta    : generate
+  Očekivano: dg — kronični aktivni enteritis s kriptnim apscessima
+             opis — sluznica tankog crijeva s mješovitom upalnom infiltracijom
+
+B-09
+  Ulaz    : degenerativna mijelpatija, aksoni, demijelinizacija, leđna moždina
+  Ruta    : generate
+  Očekivano: dg — degenerativna mijelopatija
+             opis — leđna moždina s gubitkom mijelina i aksonalnom
+             degeneracijom u bijeloj tvari
+
+B-10
+  Ulaz    : periapikalni granulom, zub, makrofag, plazmocit, fibroza
+  Ruta    : generate
+  Očekivano: dg — periapikalni granulom
+             opis — granulomatozno upalno tkivo uz apeks zuba,
+             limfoplazmocitna infiltracija i fibrozna kapsula
+
+================================================================================
+  RUBNI SLUČAJEVI — opcionalno testirati
+================================================================================
+
+R-01  Prazan upit
+  Ulaz    : (ništa / prazna lista)
+  Očekivano: poruka o grešci ili fallback na generate s praznim pojmovima
+
+R-02  Samo jedan pojam
+  Ulaz    : karcinom
+  Očekivano: search — rezultati koji sadrže "karcinom" bilo gdje u dg/opis
+
+R-03  Nepostojeći/izmišljeni pojam
+  Ulaz    : xanthopleizija, foobarium, nepoznato123
+  Ruta    : generate (search ne vraća ništa → fallback)
+  Očekivano: LLM generira nalaz ili vraća prazan/error odgovor
+
+R-04  Miješani jezici (EN + HR)
+  Ulaz    : lymphoma, limfni čvor, B-cell, difuzni
+  Očekivano: sustav funkcionira; ruta search ili generate ovisno o bazi
+
+R-05  Dupli pojmovi
+  Ulaz    : karcinom, karcinom, jetra, jetra
+  Očekivano: isti rezultat kao da su pojmovi navedeni jedanput
+
+================================================================================
+  Napomene
+================================================================================
+
+- Svi testovi se šalju kao POST na http://localhost:8000/api/search (action=search)
+  ili http://localhost:8000/api/generate (action=generate).
+- Ulazni format (JSON body):  { "keywords": ["pojam1", "pojam2", ...] }
+- Provjeri da svaki "opis" počinje s "Dostavljen je uzorak...".
+- Provjeri da "dg" sadrži vrstu patologije i organizam/organ.
+- Za generirane nalaze (B blok), provjeri da su auto-dodani u baza.json
+  s ID-em koji počinje s "gen_".
+================================================================================
