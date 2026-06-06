@@ -1,1 +1,2 @@
-boto3>=1.34.0
+# Nema vanjskih ovisnosti — koristi se samo Python standardna biblioteka.
+# LLM pozivi idu na lokalni Ollama server preko urllib (vidi llm.py).

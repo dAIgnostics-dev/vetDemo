@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Amplify } from 'aws-amplify';
-import { generateClient } from 'aws-amplify/data';
-import { Authenticator } from '@aws-amplify/ui-react';
+import { Authenticator } from './local/Authenticator';
+import { client, fetchUserAttributes, updateUserAttributes, updatePassword } from './local/api';
 import {
   Plus,
   Send,
@@ -23,14 +22,8 @@ import {
 } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
-import { fetchUserAttributes, updateUserAttributes, updatePassword } from 'aws-amplify/auth';
-import '@aws-amplify/ui-react/styles.css';
-import outputs from '../amplify_outputs.json';
 import { translations } from './translations';
 import './index.css';
-
-Amplify.configure(outputs);
-const client = generateClient();
 
 function GeneratorContent({ signOut, user }) {
   const [lang, setLang] = useState(localStorage.getItem('vet_lang') || 'en');

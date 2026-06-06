@@ -2,11 +2,13 @@ import { defineBackend } from '@aws-amplify/backend';
 import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { generateReport } from './functions/generate-report/resource';
-import { PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam';
-import { Function } from 'aws-cdk-lib/aws-lambda';
 
 /**
  * @see https://docs.amplify.aws/react/build-a-backend/ to add storage, functions, and more
+ *
+ * Napomena: generiranje nalaza ide preko lokalnog Ollama servera (vidi
+ * amplify/functions/generate-report/llm.py), pa nisu potrebne Bedrock IAM
+ * dozvole. Lokalni razvoj koristi local/server.py umjesto ovog Amplify stacka.
  */
 const backend = defineBackend({
   auth,
@@ -14,27 +16,4 @@ const backend = defineBackend({
   generateReport
 });
 
-const generateReportFn = backend.generateReport.resources.lambda as Function;
-
-generateReportFn.addToRolePolicy(
-  new PolicyStatement({
-    effect: Effect.ALLOW,
-    actions: ['bedrock:InvokeModel'],
-    resources: [
-      'arn:aws:bedrock:*::foundation-model/*',
-      'arn:aws:bedrock:*:*:inference-profile/*'
-    ],
-  })
-);
-
-generateReportFn.addToRolePolicy(
-  new PolicyStatement({
-    effect: Effect.ALLOW,
-    actions: [
-      'aws-marketplace:ViewSubscriptions',
-      'aws-marketplace:Subscribe',
-      'aws-marketplace:Unsubscribe',
-    ],
-    resources: ['*'],
-  })
-);
+export { backend };

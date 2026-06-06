@@ -1,8 +1,11 @@
-import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
+// Alternativni TypeScript handler (keywords → nalaz) preko lokalnog Ollama LLM-a.
+// Glavni tok koristi orchestrator.lambda_handler (Python); ovaj je zadržan kao
+// minimalni Node entry point — bez Amazon Bedrocka.
 import * as fs from 'fs';
 import * as path from 'path';
 
-const client = new BedrockRuntimeClient({ region: "us-east-1" });
+const OLLAMA_HOST = (process.env.OLLAMA_HOST || 'http://localhost:11434').replace(/\/$/, '');
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'qwen2.5:7b-instruct';
 
 export const handler = async (event: any) => {
   try {
@@ -10,11 +13,9 @@ export const handler = async (event: any) => {
     const keywords = body?.keywords || [];
     const keywordsStr = keywords.join(', ');
 
-    // Read examples.text bundled with the function
-    // In Gen 2 bundling, assets are typically in the same directory as the handler
+    // Read examples.text bundled with the function (few-shot kontekst)
     const examplesPath = path.resolve(__dirname, 'examples.text');
-    let examplesContent = "No examples available.";
-    
+    let examplesContent = 'No examples available.';
     if (fs.existsSync(examplesPath)) {
       examplesContent = fs.readFileSync(examplesPath, 'utf-8');
     }
@@ -31,31 +32,23 @@ ${keywordsStr}
 Please generate a professional, narrative veterinary report that follows the style of the examples provided.
 `;
 
-    const modelId = "anthropic.claude-3-sonnet-20240229-v1:0";
-    
-    const payload = {
-      anthropic_version: "bedrock-2023-05-31",
-      max_tokens: 1000,
-      messages: [
-        {
-          role: "user",
-          content: promptText
-        }
-      ]
-    };
-
-    const command = new InvokeModelCommand({
-      modelId,
-      body: JSON.stringify(payload),
-      contentType: "application/json",
-      accept: "application/json",
+    const response = await fetch(`${OLLAMA_HOST}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: OLLAMA_MODEL,
+        messages: [{ role: 'user', content: promptText }],
+        stream: false,
+        options: { num_predict: 1000 },
+      }),
     });
 
-    const response = await client.send(command);
-    const responseBody = JSON.parse(new TextDecoder().decode(response.body));
-    const generatedReport = responseBody.content[0].text;
+    if (!response.ok) {
+      throw new Error(`Ollama HTTP ${response.status}`);
+    }
 
-    return generatedReport;
+    const data: any = await response.json();
+    return data.message.content;
   } catch (error: any) {
     console.error(error);
     throw new Error(error.message);

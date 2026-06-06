@@ -1,29 +1,24 @@
 """
-Hibridni retriever: BM25 pronalazi kandidate, Claude Haiku (Bedrock) ih rerankirá.
+Hibridni retriever: BM25 pronalazi kandidate, lokalni LLM (Ollama) ih rerankirá.
 
-Podržava učitavanje baze iz lokalnog fajla (CLI) ili S3 (Lambda).
-Konfiguracija via env varijable:
-  BAZA_S3_BUCKET  — S3 bucket za bazu (ako nije postavljen, koristi lokalni fajl)
-  BAZA_S3_KEY     — S3 ključ (default: semantic-router/baza.json)
-  BEDROCK_REGION  — region za Bedrock pozive (default: us-east-1)
+Baza se učitava iz lokalnog baza.json fajla.
 
 API:
-  build_hybrid()  -> HybridRetriever   (koristi env var konfiguraciju)
-  retriever.query(text, k=5) -> [{id, opis, dg, keywords, score, haiku_rank, bm25_rank}]
+  build_hybrid()  -> HybridRetriever
+  retriever.query(text, k=5) -> [{id, opis, dg, keywords, score, llm_rank, bm25_rank}]
 """
 
 from __future__ import annotations
 
 import json
 import math
-import os
 import re
 import sys
 from collections import Counter
 from pathlib import Path
 from typing import Optional
 
-import boto3
+from llm import chat
 
 if hasattr(sys.stdout, "reconfigure"):
     try:
@@ -34,14 +29,6 @@ if hasattr(sys.stdout, "reconfigure"):
 
 
 DEFAULT_BAZA = Path(__file__).parent / "baza.json"
-
-# Bedrock cross-region inference — Lambda je u eu-north-1, Bedrock u us-east-1
-BEDROCK_REGION = os.environ.get("BEDROCK_REGION", "us-east-1")
-HAIKU_MODEL_ID = "us.anthropic.claude-haiku-4-5-20251001-v1:0"
-
-# S3 konfiguracija — postavlja se u Lambda env varijablama
-S3_BUCKET = os.environ.get("BAZA_S3_BUCKET")
-S3_KEY = os.environ.get("BAZA_S3_KEY", "semantic-router/baza.json")
 
 COMPONENT_TOP_K = 30
 
@@ -114,12 +101,9 @@ class BM25:
         return scores
 
 
-# ---------- Haiku reranker ----------
+# ---------- LLM reranker (Ollama) ----------
 
-class HaikuReranker:
-    def __init__(self):
-        self.bedrock = boto3.client("bedrock-runtime", region_name=BEDROCK_REGION)
-
+class LLMReranker:
     def rerank(self, query: str, candidates: list[dict], k: int) -> list[str]:
         if not candidates:
             return []
@@ -140,19 +124,7 @@ class HaikuReranker:
             + "\n".join(lines)
         )
 
-        body = json.dumps({
-            "anthropic_version": "bedrock-2023-05-31",
-            "max_tokens": 256,
-            "messages": [{"role": "user", "content": prompt}],
-        })
-
-        resp = self.bedrock.invoke_model(
-            modelId=HAIKU_MODEL_ID,
-            body=body,
-            contentType="application/json",
-            accept="application/json",
-        )
-        text = json.loads(resp["body"].read())["content"][0]["text"].strip()
+        text = chat(prompt, temperature=0.0, num_predict=256).strip()
 
         match = re.search(r"\[.*?\]", text, re.DOTALL)
         if match:
@@ -168,20 +140,8 @@ class HaikuReranker:
 
 # ---------- Učitavanje baze ----------
 
-def _load_entries(
-    local_path: Optional[Path] = None,
-    s3_bucket: Optional[str] = None,
-    s3_key: Optional[str] = None,
-) -> list[dict]:
-    """Učitaj unose iz S3 (Lambda) ili lokalnog fajla (CLI)."""
-    bucket = s3_bucket or S3_BUCKET
-    if bucket:
-        key = s3_key or S3_KEY
-        print(f"Učitavam bazu iz S3: s3://{bucket}/{key}")
-        s3 = boto3.client("s3")
-        obj = s3.get_object(Bucket=bucket, Key=key)
-        return json.loads(obj["Body"].read().decode("utf-8"))
-
+def _load_entries(local_path: Optional[Path] = None) -> list[dict]:
+    """Učitaj unose iz lokalnog baza.json fajla."""
     path = local_path or DEFAULT_BAZA
     print(f"Učitavam bazu iz lokalnog fajla: {path}")
     with Path(path).open(encoding="utf-8") as f:
@@ -199,8 +159,8 @@ class HybridRetriever:
         self.docs_tokens = [tokenize(_doc_text(e)) for e in entries]
         self.bm25 = BM25(self.docs_tokens)
 
-        print("Inicijaliziram Haiku reranker...")
-        self.reranker = HaikuReranker()
+        print("Inicijaliziram LLM reranker (Ollama)...")
+        self.reranker = LLMReranker()
 
     def add_entry(self, entry: dict) -> None:
         """Dodaj novi unos u in-memory retriever (bez ponovnog čitanja diska/S3)."""
@@ -231,7 +191,7 @@ class HybridRetriever:
 
         bm25_by_id = {c["id"]: c for c in candidates}
         out: list[dict] = []
-        for haiku_rank, eid in enumerate(ranked_ids, 1):
+        for llm_rank, eid in enumerate(ranked_ids, 1):
             entry = self.id_to_entry.get(eid)
             if entry is None:
                 continue
@@ -241,8 +201,8 @@ class HybridRetriever:
                 "opis": entry.get("opis"),
                 "dg": entry.get("dg"),
                 "keywords": entry.get("keywords"),
-                "score": 1.0 / haiku_rank,
-                "haiku_rank": haiku_rank,
+                "score": 1.0 / llm_rank,
+                "llm_rank": llm_rank,
                 "bm25_rank": bm.get("bm25_rank"),
                 "bm25_score": bm.get("bm25_score"),
             })

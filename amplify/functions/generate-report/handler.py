@@ -1,8 +1,14 @@
-import json
-import boto3
+"""
+Jednostavni single-shot handler (keywords → nalaz) preko lokalnog Ollama LLM-a.
 
-# Initialize Bedrock client
-bedrock = boto3.client(service_name='bedrock-runtime', region_name='us-east-1')
+Glavni tok aplikacije koristi orchestrator.lambda_handler; ovaj handler je
+alternativni minimalni entry point bez BM25 routera. Generiranje ide isključivo
+preko lokalnog Ollama servera (vidi llm.py) — bez Amazon Bedrocka.
+"""
+
+import json
+
+from llm import chat_json
 
 # System prompt for Croatian veterinary pathology report generation
 SYSTEM_PROMPT = '''
@@ -27,47 +33,6 @@ PRAVILA TOČNOSTI:
 OUTPUT:
 Vrati ISKLJUČIVO valjan JSON, bez markdown blokova, točno u ovom obliku:
 {"opis": "...", "dg": "..."}
-
---- example 1 ---
-USER:
-Keywords: subkutis, neutrofilan, infiltrativno, limfocitan, upala
-
-Generiraj {"opis": "...", "dg": "..."}.
-
-ASSISTANT:
-{"opis": "Dostavljeni uzorak tumora čine nepravilna gnijezda i otočići tumorskih stanica koji se pružaju od dubokog subkutisa do površinskog dermisa. Tumor raste infiltrativno, slabo je ograničen, a tumorske stanice pokazuju znatnu anizokariozu uz česte mitoze. U područjima nekroze prisutan je umjeren neutrofilni infiltrat, a u okolini tumora izražena je limfocitna upala.", "dg": "Tubulopapilarni karcinom mliječne žlijezde, stupanj malignosti II."}
-
---- example 2 ---
-USER:
-Keywords: epitelan, makrofag, neutrofilo, epitel, tubulo, piogranulomatozanin
-
-Generiraj {"opis": "...", "dg": "..."}.
-
-ASSISTANT:
-{"opis": "Dostavljen je uzorak mliječne žlijezde. Mliječni duktusi i tubuli su prošireni i ispunjeni pjenušavim makrofagima, toksično promijenjenim neutrofilima te deskvamiranim tubularnim epitelnim stanicama. Epitel duktusa je hiperplastičan s mjestimičnim papilarnim proliferacijama. U okolini je slabije izražen mononuklearni infiltrat te edem intersticija.", "dg": "Duktektazije i piogranulomatozni mastitis nepoznate etiologije."}
-
---- example 3 ---
-USER:
-Keywords: tri, limf, isti, limfocit, makrofag, neutrofil, plazma
-
-Generiraj {"opis": "...", "dg": "..."}.
-
-ASSISTANT:
-{"opis": "Dostavljeni su razmasci punktata limfnog čvora. Preparati su nisko do umjereno celularni s heterogenom populacijom stanica. Dominiraju zreli limfociti, uz manji udio većih limfoblasta te morfološki normalne makrofage, neutrofile i plazma stanice. U pozadini se nalaze brojna limfoglandularna tjelešca.", "dg": "Reaktivna hiperplazija limfnog čvora."}
-
-
-================================================================================
-USER TEMPLATE  (popunjavaš {keywords} za svaki primjer iz out.json)
-================================================================================
-Keywords: {keywords}
-
-Generiraj {"opis": "...", "dg": "..."}.
-
-
-================================================================================
-OUTPUT FORMAT  (model mora vratiti točno ovo)
-================================================================================
-{"opis": "...", "dg": "..."}
 '''
 
 def lambda_handler(event, context):
@@ -82,7 +47,7 @@ def lambda_handler(event, context):
             keywords = body.get('keywords', [])
         else:
             keywords = event.get('keywords', [])
-            
+
         keywords_str = ", ".join(keywords)
 
         prompt_text = (
@@ -90,32 +55,8 @@ def lambda_handler(event, context):
             'Generiraj {"opis": "...", "dg": "..."}.'
         )
 
-        model_id = 'us.anthropic.claude-haiku-4-5-20251001-v1:0'
-
-        request_body = json.dumps({
-            "anthropic_version": "bedrock-2023-05-31",
-            "max_tokens": 1000,
-            "system": [
-                {
-                    "type": "text",
-                    "text": SYSTEM_PROMPT,
-                    "cache_control": {"type": "ephemeral"},
-                }
-            ],
-            "messages": [
-                {"role": "user", "content": prompt_text}
-            ],
-        })
-
-        response = bedrock.invoke_model(
-            modelId=model_id,
-            body=request_body,
-            contentType='application/json',
-            accept='application/json'
-        )
-
-        response_body = json.loads(response.get('body').read())
-        return response_body['content'][0]['text']
+        # 2. Generiraj putem lokalnog Ollama LLM-a
+        return chat_json(SYSTEM_PROMPT, prompt_text)
 
     except Exception as e:
         print(f"Error: {str(e)}")

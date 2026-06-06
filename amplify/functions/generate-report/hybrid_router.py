@@ -1,14 +1,10 @@
 """
 BM25 retriever za veterinarsku patologiju.
 
-Podržava učitavanje baze iz lokalnog fajla (CLI) ili S3 (Lambda).
-Konfiguracija via env varijable:
-  BAZA_S3_BUCKET  — S3 bucket za bazu (ako nije postavljen, koristi lokalni fajl)
-  BAZA_S3_KEY     — S3 ključ (default: semantic-router/baza.json)
-  BEDROCK_REGION  — region za Bedrock pozive (default: us-east-1)
+Baza se učitava iz lokalnog baza.json fajla.
 
 API:
-  build_hybrid()  -> HybridRetriever   (koristi env var konfiguraciju)
+  build_hybrid()  -> HybridRetriever
   retriever.query(text, k=5) -> [{id, opis, dg, keywords, score, bm25_rank}]
 """
 
@@ -16,14 +12,11 @@ from __future__ import annotations
 
 import json
 import math
-import os
 import re
 import sys
 from collections import Counter
 from pathlib import Path
 from typing import Optional
-
-import boto3
 
 if hasattr(sys.stdout, "reconfigure"):
     try:
@@ -34,12 +27,6 @@ if hasattr(sys.stdout, "reconfigure"):
 
 
 DEFAULT_BAZA = Path(__file__).parent / "baza.json"
-
-# Bedrock cross-region inference — Lambda je u eu-north-1, Bedrock u us-east-1
-BEDROCK_REGION = os.environ.get("BEDROCK_REGION", "us-east-1")
-# S3 konfiguracija — postavlja se u Lambda env varijablama
-S3_BUCKET = os.environ.get("BAZA_S3_BUCKET")
-S3_KEY = os.environ.get("BAZA_S3_KEY", "semantic-router/baza.json")
 
 COMPONENT_TOP_K = 30
 DEFAULT_TOP_K = 5
@@ -116,20 +103,8 @@ class BM25:
 
 # ---------- Učitavanje baze ----------
 
-def _load_entries(
-    local_path: Optional[Path] = None,
-    s3_bucket: Optional[str] = None,
-    s3_key: Optional[str] = None,
-) -> list[dict]:
-    """Učitaj unose iz S3 (Lambda) ili lokalnog fajla (CLI)."""
-    bucket = s3_bucket or S3_BUCKET
-    if bucket:
-        key = s3_key or S3_KEY
-        print(f"Učitavam bazu iz S3: s3://{bucket}/{key}")
-        s3 = boto3.client("s3")
-        obj = s3.get_object(Bucket=bucket, Key=key)
-        return json.loads(obj["Body"].read().decode("utf-8"))
-
+def _load_entries(local_path: Optional[Path] = None) -> list[dict]:
+    """Učitaj unose iz lokalnog baza.json fajla."""
     path = local_path or DEFAULT_BAZA
     print(f"Učitavam bazu iz lokalnog fajla: {path}")
     with Path(path).open(encoding="utf-8") as f:

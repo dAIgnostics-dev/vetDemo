@@ -6,7 +6,7 @@ Pokretanje:
   python cli.py "limfocit, makrofag"   # jedan upit pa izlaz
 
 Naredbe u interaktivnom modu:
-  /v        toggle verbose (prikazuje haiku_rank, bm25_rank, keywords)
+  /v        toggle verbose (prikazuje llm_rank, bm25_rank, keywords)
   /q        izlaz
 """
 
@@ -25,7 +25,7 @@ from orchestrator import Orchestrator
 
 
 def _print_result(result: dict, verbose: bool) -> None:
-    source_tag = "[router]" if result["source"] == "router" else "[sonnet→baza]"
+    source_tag = "[router]" if result["source"] == "router" else "[llm→baza]"
     print(f"\n  {source_tag}")
     print(f"  Dg:   {result['dg']}")
     print(f"  Opis: {result['opis'][:200]}{'...' if len(result['opis']) > 200 else ''}")
@@ -33,7 +33,7 @@ def _print_result(result: dict, verbose: bool) -> None:
     if verbose and result["match"]:
         m = result["match"]
         print(
-            f"  haiku_rank={m.get('haiku_rank')}  "
+            f"  llm_rank={m.get('llm_rank')}  "
             f"bm25_rank={m.get('bm25_rank')}  "
             f"id={m.get('id')}"
         )

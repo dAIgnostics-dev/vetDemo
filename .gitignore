@@ -27,3 +27,11 @@ dist-ssr
 .amplify
 amplify_outputs*
 amplifyconfiguration*
+
+# local backend
+.env
+local/.env
+local/.venv
+local/vetdemo.db
+__pycache__/
+*.pyc

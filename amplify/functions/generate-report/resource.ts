@@ -2,7 +2,6 @@ import { Construct } from 'constructs';
 import { defineFunction } from '@aws-amplify/backend';
 import { Function, Runtime, Code } from 'aws-cdk-lib/aws-lambda';
 import { Duration } from 'aws-cdk-lib';
-import { PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -15,18 +14,13 @@ export const generateReport = defineFunction(
       runtime: Runtime.PYTHON_3_12,
       handler: 'orchestrator.lambda_handler',
       code: Code.fromAsset(path.resolve(__dirname)),
-      timeout: Duration.seconds(60),
+      timeout: Duration.seconds(120),
       environment: {
-        BEDROCK_REGION: 'us-east-1',
-        SONNET_MODEL_ID: 'us.anthropic.claude-haiku-4-5-20251001-v1:0',
+        // Generiranje ide preko lokalnog Ollama servera (vidi llm.py).
+        OLLAMA_HOST: process.env.OLLAMA_HOST || 'http://localhost:11434',
+        OLLAMA_MODEL: process.env.OLLAMA_MODEL || 'qwen2.5:7b-instruct',
       },
     });
-
-    fn.addToRolePolicy(new PolicyStatement({
-      effect: Effect.ALLOW,
-      actions: ['bedrock:InvokeModel'],
-      resources: ['*'],
-    }));
 
     return fn;
   }

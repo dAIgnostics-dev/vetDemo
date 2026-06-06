@@ -1,12 +1,10 @@
 """
-Orkestrira tok: keywords → semantic router → (fallback) Sonnet → write-back u bazu.
+Orkestrira tok: keywords → semantic router → (fallback) lokalni LLM → write-back u bazu.
 
-Konfiguracija via env varijable:
-  BAZA_S3_BUCKET  — S3 bucket (obavezno za Lambda; bez njega koristi lokalni fajl)
-  BAZA_S3_KEY     — S3 ključ (default: semantic-router/baza.json)
-  BEDROCK_REGION  — region za Bedrock (default: us-east-1)
+LLM generiranje ide preko lokalnog Ollama servera (vidi llm.py).
+Konfiguracija via env varijable: OLLAMA_HOST, OLLAMA_MODEL, OLLAMA_TIMEOUT.
 
-Lambda entry point: orchestrator.lambda_handler
+Entry point: orchestrator.lambda_handler
 CLI korištenje:
   from orchestrator import Orchestrator
   orch = Orchestrator()
@@ -16,24 +14,19 @@ CLI korištenje:
 from __future__ import annotations
 
 import json
-import os
+import re
 import uuid
 from pathlib import Path
 from typing import Optional
 
-import boto3
-
 from hybrid_router import (
     DEFAULT_BAZA,
-    BEDROCK_REGION,
-    S3_BUCKET,
-    S3_KEY,
     HybridRetriever,
     build_hybrid,
     get_retriever,
 )
 
-SONNET_MODEL_ID = "us.anthropic.claude-sonnet-4-6-20250514-v1:0"
+from llm import chat_json
 
 SYSTEM_PROMPT = """
 Ti si iskusan veterinarski patolog koji piše histopatološke i citološke nalaze na hrvatskom jeziku. Tvoj zadatak je iz zadane liste ključnih riječi (lematizirani medicinski pojmovi izvučeni iz originalnog nalaza) rekonstruirati:
@@ -64,7 +57,6 @@ class Orchestrator:
     def __init__(self, local_path: Optional[Path] = None):
         self.local_path = local_path or DEFAULT_BAZA
         self.retriever: HybridRetriever = build_hybrid(self.local_path)
-        self.bedrock = boto3.client("bedrock-runtime", region_name=BEDROCK_REGION)
 
     def query(self, keywords: list[str], k: int = 1) -> dict:
         """
@@ -74,7 +66,7 @@ class Orchestrator:
             {
                 "dg":     str,
                 "opis":   str,
-                "source": "router" | "sonnet",
+                "source": "router" | "llm",
                 "match":  dict | None
             }
         """
@@ -85,40 +77,24 @@ class Orchestrator:
             best = results[0]
             return {"dg": best["dg"], "opis": best["opis"], "source": "router", "match": best}
 
-        print("[orchestrator] Router nije pronašao podudaranje — pozivam Sonnet...")
-        dg, opis = self._call_sonnet(keywords)
+        print("[orchestrator] Router nije pronašao podudaranje — pozivam lokalni LLM (Ollama)...")
+        dg, opis = self._call_llm(keywords)
 
         new_entry = self._write_back(keywords, dg, opis)
         self.retriever.add_entry(new_entry)
         print(f"[orchestrator] Novi unos zapisan u bazu: id={new_entry['id']}")
 
-        return {"dg": dg, "opis": opis, "source": "sonnet", "match": None}
+        return {"dg": dg, "opis": opis, "source": "llm", "match": None}
 
-    def _call_sonnet(self, keywords: list[str]) -> tuple[str, str]:
+    def _call_llm(self, keywords: list[str]) -> tuple[str, str]:
         kw_str = ", ".join(kw.strip() for kw in keywords if kw.strip())
         prompt_text = f'Keywords: {kw_str}\n\nGeneriraj {{"opis": "...", "dg": "..."}}.'
 
-        body = json.dumps({
-            "anthropic_version": "bedrock-2023-05-31",
-            "max_tokens": 1000,
-            "system": [
-                {
-                    "type": "text",
-                    "text": SYSTEM_PROMPT,
-                    "cache_control": {"type": "ephemeral"},
-                }
-            ],
-            "messages": [{"role": "user", "content": prompt_text}],
-        })
-
-        resp = self.bedrock.invoke_model(
-            modelId=SONNET_MODEL_ID,
-            body=body,
-            contentType="application/json",
-            accept="application/json",
-        )
-        text = json.loads(resp["body"].read())["content"][0]["text"].strip()
-        parsed = json.loads(text)
+        text = chat_json(SYSTEM_PROMPT, prompt_text).strip()
+        match = re.search(r"\{.*\}", text, re.DOTALL)
+        if not match:
+            raise ValueError(f"Model nije vratio valjan JSON: {text[:200]}")
+        parsed = json.loads(match.group())
         return parsed["dg"], parsed["opis"]
 
     def _write_back(self, keywords: list[str], dg: str, opis: str) -> dict:
@@ -128,26 +104,8 @@ class Orchestrator:
             "dg": dg,
             "opis": opis,
         }
-
-        if S3_BUCKET:
-            self._write_back_s3(new_entry)
-        else:
-            self._write_back_local(new_entry)
-
+        self._write_back_local(new_entry)
         return new_entry
-
-    def _write_back_s3(self, new_entry: dict) -> None:
-        s3 = boto3.client("s3")
-        obj = s3.get_object(Bucket=S3_BUCKET, Key=S3_KEY)
-        entries = json.loads(obj["Body"].read().decode("utf-8"))
-        entries.append(new_entry)
-        s3.put_object(
-            Bucket=S3_BUCKET,
-            Key=S3_KEY,
-            Body=json.dumps(entries, ensure_ascii=False, indent=2).encode("utf-8"),
-            ContentType="application/json",
-        )
-        print(f"[orchestrator] Zapisano u S3: s3://{S3_BUCKET}/{S3_KEY}")
 
     def _write_back_local(self, new_entry: dict) -> None:
         with self.local_path.open(encoding="utf-8") as f:
@@ -164,19 +122,10 @@ _orchestrator: Optional[Orchestrator] = None
 
 
 def _get_orchestrator() -> Orchestrator:
-    """Vrati cached Orchestrator — inicijalizira se samo na cold startu."""
+    """Vrati cached Orchestrator — inicijalizira se samo jednom (cold start)."""
     global _orchestrator
     if _orchestrator is None:
-        # Za Lambda: retriever se gradi iz S3 via get_retriever()
-        # Za CLI: pad-through na lokalnu bazu
-        if S3_BUCKET:
-            orch = object.__new__(Orchestrator)
-            orch.local_path = DEFAULT_BAZA
-            orch.retriever = get_retriever()
-            orch.bedrock = boto3.client("bedrock-runtime", region_name=BEDROCK_REGION)
-            _orchestrator = orch
-        else:
-            _orchestrator = Orchestrator()
+        _orchestrator = Orchestrator()
     return _orchestrator
 
 
@@ -187,7 +136,7 @@ def lambda_handler(event, context):
     AWS Lambda entry point — kompatibilan s postojećim AppSync/Amplify setupom.
 
     Ulaz (AppSync mutation):  event.arguments.keywords = ["kw1", "kw2", ...]
-    Izlaz: JSON string {"opis": "...", "dg": "...", "source": "router"|"sonnet"}
+    Izlaz: JSON string {"opis": "...", "dg": "...", "source": "router"|"llm"}
     """
     keywords: list[str] = []
     if "arguments" in event:
