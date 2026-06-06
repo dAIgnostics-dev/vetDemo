@@ -95,11 +95,6 @@ class Orchestrator:
         """
         print("[orchestrator] Generiram nalaz putem lokalnog LLM-a (Ollama)...")
         dg, opis = self._call_llm(keywords)
-
-        new_entry = self._write_back(keywords, dg, opis)
-        self.retriever.add_entry(new_entry)
-        print(f"[orchestrator] Novi unos zapisan u bazu: id={new_entry['id']}")
-
         return {"source": "llm", "results": [{"dg": dg, "opis": opis}]}
 
     def _call_llm(self, keywords: list[str]) -> tuple[str, str]:

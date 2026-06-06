@@ -39,6 +39,8 @@ function GeneratorContent({ signOut, user }) {
   const [searchLoading, setSearchLoading] = useState(false);
   const [noDbResults, setNoDbResults] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [accepting, setAccepting] = useState(false);
+  const [accepted, setAccepted] = useState(false);
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
@@ -99,6 +101,7 @@ function GeneratorContent({ signOut, user }) {
     setLoading(true);
     setReport('');
     setNoDbResults(false);
+    setAccepted(false);
     try {
       const { data, errors } = await client.mutations.generateReport({
         keywords: keywords.filter(k => k.trim() !== '')
@@ -385,8 +388,27 @@ function GeneratorContent({ signOut, user }) {
     setEditedOpis('');
     setEditedDg('');
     setNoDbResults(false);
+    setAccepted(false);
     setShowHistory(false);
     setShowProfile(false);
+  };
+
+  const acceptGenerated = async () => {
+    const dg = selectedIdx !== null ? editedDg : results[0]?.dg || '';
+    const opis = selectedIdx !== null ? editedOpis : results[0]?.opis || '';
+    setAccepting(true);
+    try {
+      await client.acceptGenerated({
+        keywords: keywords.filter(k => k.trim() !== ''),
+        dg,
+        opis,
+      });
+      setAccepted(true);
+    } catch (e) {
+      alert('Greška pri dodavanju u bazu: ' + e.message);
+    } finally {
+      setAccepting(false);
+    }
   };
 
   const loadFromHistory = (item) => {
@@ -653,6 +675,49 @@ function GeneratorContent({ signOut, user }) {
                 Odaberi jedan nalaz za uređivanje, spremanje ili PDF izvoz.
               </p>
             )}
+            {resultSource === 'llm' && (
+              <div style={{
+                marginBottom: '1.25rem',
+                padding: '1rem 1.25rem',
+                background: accepted ? 'rgba(34,197,94,0.08)' : 'rgba(245,158,11,0.08)',
+                border: `1px solid ${accepted ? 'rgba(34,197,94,0.3)' : 'rgba(245,158,11,0.3)'}`,
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '0.75rem',
+              }}>
+                {accepted ? (
+                  <span style={{ fontSize: '0.9rem', color: '#16a34a', fontWeight: 600 }}>
+                    Nalaz dodan u bazu znanja.
+                  </span>
+                ) : (
+                  <>
+                    <span style={{ fontSize: '0.875rem', color: '#92400e' }}>
+                      Nalaz nije još dodan u bazu. Prihvati ga ili generiraj novi.
+                    </span>
+                    <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+                      <button
+                        className="btn btn-secondary btn-sm"
+                        onClick={generateReport}
+                        disabled={loading || accepting}
+                      >
+                        Generiraj opet
+                      </button>
+                      <button
+                        className="btn btn-primary btn-sm"
+                        onClick={acceptGenerated}
+                        disabled={accepting || loading}
+                      >
+                        {accepting ? <div className="loading-spinner" style={{ width: 16, height: 16, borderWidth: 2 }} /> : 'Prihvati'}
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {results.map((r, i) => {
                 const isSelected = selectedIdx === i;

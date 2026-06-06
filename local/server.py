@@ -179,6 +179,25 @@ def delete_diagnosis(user, diag_id):
 
 # ---------- LLM / Router (Lambda zamjena) ----------
 
+@app.post("/accept-generated")
+@require_auth
+def accept_generated(user):
+    """Spremi LLM-generirani nalaz u baza.json (samo kad korisnik klikne Prihvati)."""
+    body = request.get_json(force=True) or {}
+    keywords = [k for k in (body.get("keywords") or []) if str(k).strip()]
+    dg = (body.get("dg") or "").strip()
+    opis = (body.get("opis") or "").strip()
+    if not dg or not opis:
+        return jsonify({"error": "dg i opis su obavezni"}), 400
+    try:
+        orch = orchestrator._get_orchestrator()
+        new_entry = orch._write_back(keywords, dg, opis)
+        orch.retriever.add_entry(new_entry)
+        return jsonify({"ok": True, "id": new_entry["id"]})
+    except Exception as e:
+        app.logger.exception("accept-generated failed")
+        return jsonify({"errors": [{"message": str(e)}]}), 500
+
 def _keywords_from_request() -> list[str]:
     body = request.get_json(force=True) or {}
     return [k for k in (body.get("keywords") or []) if str(k).strip()]

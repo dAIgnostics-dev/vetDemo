@@ -1741,5 +1741,29 @@
     "dg": "Mastocitom; stupanj malignosti I (dvostupanjska klasifikacija i trostupanjska klasifikacija)",
     "keywords": "intradermalna, marginama, epidermisa, dubokim, mastocita, membrane, difuznih, epidermisa sastoji, nakupina gusto, membrane epidermisa",
     "keywords_original": "mastocit, koža, infiltrativan, epidermis, granula, eozinofil"
+  },
+  {
+    "id": "gen_f0277490",
+    "keywords": "degenerativna mijelpatija, aksoni, demijelinizacija, leđna moždina",
+    "dg": "Degenerativna mijelpatija leđne moždine.",
+    "opis": "Dostavljen je uzorak od leđne moždine. Mikroskopski opis: Pristupačni materijal sadrži aksoni s degenerativnim promjenama, okruženi demijeliniziranim zaližnicima."
+  },
+  {
+    "id": "gen_7bd1425e",
+    "keywords": "degenerativna mijelpatija, aksoni, demijelinizacija, leđna moždina",
+    "dg": "Degenerativna mijelpatija s prevladavim demijeliniziranim aksonima.",
+    "opis": "Dostavljen je uzorak od leđne možedice koja pokazuje na presjek različitih sekcija tkiva. Primarni opseg analize uvijek uključuje mikroskopski pregled, a ovdje se nalazi promjena u obliku degenerativnih mijelpatija s prevladavim aksonima i demijelinizacije."
+  },
+  {
+    "id": "gen_859b380b",
+    "keywords": "perikarditis, fibrin, neutrofil, eksudativni, pas",
+    "dg": "Reaktivna perikarditis",
+    "opis": "Dostavljen je uzorak perikarda iz pasova. Mikroskopski opis pokazuje na prekidan fibrinov eksudat s prevladajućim infiltratom neutrofilske krvne šarne. Strukturirana tkiva nije otkrivena, što sugeriše reaktivnu etiologiju."
+  },
+  {
+    "id": "gen_54ddd05e",
+    "keywords": "granulomatozni hepatitis, makrofag, epiteloidna stanica, mačka",
+    "dg": "Granulomatozna hepatitis plicacijskog žlijezda",
+    "opis": "Dostavljen je uzorak otoka plicacijskog žlijezda od mačke. Mikroskopski opis pokazuje granulomatoznu hepatitis s prevladavim epiteloidnim stanicama i okupljanjem makrofagova. Neplastične karakteristike uključuju intenzivni infiltrat granulomaformnog tipa."
   }
 ]

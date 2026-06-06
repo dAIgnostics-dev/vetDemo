@@ -123,6 +123,13 @@ export const client = {
     },
   },
 
+  async acceptGenerated({ keywords, dg, opis }) {
+    return request('/accept-generated', {
+      method: 'POST',
+      body: { keywords, dg, opis },
+    });
+  },
+
   // client.graphql({ query, variables }) — koristi se samo za searchDatabase.
   // Vraćamo { data: <json string>, errors }; App radi data?.searchDatabase ?? data.
   async graphql({ variables } = {}) {
