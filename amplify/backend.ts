@@ -39,7 +39,7 @@ generateReportFn.addToRolePolicy(
   })
 );
 
-// Grant authenticated users permission to call Bedrock directly (for voice input cleanup)
+// Grant authenticated users permission to call Bedrock and Transcribe directly (for voice input)
 const authRole = backend.auth.resources.authenticatedUserIamRole;
 
 authRole.addToPrincipalPolicy(
@@ -50,5 +50,13 @@ authRole.addToPrincipalPolicy(
       'arn:aws:bedrock:*::foundation-model/*',
       'arn:aws:bedrock:*:*:inference-profile/*'
     ],
+  })
+);
+
+authRole.addToPrincipalPolicy(
+  new PolicyStatement({
+    effect: Effect.ALLOW,
+    actions: ['transcribe:StartStreamTranscription'],
+    resources: ['*'],
   })
 );

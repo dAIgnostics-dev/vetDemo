@@ -27,6 +27,7 @@ import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { fetchUserAttributes, updateUserAttributes, updatePassword, fetchAuthSession } from 'aws-amplify/auth';
 import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
+import { TranscribeStreamingClient, StartStreamTranscriptionCommand } from '@aws-sdk/client-transcribe-streaming';
 import '@aws-amplify/ui-react/styles.css';
 import outputs from '../amplify_outputs.json';
 import { translations } from './translations';
@@ -35,38 +36,111 @@ import './index.css';
 Amplify.configure(outputs);
 const client = generateClient();
 
-// ─── Bedrock TEXT helper (runs client-side with Cognito credentials) ───
-const BEDROCK_REGION = 'us-east-1';
+// ─── Constants ───
+const AWS_REGION = 'us-east-1';
 const BEDROCK_MODEL_ID = 'us.anthropic.claude-haiku-4-5-20251001-v1:0';
 
-async function processTextWithBedrock(rawText, mode, lang) {
+// ─── Audio helpers: convert MediaRecorder output → PCM for Transcribe ───
+function downsampleBuffer(buffer, inputRate, outputRate) {
+  if (inputRate === outputRate) return buffer;
+  const ratio = inputRate / outputRate;
+  const newLength = Math.round(buffer.length / ratio);
+  const result = new Float32Array(newLength);
+  for (let i = 0; i < newLength; i++) {
+    const srcIdx = i * ratio;
+    const lo = Math.floor(srcIdx);
+    const hi = Math.min(lo + 1, buffer.length - 1);
+    const frac = srcIdx - lo;
+    result[i] = buffer[lo] * (1 - frac) + buffer[hi] * frac;
+  }
+  return result;
+}
+
+function float32ToInt16(float32) {
+  const int16 = new Int16Array(float32.length);
+  for (let i = 0; i < float32.length; i++) {
+    const s = Math.max(-1, Math.min(1, float32[i]));
+    int16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+  }
+  return int16;
+}
+
+// ─── Amazon Transcribe Streaming: audio blob → text ───
+async function transcribeAudioBlob(audioBlob, lang) {
+  const session = await fetchAuthSession();
+  const credentials = session.credentials;
+  if (!credentials) throw new Error('No credentials');
+
+  const transcribeClient = new TranscribeStreamingClient({
+    region: AWS_REGION,
+    credentials,
+  });
+
+  // Decode audio blob to PCM via AudioContext
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const arrayBuffer = await audioBlob.arrayBuffer();
+  const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+  const mono = audioBuffer.getChannelData(0);
+  const pcm16kHz = downsampleBuffer(mono, audioBuffer.sampleRate, 16000);
+  const pcmInt16 = float32ToInt16(pcm16kHz);
+  const pcmBytes = new Uint8Array(pcmInt16.buffer);
+  audioCtx.close();
+
+  // Stream audio to Transcribe in chunks
+  const CHUNK = 4096;
+  async function* audioStream() {
+    for (let i = 0; i < pcmBytes.length; i += CHUNK) {
+      yield { AudioEvent: { AudioChunk: pcmBytes.slice(i, i + CHUNK) } };
+    }
+  }
+
+  const command = new StartStreamTranscriptionCommand({
+    LanguageCode: lang === 'hr' ? 'hr-HR' : 'en-US',
+    MediaEncoding: 'pcm',
+    MediaSampleRateHertz: 16000,
+    AudioStream: audioStream(),
+  });
+
+  const response = await transcribeClient.send(command);
+
+  let transcript = '';
+  for await (const event of response.TranscriptResultStream) {
+    const results = event.TranscriptEvent?.Transcript?.Results || [];
+    for (const r of results) {
+      if (!r.IsPartial) {
+        transcript += (r.Alternatives?.[0]?.Transcript || '') + ' ';
+      }
+    }
+  }
+  return transcript.trim();
+}
+
+// ─── Bedrock text cleanup (transcribed text → clean text / keywords) ───
+async function cleanupWithBedrock(rawText, mode, lang) {
   try {
     const session = await fetchAuthSession();
     const credentials = session.credentials;
     if (!credentials) throw new Error('No credentials');
 
     const bedrockClient = new BedrockRuntimeClient({
-      region: BEDROCK_REGION,
+      region: AWS_REGION,
       credentials,
     });
 
     let systemPrompt, userMessage;
     if (mode === 'details') {
-      systemPrompt = 'You are a veterinary medical transcription assistant. You receive raw speech-to-text transcriptions from veterinarians dictating case descriptions. Clean up the text into a professional, concise veterinary case description. Fix grammar, remove filler words (um, uh, like, so), and format properly. Preserve ALL clinical information. Return ONLY the cleaned text, nothing else.';
+      systemPrompt = 'You are a veterinary medical transcription assistant. Clean up raw speech-to-text into a professional, concise veterinary case description. Fix grammar, remove filler words (um, uh, like, so), and format properly. Preserve ALL clinical information. Return ONLY the cleaned text, nothing else.';
       userMessage = `Clean up this dictated veterinary case description. The text is in ${lang === 'hr' ? 'Croatian' : 'English'}. Return ONLY the cleaned professional text:\n\n${rawText}`;
     } else {
-      systemPrompt = 'You are a veterinary keyword extraction assistant. You receive raw speech-to-text transcriptions from veterinarians dictating clinical observations. Extract individual clinical keywords or observations. Return ONLY a JSON array of strings, each being one keyword/observation. Examples: ["limping", "elevated temperature", "loss of appetite"]. Remove filler words and duplicates. Return ONLY the JSON array, no other text.';
-      userMessage = `Extract clinical keywords from this dictated text. The text is in ${lang === 'hr' ? 'Croatian' : 'English'}. Return ONLY a JSON array of keyword strings:\n\n${rawText}`;
+      systemPrompt = 'You are a veterinary keyword extraction assistant. Extract individual clinical keywords or observations from raw speech-to-text. Return ONLY a JSON array of strings. Examples: ["limping", "elevated temperature", "loss of appetite"]. Remove filler words and duplicates. Return ONLY the JSON array, no other text.';
+      userMessage = `Extract clinical keywords from this dictated text. The text is in ${lang === 'hr' ? 'Croatian' : 'English'}. Return ONLY a JSON array:\n\n${rawText}`;
     }
 
     const body = JSON.stringify({
       anthropic_version: 'bedrock-2023-05-31',
       max_tokens: 1024,
       system: systemPrompt,
-      messages: [{
-        role: 'user',
-        content: userMessage,
-      }],
+      messages: [{ role: 'user', content: userMessage }],
     });
 
     const command = new InvokeModelCommand({
@@ -82,83 +156,61 @@ async function processTextWithBedrock(rawText, mode, lang) {
 
     if (mode === 'keywords') {
       const match = resultText.match(/\[[\s\S]*?\]/);
-      if (match) {
-        return { type: 'keywords', data: JSON.parse(match[0]) };
-      }
+      if (match) return { type: 'keywords', data: JSON.parse(match[0]) };
       return { type: 'keywords', data: resultText.split(',').map(k => k.trim().replace(/^["']|["']$/g, '')).filter(Boolean) };
     }
-
     return { type: 'text', data: resultText.trim() };
   } catch (err) {
-    console.error('Bedrock text processing error:', err);
+    console.error('Bedrock cleanup error:', err);
     return null;
   }
 }
 
-// ─── Cross-browser voice input hook using SpeechRecognition ───
-const SpeechRecognition = typeof window !== 'undefined'
-  ? (window.SpeechRecognition || window.webkitSpeechRecognition)
-  : null;
-
+// ─── Cross-browser voice input hook using MediaRecorder ───
 function useVoiceInput() {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const recognitionRef = useRef(null);
-  const transcriptRef = useRef('');
+  const recorderRef = useRef(null);
+  const chunksRef = useRef([]);
+  const streamRef = useRef(null);
   const onResultRef = useRef(null);
 
-  const startRecording = useCallback(async (onResult, langCode) => {
-    if (!SpeechRecognition) {
-      return false;
-    }
+  const startRecording = useCallback(async (onResult) => {
     try {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = false;
-      recognition.lang = langCode === 'hr' ? 'hr-HR' : 'en-US';
-      transcriptRef.current = '';
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+      const recorder = new MediaRecorder(stream);
+      chunksRef.current = [];
       onResultRef.current = onResult;
 
-      recognition.onresult = (event) => {
-        let transcript = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          if (event.results[i].isFinal) {
-            transcript += event.results[i][0].transcript + ' ';
-          }
-        }
-        transcriptRef.current += transcript;
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
       };
 
-      recognition.onerror = (event) => {
-        console.error('SpeechRecognition error:', event.error);
-        // Don't treat 'no-speech' as a fatal error — user just didn't say anything yet
-        if (event.error !== 'no-speech' && event.error !== 'aborted') {
-          setIsRecording(false);
+      recorder.onstop = () => {
+        const blob = new Blob(chunksRef.current, { type: recorder.mimeType });
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach(t => t.stop());
+          streamRef.current = null;
         }
-      };
-
-      recognition.onend = () => {
         setIsRecording(false);
-        const finalText = transcriptRef.current.trim();
-        if (finalText && onResultRef.current) {
-          onResultRef.current(finalText);
-        }
+        if (blob.size > 0 && onResultRef.current) onResultRef.current(blob);
       };
 
-      recognitionRef.current = recognition;
-      recognition.start();
+      recorderRef.current = recorder;
+      recorder.start();
       setIsRecording(true);
       return true;
     } catch (err) {
-      console.error('SpeechRecognition start error:', err);
+      console.error('Microphone access error:', err);
       setIsRecording(false);
       return false;
     }
   }, []);
 
   const stopRecording = useCallback(() => {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
+    if (recorderRef.current && recorderRef.current.state !== 'inactive') {
+      recorderRef.current.stop();
     }
   }, []);
 
@@ -244,28 +296,25 @@ function GeneratorContent({ signOut, user }) {
     if (detailsVoice.isRecording) {
       detailsVoice.stopRecording();
     } else {
-      const started = await detailsVoice.startRecording(async (rawText) => {
-        // rawText is the speech-to-text transcript from SpeechRecognition
+      const started = await detailsVoice.startRecording(async (audioBlob) => {
         detailsVoice.setIsProcessing(true);
         try {
-          const result = await processTextWithBedrock(rawText, 'details', lang);
-          if (result && result.data) {
-            setDetails(prev => prev ? prev + '\n' + result.data : result.data);
-          } else {
-            // Bedrock cleanup failed — fall back to raw transcription
-            setDetails(prev => prev ? prev + '\n' + rawText : rawText);
-          }
+          // Step 1: Transcribe audio → text
+          const rawText = await transcribeAudioBlob(audioBlob, lang);
+          if (!rawText) { alert(t('voice_error')); return; }
+
+          // Step 2: Clean up with Bedrock
+          const result = await cleanupWithBedrock(rawText, 'details', lang);
+          const cleanText = result?.data || rawText;
+          setDetails(prev => prev ? prev + '\n' + cleanText : cleanText);
         } catch (err) {
-          console.error('Voice details processing error:', err);
-          // Still use the raw transcript so the user isn't left empty-handed
-          setDetails(prev => prev ? prev + '\n' + rawText : rawText);
+          console.error('Voice details error:', err);
+          alert(t('voice_error'));
         } finally {
           detailsVoice.setIsProcessing(false);
         }
-      }, lang);
-      if (!started) {
-        alert(t('voice_not_supported'));
-      }
+      });
+      if (!started) alert(t('voice_not_supported'));
     }
   };
 
@@ -273,60 +322,45 @@ function GeneratorContent({ signOut, user }) {
     if (keywordsVoice.isRecording) {
       keywordsVoice.stopRecording();
     } else {
-      const started = await keywordsVoice.startRecording(async (rawText) => {
-        // rawText is the speech-to-text transcript from SpeechRecognition
+      const started = await keywordsVoice.startRecording(async (audioBlob) => {
         keywordsVoice.setIsProcessing(true);
         try {
-          const result = await processTextWithBedrock(rawText, 'keywords', lang);
-          if (result && result.type === 'keywords' && Array.isArray(result.data)) {
+          // Step 1: Transcribe audio → text
+          const rawText = await transcribeAudioBlob(audioBlob, lang);
+          if (!rawText) { alert(t('voice_error')); return; }
+
+          // Step 2: Extract keywords with Bedrock
+          const result = await cleanupWithBedrock(rawText, 'keywords', lang);
+          if (result?.type === 'keywords' && Array.isArray(result.data)) {
             setKeywords(prev => {
-              const newKeywords = [...prev];
-              let insertIdx = 0;
+              const newKw = [...prev];
+              let idx = 0;
               for (const kw of result.data) {
-                while (insertIdx < newKeywords.length && newKeywords[insertIdx].trim() !== '') {
-                  insertIdx++;
-                }
-                if (insertIdx < newKeywords.length) {
-                  newKeywords[insertIdx] = kw;
-                } else {
-                  newKeywords.push(kw);
-                }
-                insertIdx++;
+                while (idx < newKw.length && newKw[idx].trim() !== '') idx++;
+                if (idx < newKw.length) newKw[idx] = kw;
+                else newKw.push(kw);
+                idx++;
               }
-              return newKeywords;
+              return newKw;
             });
           } else {
-            // Bedrock extraction failed — put the raw text in the first empty keyword slot
+            // Fallback: put raw transcript in first empty slot
             setKeywords(prev => {
-              const newKeywords = [...prev];
-              const emptyIdx = newKeywords.findIndex(k => k.trim() === '');
-              if (emptyIdx >= 0) {
-                newKeywords[emptyIdx] = rawText;
-              } else {
-                newKeywords.push(rawText);
-              }
-              return newKeywords;
+              const newKw = [...prev];
+              const empty = newKw.findIndex(k => k.trim() === '');
+              if (empty >= 0) newKw[empty] = rawText;
+              else newKw.push(rawText);
+              return newKw;
             });
           }
         } catch (err) {
-          console.error('Voice keywords processing error:', err);
-          setKeywords(prev => {
-            const newKeywords = [...prev];
-            const emptyIdx = newKeywords.findIndex(k => k.trim() === '');
-            if (emptyIdx >= 0) {
-              newKeywords[emptyIdx] = rawText;
-            } else {
-              newKeywords.push(rawText);
-            }
-            return newKeywords;
-          });
+          console.error('Voice keywords error:', err);
+          alert(t('voice_error'));
         } finally {
           keywordsVoice.setIsProcessing(false);
         }
-      }, lang);
-      if (!started) {
-        alert(t('voice_not_supported'));
-      }
+      });
+      if (!started) alert(t('voice_not_supported'));
     }
   };
 
