@@ -37,7 +37,13 @@ export const translations = {
     profile_instructions: "Update your name and change your password below.",
     close: "Close",
     search_btn: "Search Database",
-    no_db_results: "No matching records found in the database."
+    no_db_results: "No matching records found in the database.",
+    voice_input_start: "Start voice input",
+    voice_input_stop: "Stop recording",
+    voice_processing: "Processing speech...",
+    voice_not_supported: "Voice input is not supported in this browser. Please use Chrome or Edge.",
+    voice_error: "Voice input error. Please try again.",
+    voice_cleanup_failed: "Could not clean up speech. Using raw transcription."
   },
   hr: {
     app_title: "dAIgnostics Studio",
@@ -77,6 +83,12 @@ export const translations = {
     profile_instructions: "Ažurirajte svoje ime i promijenite lozinku ispod.",
     close: "Zatvori",
     search_btn: "Pretraži Bazu",
-    no_db_results: "Nema odgovarajućih nalaza u bazi podataka."
+    no_db_results: "Nema odgovarajućih nalaza u bazi podataka.",
+    voice_input_start: "Započni glasovni unos",
+    voice_input_stop: "Zaustavi snimanje",
+    voice_processing: "Obrada govora...",
+    voice_not_supported: "Glasovni unos nije podržan u ovom pregledniku. Koristite Chrome ili Edge.",
+    voice_error: "Greška glasovnog unosa. Pokušajte ponovo.",
+    voice_cleanup_failed: "Nije moguće obraditi govor. Koristi se neobrađeni transkript."
   }
 };

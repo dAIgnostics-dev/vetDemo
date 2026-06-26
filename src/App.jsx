@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Amplify } from 'aws-amplify';
 import { generateClient } from 'aws-amplify/data';
 import { Authenticator } from '@aws-amplify/ui-react';
@@ -19,11 +19,14 @@ import {
   Globe,
   Lock,
   ShieldCheck,
-  Search
+  Search,
+  Mic,
+  MicOff
 } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
-import { fetchUserAttributes, updateUserAttributes, updatePassword } from 'aws-amplify/auth';
+import { fetchUserAttributes, updateUserAttributes, updatePassword, fetchAuthSession } from 'aws-amplify/auth';
+import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 import '@aws-amplify/ui-react/styles.css';
 import outputs from '../amplify_outputs.json';
 import { translations } from './translations';
@@ -31,6 +34,130 @@ import './index.css';
 
 Amplify.configure(outputs);
 const client = generateClient();
+
+// ─── Bedrock cleanup helper (runs client-side with Cognito credentials) ───
+const BEDROCK_REGION = 'us-east-1';
+const BEDROCK_MODEL_ID = 'us.anthropic.claude-3-haiku-20240307-v1:0';
+
+async function cleanupWithBedrock(rawText, mode, lang) {
+  try {
+    const session = await fetchAuthSession();
+    const credentials = session.credentials;
+    if (!credentials) throw new Error('No credentials');
+
+    const bedrockClient = new BedrockRuntimeClient({
+      region: BEDROCK_REGION,
+      credentials,
+    });
+
+    let systemPrompt, userPrompt;
+
+    if (mode === 'details') {
+      systemPrompt = 'You are a veterinary medical transcription assistant. Clean up dictated text into professional, concise veterinary case descriptions. Fix grammar, remove filler words (um, uh, like, so), and format properly. Preserve ALL clinical information. Return ONLY the cleaned text, nothing else.';
+      userPrompt = `Clean up this dictated veterinary case description:\n\n"${rawText}"`;
+    } else {
+      // mode === 'keywords'
+      systemPrompt = 'You are a veterinary keyword extraction assistant. Given dictated text, extract individual clinical keywords or observations. Return ONLY a JSON array of strings, each being one keyword/observation. Examples: ["limping", "elevated temperature", "loss of appetite"]. Remove filler words and duplicates. Return ONLY the JSON array, no other text.';
+      userPrompt = `Extract clinical keywords from this dictated text:\n\n"${rawText}"`;
+    }
+
+    const body = JSON.stringify({
+      anthropic_version: 'bedrock-2023-05-31',
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages: [
+        { role: 'user', content: userPrompt }
+      ],
+    });
+
+    const command = new InvokeModelCommand({
+      modelId: BEDROCK_MODEL_ID,
+      contentType: 'application/json',
+      accept: 'application/json',
+      body: new TextEncoder().encode(body),
+    });
+
+    const response = await bedrockClient.send(command);
+    const responseBody = JSON.parse(new TextDecoder().decode(response.body));
+    const resultText = responseBody.content?.[0]?.text || '';
+
+    if (mode === 'keywords') {
+      // Parse the JSON array of keywords
+      const match = resultText.match(/\[([\s\S]*?)\]/);
+      if (match) {
+        return JSON.parse(match[0]);
+      }
+      // Fallback: split by commas
+      return resultText.split(',').map(k => k.trim().replace(/^["']|["']$/g, '')).filter(Boolean);
+    }
+
+    return resultText.trim();
+  } catch (err) {
+    console.error('Bedrock cleanup error:', err);
+    return null; // Signals fallback to raw text
+  }
+}
+
+// ─── Voice input hook using Web Speech API ───
+function useVoiceInput(lang) {
+  const [isRecording, setIsRecording] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const recognitionRef = useRef(null);
+  const transcriptRef = useRef('');
+  const onResultRef = useRef(null);
+
+  const isSupported = typeof window !== 'undefined' && 
+    (window.SpeechRecognition || window.webkitSpeechRecognition);
+
+  const startRecording = useCallback((onResult) => {
+    if (!isSupported) return false;
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    recognition.lang = lang === 'hr' ? 'hr-HR' : 'en-US';
+
+    transcriptRef.current = '';
+    onResultRef.current = onResult;
+
+    recognition.onresult = (event) => {
+      let finalTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript + ' ';
+        }
+      }
+      transcriptRef.current += finalTranscript;
+    };
+
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error:', event.error);
+      setIsRecording(false);
+    };
+
+    recognition.onend = () => {
+      setIsRecording(false);
+      const finalText = transcriptRef.current.trim();
+      if (finalText && onResultRef.current) {
+        onResultRef.current(finalText);
+      }
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+    setIsRecording(true);
+    return true;
+  }, [isSupported, lang]);
+
+  const stopRecording = useCallback(() => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+    }
+  }, []);
+
+  return { isRecording, isProcessing, setIsProcessing, startRecording, stopRecording, isSupported };
+}
 
 function GeneratorContent({ signOut, user }) {
   const [lang, setLang] = useState(localStorage.getItem('vet_lang') || 'en');
@@ -51,6 +178,10 @@ function GeneratorContent({ signOut, user }) {
   const [showProfile, setShowProfile] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [userProfile, setUserProfile] = useState({ firstName: '', lastName: '' });
+
+  // Voice input hooks — one for details, one for keywords
+  const detailsVoice = useVoiceInput(lang);
+  const keywordsVoice = useVoiceInput(lang);
 
   const t = (key) => translations[lang][key] || key;
 
@@ -100,6 +231,94 @@ function GeneratorContent({ signOut, user }) {
 
   const addKeywordField = () => {
     setKeywords([...keywords, '']);
+  };
+
+  // ─── Voice handlers ───
+  const handleDetailsVoice = () => {
+    if (!detailsVoice.isSupported) {
+      alert(t('voice_not_supported'));
+      return;
+    }
+    if (detailsVoice.isRecording) {
+      detailsVoice.stopRecording();
+    } else {
+      detailsVoice.startRecording(async (rawText) => {
+        detailsVoice.setIsProcessing(true);
+        try {
+          const cleaned = await cleanupWithBedrock(rawText, 'details', lang);
+          if (cleaned) {
+            setDetails(prev => prev ? prev + '\n' + cleaned : cleaned);
+          } else {
+            // Fallback to raw transcription
+            setDetails(prev => prev ? prev + '\n' + rawText : rawText);
+          }
+        } catch (err) {
+          setDetails(prev => prev ? prev + '\n' + rawText : rawText);
+        } finally {
+          detailsVoice.setIsProcessing(false);
+        }
+      });
+    }
+  };
+
+  const handleKeywordsVoice = () => {
+    if (!keywordsVoice.isSupported) {
+      alert(t('voice_not_supported'));
+      return;
+    }
+    if (keywordsVoice.isRecording) {
+      keywordsVoice.stopRecording();
+    } else {
+      keywordsVoice.startRecording(async (rawText) => {
+        keywordsVoice.setIsProcessing(true);
+        try {
+          const extractedKeywords = await cleanupWithBedrock(rawText, 'keywords', lang);
+          if (extractedKeywords && Array.isArray(extractedKeywords)) {
+            setKeywords(prev => {
+              const newKeywords = [...prev];
+              let insertIdx = 0;
+              for (const kw of extractedKeywords) {
+                // Find next empty slot
+                while (insertIdx < newKeywords.length && newKeywords[insertIdx].trim() !== '') {
+                  insertIdx++;
+                }
+                if (insertIdx < newKeywords.length) {
+                  newKeywords[insertIdx] = kw;
+                } else {
+                  newKeywords.push(kw);
+                }
+                insertIdx++;
+              }
+              return newKeywords;
+            });
+          } else {
+            // Fallback: split raw text by commas and insert
+            const fallbackKeywords = rawText.split(/[,;]+/).map(k => k.trim()).filter(Boolean);
+            setKeywords(prev => {
+              const newKeywords = [...prev];
+              let insertIdx = 0;
+              for (const kw of fallbackKeywords) {
+                while (insertIdx < newKeywords.length && newKeywords[insertIdx].trim() !== '') {
+                  insertIdx++;
+                }
+                if (insertIdx < newKeywords.length) {
+                  newKeywords[insertIdx] = kw;
+                } else {
+                  newKeywords.push(kw);
+                }
+                insertIdx++;
+              }
+              return newKeywords;
+            });
+          }
+        } catch (err) {
+          // Fallback to raw text as single keyword
+          setKeywords(prev => [...prev.filter(k => k.trim() !== ''), rawText, '']);
+        } finally {
+          keywordsVoice.setIsProcessing(false);
+        }
+      });
+    }
   };
 
   const generateReport = async () => {
@@ -587,18 +806,59 @@ function GeneratorContent({ signOut, user }) {
           </p>
 
           <div style={{ marginBottom: '1.5rem' }}>
-            <label className="input-label">{t('case_details')}</label>
+            <div className="label-with-mic">
+              <label className="input-label" style={{ marginBottom: 0 }}>{t('case_details')}</label>
+              <button
+                type="button"
+                className={`mic-btn ${detailsVoice.isRecording ? 'recording' : ''} ${detailsVoice.isProcessing ? 'processing' : ''}`}
+                onClick={handleDetailsVoice}
+                title={detailsVoice.isRecording ? t('voice_input_stop') : t('voice_input_start')}
+                disabled={detailsVoice.isProcessing}
+              >
+                {detailsVoice.isProcessing ? (
+                  <div className="mic-spinner" />
+                ) : detailsVoice.isRecording ? (
+                  <MicOff size={15} />
+                ) : (
+                  <Mic size={15} />
+                )}
+              </button>
+              {detailsVoice.isProcessing && (
+                <span style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 500 }}>{t('voice_processing')}</span>
+              )}
+            </div>
             <textarea
               className="details-textarea"
               placeholder={t('case_details_placeholder')}
               value={details}
               onChange={(e) => setDetails(e.target.value)}
+              style={{ marginTop: '0.5rem' }}
             />
           </div>
           
           <div>
-            <label className="input-label">{t('observations_label')}</label>
-            <div className="keyword-inputs">
+            <div className="label-with-mic">
+              <label className="input-label" style={{ marginBottom: 0 }}>{t('observations_label')}</label>
+              <button
+                type="button"
+                className={`mic-btn ${keywordsVoice.isRecording ? 'recording' : ''} ${keywordsVoice.isProcessing ? 'processing' : ''}`}
+                onClick={handleKeywordsVoice}
+                title={keywordsVoice.isRecording ? t('voice_input_stop') : t('voice_input_start')}
+                disabled={keywordsVoice.isProcessing}
+              >
+                {keywordsVoice.isProcessing ? (
+                  <div className="mic-spinner" />
+                ) : keywordsVoice.isRecording ? (
+                  <MicOff size={15} />
+                ) : (
+                  <Mic size={15} />
+                )}
+              </button>
+              {keywordsVoice.isProcessing && (
+                <span style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 500 }}>{t('voice_processing')}</span>
+              )}
+            </div>
+            <div className="keyword-inputs" style={{ marginTop: '0.5rem' }}>
               {keywords.map((kw, index) => (
                 <input
                   key={index}

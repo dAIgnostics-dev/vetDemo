@@ -38,3 +38,17 @@ generateReportFn.addToRolePolicy(
     resources: ['*'],
   })
 );
+
+// Grant authenticated users permission to call Bedrock directly (for voice input cleanup)
+const authRole = backend.auth.resources.authenticatedUserIamRole;
+
+authRole.addToPrincipalPolicy(
+  new PolicyStatement({
+    effect: Effect.ALLOW,
+    actions: ['bedrock:InvokeModel'],
+    resources: [
+      'arn:aws:bedrock:*::foundation-model/*',
+      'arn:aws:bedrock:*:*:inference-profile/*'
+    ],
+  })
+);
