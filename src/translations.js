@@ -41,7 +41,7 @@ export const translations = {
     voice_input_start: "Start voice input",
     voice_input_stop: "Stop recording",
     voice_processing: "Processing speech...",
-    voice_not_supported: "Voice input is not supported in this browser. Please use Chrome or Edge.",
+    voice_not_supported: "Could not access your microphone. Please check browser permissions.",
     voice_error: "Voice input error. Please try again.",
     voice_cleanup_failed: "Could not clean up speech. Using raw transcription."
   },
@@ -87,7 +87,7 @@ export const translations = {
     voice_input_start: "Započni glasovni unos",
     voice_input_stop: "Zaustavi snimanje",
     voice_processing: "Obrada govora...",
-    voice_not_supported: "Glasovni unos nije podržan u ovom pregledniku. Koristite Chrome ili Edge.",
+    voice_not_supported: "Nije moguće pristupiti mikrofonu. Provjerite dozvole preglednika.",
     voice_error: "Greška glasovnog unosa. Pokušajte ponovo.",
     voice_cleanup_failed: "Nije moguće obraditi govor. Koristi se neobrađeni transkript."
   }

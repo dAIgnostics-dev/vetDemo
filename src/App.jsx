@@ -35,11 +35,22 @@ import './index.css';
 Amplify.configure(outputs);
 const client = generateClient();
 
-// ─── Bedrock cleanup helper (runs client-side with Cognito credentials) ───
+// ─── Bedrock audio+text helper (runs client-side with Cognito credentials) ───
 const BEDROCK_REGION = 'us-east-1';
-const BEDROCK_MODEL_ID = 'us.anthropic.claude-3-haiku-20240307-v1:0';
+const BEDROCK_AUDIO_MODEL_ID = 'us.anthropic.claude-haiku-4-5-20251001-v1:0';
 
-async function cleanupWithBedrock(rawText, mode, lang) {
+function arrayBufferToBase64(buffer) {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  const chunkSize = 8192;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+    binary += String.fromCharCode.apply(null, chunk);
+  }
+  return btoa(binary);
+}
+
+async function processAudioWithBedrock(audioBlob, mode, lang) {
   try {
     const session = await fetchAuthSession();
     const credentials = session.credentials;
@@ -50,28 +61,44 @@ async function cleanupWithBedrock(rawText, mode, lang) {
       credentials,
     });
 
-    let systemPrompt, userPrompt;
+    const audioBuffer = await audioBlob.arrayBuffer();
+    const audioBase64 = arrayBufferToBase64(audioBuffer);
+    const mediaMime = audioBlob.type || 'audio/webm';
 
+    let systemPrompt, textInstruction;
     if (mode === 'details') {
-      systemPrompt = 'You are a veterinary medical transcription assistant. Clean up dictated text into professional, concise veterinary case descriptions. Fix grammar, remove filler words (um, uh, like, so), and format properly. Preserve ALL clinical information. Return ONLY the cleaned text, nothing else.';
-      userPrompt = `Clean up this dictated veterinary case description:\n\n"${rawText}"`;
+      systemPrompt = 'You are a veterinary medical transcription assistant. You receive audio recordings of veterinarians dictating case descriptions. Transcribe the audio, then clean up the text into a professional, concise veterinary case description. Fix grammar, remove filler words (um, uh, like, so), and format properly. Preserve ALL clinical information. Return ONLY the cleaned text, nothing else.';
+      textInstruction = `Transcribe and clean up this dictated veterinary case description. The audio is in ${lang === 'hr' ? 'Croatian' : 'English'}. Return ONLY the cleaned professional text.`;
     } else {
-      // mode === 'keywords'
-      systemPrompt = 'You are a veterinary keyword extraction assistant. Given dictated text, extract individual clinical keywords or observations. Return ONLY a JSON array of strings, each being one keyword/observation. Examples: ["limping", "elevated temperature", "loss of appetite"]. Remove filler words and duplicates. Return ONLY the JSON array, no other text.';
-      userPrompt = `Extract clinical keywords from this dictated text:\n\n"${rawText}"`;
+      systemPrompt = 'You are a veterinary keyword extraction assistant. You receive audio recordings of veterinarians dictating clinical observations. Transcribe the audio, then extract individual clinical keywords or observations. Return ONLY a JSON array of strings, each being one keyword/observation. Examples: ["limping", "elevated temperature", "loss of appetite"]. Remove filler words and duplicates. Return ONLY the JSON array, no other text.';
+      textInstruction = `Transcribe this audio and extract clinical keywords. The audio is in ${lang === 'hr' ? 'Croatian' : 'English'}. Return ONLY a JSON array of keyword strings.`;
     }
 
     const body = JSON.stringify({
       anthropic_version: 'bedrock-2023-05-31',
       max_tokens: 1024,
       system: systemPrompt,
-      messages: [
-        { role: 'user', content: userPrompt }
-      ],
+      messages: [{
+        role: 'user',
+        content: [
+          {
+            type: 'document',
+            source: {
+              type: 'base64',
+              media_type: mediaMime,
+              data: audioBase64,
+            },
+          },
+          {
+            type: 'text',
+            text: textInstruction,
+          },
+        ],
+      }],
     });
 
     const command = new InvokeModelCommand({
-      modelId: BEDROCK_MODEL_ID,
+      modelId: BEDROCK_AUDIO_MODEL_ID,
       contentType: 'application/json',
       accept: 'application/json',
       body: new TextEncoder().encode(body),
@@ -82,81 +109,75 @@ async function cleanupWithBedrock(rawText, mode, lang) {
     const resultText = responseBody.content?.[0]?.text || '';
 
     if (mode === 'keywords') {
-      // Parse the JSON array of keywords
       const match = resultText.match(/\[([\s\S]*?)\]/);
       if (match) {
-        return JSON.parse(match[0]);
+        return { type: 'keywords', data: JSON.parse(match[0]) };
       }
-      // Fallback: split by commas
-      return resultText.split(',').map(k => k.trim().replace(/^["']|["']$/g, '')).filter(Boolean);
+      return { type: 'keywords', data: resultText.split(',').map(k => k.trim().replace(/^["']|["']$/g, '')).filter(Boolean) };
     }
 
-    return resultText.trim();
+    return { type: 'text', data: resultText.trim() };
   } catch (err) {
-    console.error('Bedrock cleanup error:', err);
-    return null; // Signals fallback to raw text
+    console.error('Bedrock audio processing error:', err);
+    return null;
   }
 }
 
-// ─── Voice input hook using Web Speech API ───
-function useVoiceInput(lang) {
+// ─── Cross-browser voice input hook using MediaRecorder ───
+function useVoiceInput() {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const recognitionRef = useRef(null);
-  const transcriptRef = useRef('');
+  const mediaRecorderRef = useRef(null);
+  const chunksRef = useRef([]);
+  const streamRef = useRef(null);
   const onResultRef = useRef(null);
 
-  const isSupported = typeof window !== 'undefined' && 
-    (window.SpeechRecognition || window.webkitSpeechRecognition);
+  const startRecording = useCallback(async (onResult) => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
 
-  const startRecording = useCallback((onResult) => {
-    if (!isSupported) return false;
+      const mediaRecorder = new MediaRecorder(stream);
+      chunksRef.current = [];
+      onResultRef.current = onResult;
 
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = false;
-    recognition.lang = lang === 'hr' ? 'hr-HR' : 'en-US';
-
-    transcriptRef.current = '';
-    onResultRef.current = onResult;
-
-    recognition.onresult = (event) => {
-      let finalTranscript = '';
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript + ' ';
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunksRef.current.push(event.data);
         }
-      }
-      transcriptRef.current += finalTranscript;
-    };
+      };
 
-    recognition.onerror = (event) => {
-      console.error('Speech recognition error:', event.error);
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunksRef.current, { type: mediaRecorder.mimeType });
+        // Release mic
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach(track => track.stop());
+          streamRef.current = null;
+        }
+        setIsRecording(false);
+        if (blob.size > 0 && onResultRef.current) {
+          onResultRef.current(blob);
+        }
+      };
+
+      mediaRecorderRef.current = mediaRecorder;
+      mediaRecorder.start();
+      setIsRecording(true);
+      return true;
+    } catch (err) {
+      console.error('Microphone access error:', err);
       setIsRecording(false);
-    };
-
-    recognition.onend = () => {
-      setIsRecording(false);
-      const finalText = transcriptRef.current.trim();
-      if (finalText && onResultRef.current) {
-        onResultRef.current(finalText);
-      }
-    };
-
-    recognitionRef.current = recognition;
-    recognition.start();
-    setIsRecording(true);
-    return true;
-  }, [isSupported, lang]);
-
-  const stopRecording = useCallback(() => {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
+      return false;
     }
   }, []);
 
-  return { isRecording, isProcessing, setIsProcessing, startRecording, stopRecording, isSupported };
+  const stopRecording = useCallback(() => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+    }
+  }, []);
+
+  return { isRecording, isProcessing, setIsProcessing, startRecording, stopRecording };
 }
 
 function GeneratorContent({ signOut, user }) {
@@ -180,8 +201,8 @@ function GeneratorContent({ signOut, user }) {
   const [userProfile, setUserProfile] = useState({ firstName: '', lastName: '' });
 
   // Voice input hooks — one for details, one for keywords
-  const detailsVoice = useVoiceInput(lang);
-  const keywordsVoice = useVoiceInput(lang);
+  const detailsVoice = useVoiceInput();
+  const keywordsVoice = useVoiceInput();
 
   const t = (key) => translations[lang][key] || key;
 
@@ -234,51 +255,45 @@ function GeneratorContent({ signOut, user }) {
   };
 
   // ─── Voice handlers ───
-  const handleDetailsVoice = () => {
-    if (!detailsVoice.isSupported) {
-      alert(t('voice_not_supported'));
-      return;
-    }
+  const handleDetailsVoice = async () => {
     if (detailsVoice.isRecording) {
       detailsVoice.stopRecording();
     } else {
-      detailsVoice.startRecording(async (rawText) => {
+      const started = await detailsVoice.startRecording(async (audioBlob) => {
         detailsVoice.setIsProcessing(true);
         try {
-          const cleaned = await cleanupWithBedrock(rawText, 'details', lang);
-          if (cleaned) {
-            setDetails(prev => prev ? prev + '\n' + cleaned : cleaned);
+          const result = await processAudioWithBedrock(audioBlob, 'details', lang);
+          if (result && result.data) {
+            setDetails(prev => prev ? prev + '\n' + result.data : result.data);
           } else {
-            // Fallback to raw transcription
-            setDetails(prev => prev ? prev + '\n' + rawText : rawText);
+            alert(t('voice_error'));
           }
         } catch (err) {
-          setDetails(prev => prev ? prev + '\n' + rawText : rawText);
+          console.error('Voice details error:', err);
+          alert(t('voice_error'));
         } finally {
           detailsVoice.setIsProcessing(false);
         }
       });
+      if (!started) {
+        alert(t('voice_not_supported'));
+      }
     }
   };
 
-  const handleKeywordsVoice = () => {
-    if (!keywordsVoice.isSupported) {
-      alert(t('voice_not_supported'));
-      return;
-    }
+  const handleKeywordsVoice = async () => {
     if (keywordsVoice.isRecording) {
       keywordsVoice.stopRecording();
     } else {
-      keywordsVoice.startRecording(async (rawText) => {
+      const started = await keywordsVoice.startRecording(async (audioBlob) => {
         keywordsVoice.setIsProcessing(true);
         try {
-          const extractedKeywords = await cleanupWithBedrock(rawText, 'keywords', lang);
-          if (extractedKeywords && Array.isArray(extractedKeywords)) {
+          const result = await processAudioWithBedrock(audioBlob, 'keywords', lang);
+          if (result && result.type === 'keywords' && Array.isArray(result.data)) {
             setKeywords(prev => {
               const newKeywords = [...prev];
               let insertIdx = 0;
-              for (const kw of extractedKeywords) {
-                // Find next empty slot
+              for (const kw of result.data) {
                 while (insertIdx < newKeywords.length && newKeywords[insertIdx].trim() !== '') {
                   insertIdx++;
                 }
@@ -292,32 +307,18 @@ function GeneratorContent({ signOut, user }) {
               return newKeywords;
             });
           } else {
-            // Fallback: split raw text by commas and insert
-            const fallbackKeywords = rawText.split(/[,;]+/).map(k => k.trim()).filter(Boolean);
-            setKeywords(prev => {
-              const newKeywords = [...prev];
-              let insertIdx = 0;
-              for (const kw of fallbackKeywords) {
-                while (insertIdx < newKeywords.length && newKeywords[insertIdx].trim() !== '') {
-                  insertIdx++;
-                }
-                if (insertIdx < newKeywords.length) {
-                  newKeywords[insertIdx] = kw;
-                } else {
-                  newKeywords.push(kw);
-                }
-                insertIdx++;
-              }
-              return newKeywords;
-            });
+            alert(t('voice_error'));
           }
         } catch (err) {
-          // Fallback to raw text as single keyword
-          setKeywords(prev => [...prev.filter(k => k.trim() !== ''), rawText, '']);
+          console.error('Voice keywords error:', err);
+          alert(t('voice_error'));
         } finally {
           keywordsVoice.setIsProcessing(false);
         }
       });
+      if (!started) {
+        alert(t('voice_not_supported'));
+      }
     }
   };
 
