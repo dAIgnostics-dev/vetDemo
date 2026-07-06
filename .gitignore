@@ -35,3 +35,9 @@ local/.venv
 local/vetdemo.db
 __pycache__/
 *.pyc
+
+# knowledge base source (Access DB) — prevelik za GitHub (>100 MB), lokalni izvor istine
+knowledgeBase/
+*.mdb
+*.ldb
+*.npph

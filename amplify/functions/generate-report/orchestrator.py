@@ -27,6 +27,7 @@ from hybrid_router import (
 )
 
 from llm import chat_json
+from report_templates import build_structure_guidance
 
 
 def _strip_dg_suffix(opis: str) -> str:
@@ -39,6 +40,7 @@ Ti si iskusan veterinarski patolog koji piše histopatološke i citološke nalaz
     2) "dg"   — kratku, konkretnu dijagnozu u jednoj rečenici.
 
 PRAVILA STILA (obavezno):
+- Uz keywords dobit ćeš STRUKTURU NALAZA (ECVP deskriptivna tehnika) — obavezno slijedi taj redoslijed i sadržaj rečenica. Uključi samo one elemente strukture koje ključne riječi podržavaju ili proizlaze iz uobičajenog kliničkog konteksta; preskoči one bez podloge (NE izmišljaj).
 - Opis počinje frazom tipa: "Dostavljen je uzorak …", "Dostavljeni su razmasci …", "Dostavljeno tkivo čini …".
 - Koristi standardnu veterinarsko-patološku terminologiju (anizokarioza, mitoze, infiltrativan rast, nekroza, neutrofilni/limfocitni infiltrat, hiperplazija, metaplazija, pleomorfizam, itd.).
 - Spominji tip tkiva/organa ako ga keywords impliciraju (npr. "subkutis" → potkožje, "mliječna" → mliječna žlijezda, "limf" → limfni čvor).
@@ -99,7 +101,13 @@ class Orchestrator:
 
     def _call_llm(self, keywords: list[str]) -> tuple[str, str]:
         kw_str = ", ".join(kw.strip() for kw in keywords if kw.strip())
-        prompt_text = f'Keywords: {kw_str}\n\nGeneriraj {{"opis": "...", "dg": "..."}}.'
+        # ECVP šablona (tumor vs ne-tumor) — daje strukturu koju nalaz mora slijediti.
+        guidance = build_structure_guidance(keywords)
+        prompt_text = (
+            f"Keywords: {kw_str}\n\n"
+            f"{guidance}\n\n"
+            'Generiraj {"opis": "...", "dg": "..."}.'
+        )
 
         text = chat_json(SYSTEM_PROMPT, prompt_text).strip()
 
