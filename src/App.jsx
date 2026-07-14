@@ -40,6 +40,241 @@ const client = generateClient();
 const AWS_REGION = 'us-east-1';
 const BEDROCK_MODEL_ID = 'us.anthropic.claude-haiku-4-5-20251001-v1:0';
 
+// ─── Structured report helpers (novi izlazni format: zaglavlje / sekcije / komentar) ───
+
+// Normaliziraj bilo koji odgovor (novi rich ili stari plosnati {opis,dg}) u jedinstveni oblik.
+function normalizeReport(r) {
+  if (!r || typeof r !== 'object') return null;
+  if (!Array.isArray(r.sekcije)) {
+    if (r.opis !== undefined || r.dg !== undefined) {
+      return {
+        vrsta_nalaza: r.vrsta_nalaza || null,
+        zaglavlje: r.zaglavlje || {},
+        sekcije: [{ naslov: '', opis: r.opis || '', dg: r.dg ?? '' }],
+        komentar: r.komentar || '',
+      };
+    }
+    return null;
+  }
+  const sekcije = (r.sekcije.length ? r.sekcije : [{}]).map((s) => ({
+    naslov: s.naslov ?? '',
+    opis: s.opis || '',
+    dg: Array.isArray(s.dg) ? [...s.dg] : (s.dg ?? ''),
+  }));
+  return {
+    vrsta_nalaza: r.vrsta_nalaza || null,
+    zaglavlje: r.zaglavlje || {},
+    sekcije,
+    komentar: r.komentar || '',
+  };
+}
+
+// Duboka kopija za uređivanje.
+function cloneReport(r) {
+  return normalizeReport(JSON.parse(JSON.stringify(r)));
+}
+
+const ZAGLAVLJE_FIELDS = ['oznaka_uzorka', 'vrsta_uzorka', 'datum', 'doktor'];
+
+// Serijaliziraj strukturirani nalaz u čitljiv tekst (za spremanje i kao izvor za PDF).
+function formatReportText(report, lang) {
+  if (!report) return '';
+  const en = lang === 'en';
+  const lines = [];
+  const z = report.zaglavlje || {};
+  const zLine = ZAGLAVLJE_FIELDS.map((f) => (z[f] || '').trim()).filter(Boolean).join(' · ');
+  if (zLine) { lines.push(zLine, ''); }
+  (report.sekcije || []).forEach((s) => {
+    if (s.naslov && s.naslov.trim()) lines.push(`${s.naslov.trim()}:`);
+    if (s.opis && s.opis.trim()) lines.push(s.opis.trim());
+    const dgLabel = en ? 'Dx:' : 'Dg.:';
+    if (Array.isArray(s.dg)) {
+      const items = s.dg.map((d) => (d || '').trim()).filter(Boolean);
+      if (items.length) {
+        lines.push(dgLabel);
+        items.forEach((d, i) => lines.push(`${i + 1}. ${d}`));
+      }
+    } else if (s.dg && s.dg.trim()) {
+      lines.push(`${dgLabel} ${s.dg.trim()}`);
+    }
+    lines.push('');
+  });
+  if (report.komentar && report.komentar.trim()) {
+    lines.push(`${en ? 'Comment:' : 'Komentar:'} ${report.komentar.trim()}`);
+  }
+  return lines.join('\n').trim();
+}
+
+// Kratki sažetak dijagnoze za pregled neselektiranih rezultata.
+function reportDgSummary(report) {
+  const parts = [];
+  (report.sekcije || []).forEach((s) => {
+    if (Array.isArray(s.dg)) parts.push(...s.dg);
+    else if (s.dg) parts.push(s.dg);
+  });
+  return parts.filter(Boolean).join('; ');
+}
+
+const FIELD_INPUT = { width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border)', fontFamily: 'inherit', fontSize: '0.95rem', boxSizing: 'border-box' };
+const FIELD_LABEL = { fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.3rem', display: 'block' };
+const SECTION_LABEL = { fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.05em' };
+
+// Read-only prikaz nalaza (za neselektirane rezultate pretrage).
+function ReportPreview({ report, lang, t }) {
+  const z = report.zaglavlje || {};
+  const zLine = ZAGLAVLJE_FIELDS.map((f) => (z[f] || '').trim()).filter(Boolean).join(' · ');
+  const dgLabel = lang === 'en' ? 'Dx:' : 'Dg.:';
+  return (
+    <div>
+      {zLine && (
+        <p style={{ margin: '0 0 0.75rem', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>{zLine}</p>
+      )}
+      {(report.sekcije || []).map((s, i) => (
+        <div key={i} style={{ marginBottom: '1rem' }}>
+          {s.naslov && s.naslov.trim() && (
+            <div style={{ fontWeight: 700, marginBottom: '0.35rem' }}>{s.naslov.trim()}</div>
+          )}
+          {s.opis && <p style={{ margin: '0 0 0.5rem', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{s.opis}</p>}
+          {Array.isArray(s.dg) ? (
+            <>
+              <div style={{ ...SECTION_LABEL, marginBottom: '0.2rem' }}>{dgLabel}</div>
+              <ol style={{ margin: 0, paddingLeft: '1.2rem', fontWeight: 600 }}>
+                {s.dg.filter(Boolean).map((d, j) => <li key={j}>{d}</li>)}
+              </ol>
+            </>
+          ) : (
+            s.dg && <p style={{ margin: 0, fontWeight: 600 }}>{dgLabel} {s.dg}</p>
+          )}
+        </div>
+      ))}
+      {report.komentar && report.komentar.trim() && (
+        <div style={{ borderTop: '1px solid var(--border)', paddingTop: '0.6rem', marginTop: '0.6rem' }}>
+          <div style={SECTION_LABEL}>{t('comment_label')}</div>
+          <p style={{ margin: 0, lineHeight: 1.6, color: 'var(--text-muted)', whiteSpace: 'pre-wrap' }}>{report.komentar}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Strukturirani editor nalaza (zaglavlje, sekcije, numerirana dg, komentar).
+function ReportEditor({ report, lang, t, updateZaglavlje, updateSection, addSection, removeSection, dgToList, dgToString, updateDgItem, addDgItem, removeDgItem, updateKomentar }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+      {/* Zaglavlje */}
+      <div>
+        <div style={SECTION_LABEL}>{t('header_section')}</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+          {ZAGLAVLJE_FIELDS.map((f) => (
+            <div key={f}>
+              <label style={FIELD_LABEL}>{t('z_' + f)}</label>
+              <input
+                value={(report.zaglavlje && report.zaglavlje[f]) || ''}
+                onChange={(e) => updateZaglavlje(f, e.target.value)}
+                style={FIELD_INPUT}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Sekcije */}
+      {(report.sekcije || []).map((s, i) => {
+        const dgIsList = Array.isArray(s.dg);
+        return (
+          <div key={i} style={{ border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+              <div style={SECTION_LABEL}>{t('section_label')} {i + 1}</div>
+              {report.sekcije.length > 1 && (
+                <button className="btn btn-ghost btn-sm" onClick={() => removeSection(i)} title={t('remove_section')}>
+                  <Trash2 size={15} />
+                </button>
+              )}
+            </div>
+
+            <div style={{ marginBottom: '0.75rem' }}>
+              <label style={FIELD_LABEL}>{t('section_title')}</label>
+              <input
+                value={s.naslov || ''}
+                onChange={(e) => updateSection(i, 'naslov', e.target.value)}
+                placeholder={t('section_title_ph')}
+                style={FIELD_INPUT}
+              />
+            </div>
+
+            <div style={{ marginBottom: '0.75rem' }}>
+              <label style={FIELD_LABEL}>{t('opis_label')}</label>
+              <textarea
+                value={s.opis || ''}
+                onChange={(e) => updateSection(i, 'opis', e.target.value)}
+                style={{ ...FIELD_INPUT, minHeight: '140px', resize: 'vertical', lineHeight: 1.7 }}
+              />
+            </div>
+
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                <label style={{ ...FIELD_LABEL, marginBottom: 0 }}>{t('dg_label')}</label>
+                <button
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => (dgIsList ? dgToString(i) : dgToList(i))}
+                  style={{ fontSize: '0.72rem' }}
+                >
+                  {dgIsList ? t('dg_to_single') : t('dg_to_list')}
+                </button>
+              </div>
+              {dgIsList ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  {s.dg.map((d, j) => (
+                    <div key={j} style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                      <span style={{ fontWeight: 700, color: 'var(--text-muted)', minWidth: '1.2rem' }}>{j + 1}.</span>
+                      <input
+                        value={d}
+                        onChange={(e) => updateDgItem(i, j, e.target.value)}
+                        style={{ ...FIELD_INPUT, fontWeight: 600 }}
+                      />
+                      <button className="btn btn-ghost btn-sm" onClick={() => removeDgItem(i, j)} title={t('remove_section')}>
+                        <X size={15} />
+                      </button>
+                    </div>
+                  ))}
+                  <div>
+                    <button className="btn btn-secondary btn-sm" onClick={() => addDgItem(i)}>
+                      <Plus size={15} /> {t('add_dg')}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <input
+                  value={s.dg || ''}
+                  onChange={(e) => updateSection(i, 'dg', e.target.value)}
+                  style={{ ...FIELD_INPUT, fontWeight: 600 }}
+                />
+              )}
+            </div>
+          </div>
+        );
+      })}
+
+      <div>
+        <button className="btn btn-secondary btn-sm" onClick={addSection}>
+          <Plus size={15} /> {t('add_section')}
+        </button>
+      </div>
+
+      {/* Komentar */}
+      <div>
+        <label style={FIELD_LABEL}>{t('comment_label')}</label>
+        <textarea
+          value={report.komentar || ''}
+          onChange={(e) => updateKomentar(e.target.value)}
+          placeholder={t('comment_ph')}
+          style={{ ...FIELD_INPUT, minHeight: '80px', resize: 'vertical', lineHeight: 1.6 }}
+        />
+      </div>
+    </div>
+  );
+}
+
 // ─── Audio helpers: convert MediaRecorder output → PCM for Transcribe ───
 function downsampleBuffer(buffer, inputRate, outputRate) {
   if (inputRate === outputRate) return buffer;
@@ -225,8 +460,7 @@ function GeneratorContent({ signOut, user }) {
   const [results, setResults] = useState([]);
   const [resultSource, setResultSource] = useState('');
   const [selectedIdx, setSelectedIdx] = useState(null);
-  const [editedOpis, setEditedOpis] = useState('');
-  const [editedDg, setEditedDg] = useState('');
+  const [editedReport, setEditedReport] = useState(null);
   const [loading, setLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
   const [noDbResults, setNoDbResults] = useState(false);
@@ -370,45 +604,43 @@ function GeneratorContent({ signOut, user }) {
     setNoDbResults(false);
     try {
       const { data, errors } = await client.mutations.generateReport({
-        keywords: keywords.filter(k => k.trim() !== '')
+        keywords: keywords.filter(k => k.trim() !== ''),
+        details: details,
+        lang: lang
       });
 
       if (errors) {
         console.error('GraphQL errors:', errors);
         setReport("Error generating report: " + errors[0].message);
         setResults([]);
+        setSelectedIdx(null);
+        setEditedReport(null);
       } else {
         try {
           const parsed = typeof data === 'string' ? JSON.parse(data) : data;
-          if (parsed.results && Array.isArray(parsed.results)) {
-            setResults(parsed.results);
-            setResultSource(parsed.source || '');
+          const list = (parsed?.results || [parsed]).map(normalizeReport).filter(Boolean);
+          if (list.length) {
+            setResults(list);
+            setResultSource(parsed.source || 'sonnet');
             setReport('');
-            if (parsed.results.length === 1) {
+            if (list.length === 1) {
               setSelectedIdx(0);
-              setEditedOpis(parsed.results[0].opis || '');
-              setEditedDg(parsed.results[0].dg || '');
+              setEditedReport(cloneReport(list[0]));
             } else {
               setSelectedIdx(null);
-              setEditedOpis('');
-              setEditedDg('');
+              setEditedReport(null);
             }
-          } else if (parsed.opis || parsed.dg) {
-            setResults([{ opis: parsed.opis, dg: parsed.dg }]);
-            setResultSource(parsed.source || '');
-            setSelectedIdx(0);
-            setEditedOpis(parsed.opis || '');
-            setEditedDg(parsed.dg || '');
-            setReport('');
           } else {
-            setReport(data || "No report generated.");
+            setReport((typeof data === 'string' ? data : '') || "No report generated.");
             setResults([]);
             setSelectedIdx(null);
+            setEditedReport(null);
           }
         } catch (e) {
-          setReport(data || "No report generated.");
+          setReport((typeof data === 'string' ? data : '') || "No report generated.");
           setResults([]);
           setSelectedIdx(null);
+          setEditedReport(null);
         }
       }
     } catch (error) {
@@ -426,8 +658,7 @@ function GeneratorContent({ signOut, user }) {
     setResultSource('');
     setNoDbResults(false);
     setSelectedIdx(null);
-    setEditedOpis('');
-    setEditedDg('');
+    setEditedReport(null);
     try {
       const { data, errors } = await client.graphql({
         query: `mutation SearchDatabase($keywords: [String], $action: String) { searchDatabase(keywords: $keywords, action: $action) }`,
@@ -439,15 +670,15 @@ function GeneratorContent({ signOut, user }) {
       } else {
         const raw = data?.searchDatabase ?? data;
         const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
-        if (parsed.source === 'none' || !parsed.results || parsed.results.length === 0) {
+        const list = (parsed.results || []).map(normalizeReport).filter(Boolean);
+        if (parsed.source === 'none' || list.length === 0) {
           setNoDbResults(true);
         } else {
-          setResults(parsed.results);
+          setResults(list);
           setResultSource(parsed.source || 'router');
-          if (parsed.results.length === 1) {
+          if (list.length === 1) {
             setSelectedIdx(0);
-            setEditedOpis(parsed.results[0].opis || '');
-            setEditedDg(parsed.results[0].dg || '');
+            setEditedReport(cloneReport(list[0]));
           }
         }
       }
@@ -461,12 +692,49 @@ function GeneratorContent({ signOut, user }) {
 
   const selectResult = (idx) => {
     setSelectedIdx(idx);
-    setEditedOpis(results[idx].opis || '');
-    setEditedDg(results[idx].dg || '');
+    setEditedReport(cloneReport(results[idx]));
   };
 
-  const activeReport = selectedIdx !== null
-    ? `OPIS:\n${editedOpis}\n\nDIJAGNOZA:\n${editedDg}`
+  const deselectResult = () => {
+    setSelectedIdx(null);
+    setEditedReport(null);
+  };
+
+  // ─── Immutable patch helpers za editedReport ───
+  const patchReport = (fn) => setEditedReport((prev) => {
+    if (!prev) return prev;
+    const next = cloneReport(prev);
+    fn(next);
+    return next;
+  });
+
+  const updateZaglavlje = (field, value) => patchReport((r) => {
+    r.zaglavlje = { ...(r.zaglavlje || {}), [field]: value };
+  });
+  const updateSection = (i, field, value) => patchReport((r) => { r.sekcije[i][field] = value; });
+  const addSection = () => patchReport((r) => { r.sekcije.push({ naslov: '', opis: '', dg: '' }); });
+  const removeSection = (i) => patchReport((r) => {
+    r.sekcije.splice(i, 1);
+    if (r.sekcije.length === 0) r.sekcije.push({ naslov: '', opis: '', dg: '' });
+  });
+  const dgToList = (i) => patchReport((r) => {
+    const cur = r.sekcije[i].dg;
+    r.sekcije[i].dg = Array.isArray(cur) ? cur : [cur || ''];
+  });
+  const dgToString = (i) => patchReport((r) => {
+    const cur = r.sekcije[i].dg;
+    r.sekcije[i].dg = Array.isArray(cur) ? (cur[0] || '') : (cur || '');
+  });
+  const updateDgItem = (i, j, value) => patchReport((r) => { r.sekcije[i].dg[j] = value; });
+  const addDgItem = (i) => patchReport((r) => { r.sekcije[i].dg.push(''); });
+  const removeDgItem = (i, j) => patchReport((r) => {
+    r.sekcije[i].dg.splice(j, 1);
+    if (r.sekcije[i].dg.length === 0) r.sekcije[i].dg = '';
+  });
+  const updateKomentar = (value) => patchReport((r) => { r.komentar = value; });
+
+  const activeReport = selectedIdx !== null && editedReport
+    ? formatReportText(editedReport, lang)
     : report;
 
   const saveToStorage = async () => {
@@ -567,16 +835,47 @@ function GeneratorContent({ signOut, user }) {
         `;
       }
       
-      if (selectedIdx !== null) {
-        htmlContent += `
-          <div style="margin-bottom: 25px;">
-            <p style="margin: 0 0 10px 0; font-weight: 700; font-size: 14px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">Opis:</p>
-            <div style="margin: 0; font-size: 14px; line-height: 1.8; color: #1e293b; white-space: pre-wrap;">${editedOpis}</div>
-          </div>
-          <div style="margin-bottom: 25px;">
-            <p style="margin: 0 0 10px 0; font-weight: 700; font-size: 14px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">Dijagnoza:</p>
-            <div style="margin: 0; font-size: 14px; font-weight: 600; color: #1e293b;">${editedDg}</div>
-          </div>`;
+      if (selectedIdx !== null && editedReport) {
+        const en = lang === 'en';
+        const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const dgLabel = en ? 'Dx:' : 'Dg.:';
+
+        const z = editedReport.zaglavlje || {};
+        const zLine = ZAGLAVLJE_FIELDS.map((f) => (z[f] || '').trim()).filter(Boolean).join(' · ');
+        if (zLine) {
+          htmlContent += `
+            <div style="margin-bottom: 20px;">
+              <p style="margin: 0; font-size: 13px; font-weight: 600; color: #475569;">${esc(zLine)}</p>
+            </div>`;
+        }
+
+        (editedReport.sekcije || []).forEach((s) => {
+          htmlContent += `<div style="margin-bottom: 22px;">`;
+          if (s.naslov && s.naslov.trim()) {
+            htmlContent += `<p style="margin: 0 0 8px 0; font-weight: 700; font-size: 15px; color: #0f172a;">${esc(s.naslov.trim())}</p>`;
+          }
+          if (s.opis && s.opis.trim()) {
+            htmlContent += `<div style="margin: 0 0 10px 0; font-size: 14px; line-height: 1.8; color: #1e293b; white-space: pre-wrap;">${esc(s.opis.trim())}</div>`;
+          }
+          if (Array.isArray(s.dg)) {
+            const items = s.dg.map((d) => (d || '').trim()).filter(Boolean);
+            if (items.length) {
+              htmlContent += `<p style="margin: 0 0 4px 0; font-weight: 700; font-size: 14px; color: #1e293b;">${dgLabel}</p>`;
+              htmlContent += `<ol style="margin: 0; padding-left: 20px; font-size: 14px; font-weight: 600; color: #1e293b;">${items.map((d) => `<li style="margin-bottom: 3px;">${esc(d)}</li>`).join('')}</ol>`;
+            }
+          } else if (s.dg && s.dg.trim()) {
+            htmlContent += `<p style="margin: 0; font-size: 14px; font-weight: 600; color: #1e293b;">${dgLabel} ${esc(s.dg.trim())}</p>`;
+          }
+          htmlContent += `</div>`;
+        });
+
+        if (editedReport.komentar && editedReport.komentar.trim()) {
+          htmlContent += `
+            <div style="margin-bottom: 25px; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+              <p style="margin: 0 0 6px 0; font-weight: 700; font-size: 14px; color: #64748b;">${en ? 'Comment' : 'Komentar'}:</p>
+              <div style="margin: 0; font-size: 14px; line-height: 1.7; color: #475569; white-space: pre-wrap;">${esc(editedReport.komentar.trim())}</div>
+            </div>`;
+        }
       } else {
         htmlContent += `
           <div style="margin-bottom: 25px;">
@@ -651,8 +950,7 @@ function GeneratorContent({ signOut, user }) {
     setResults([]);
     setResultSource('');
     setSelectedIdx(null);
-    setEditedOpis('');
-    setEditedDg('');
+    setEditedReport(null);
     setNoDbResults(false);
     setShowHistory(false);
     setShowProfile(false);
@@ -664,8 +962,7 @@ function GeneratorContent({ signOut, user }) {
     setResults([]);
     setResultSource('');
     setSelectedIdx(null);
-    setEditedOpis('');
-    setEditedDg('');
+    setEditedReport(null);
     setReport(item.report || '');
     setShowHistory(false);
   };
@@ -942,7 +1239,7 @@ function GeneratorContent({ signOut, user }) {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
               <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <FileText size={20} />
-                {resultSource === 'router' ? `📚 ${results.length} rezultat${results.length > 1 ? 'a' : ''} iz baze` : '🤖 Generirano'}
+                {resultSource === 'router' ? `📚 ${results.length} ${t('results_from_db')}` : `🤖 ${t('generated_label')}`}
               </h3>
               <div className="actions">
                 <button className="btn btn-secondary" onClick={downloadPDF} disabled={selectedIdx === null} title={t('pdf_btn')}>
@@ -960,7 +1257,7 @@ function GeneratorContent({ signOut, user }) {
             </div>
             {results.length > 1 && selectedIdx === null && (
               <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
-                Odaberi jedan nalaz za uređivanje, spremanje ili PDF izvoz.
+                {t('select_hint')}
               </p>
             )}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -977,47 +1274,41 @@ function GeneratorContent({ signOut, user }) {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
                       {results.length > 1 && (
                         <div style={{ fontSize: '0.75rem', fontWeight: 700, color: isSelected ? 'var(--primary)' : 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                          Nalaz {i + 1}
+                          {t('result_label')} {i + 1}{r.vrsta_nalaza ? ` · ${r.vrsta_nalaza}` : ''}
                         </div>
                       )}
                       <div style={{ marginLeft: 'auto' }}>
                         {isSelected ? (
-                          <button className="btn btn-secondary btn-sm" onClick={() => { setSelectedIdx(null); setEditedOpis(''); setEditedDg(''); }}>
-                            Poništi odabir
+                          <button className="btn btn-secondary btn-sm" onClick={deselectResult}>
+                            {t('deselect_result')}
                           </button>
                         ) : (
                           <button className="btn btn-primary btn-sm" onClick={() => selectResult(i)}>
-                            Odaberi
+                            {t('select_result')}
                           </button>
                         )}
                       </div>
                     </div>
 
-                    <div style={{ marginBottom: '1rem' }}>
-                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.4rem', textTransform: 'uppercase' }}>Opis</div>
-                      {isSelected ? (
-                        <textarea
-                          value={editedOpis}
-                          onChange={(e) => setEditedOpis(e.target.value)}
-                          style={{ width: '100%', minHeight: '140px', resize: 'vertical', lineHeight: 1.7, padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border)', fontFamily: 'inherit', fontSize: '0.95rem' }}
-                        />
-                      ) : (
-                        <p style={{ margin: 0, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{r.opis}</p>
-                      )}
-                    </div>
-
-                    <div style={{ borderTop: '1px solid var(--border)', paddingTop: '0.75rem' }}>
-                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.4rem', textTransform: 'uppercase' }}>Dijagnoza</div>
-                      {isSelected ? (
-                        <input
-                          value={editedDg}
-                          onChange={(e) => setEditedDg(e.target.value)}
-                          style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border)', fontFamily: 'inherit', fontSize: '0.95rem', fontWeight: 600 }}
-                        />
-                      ) : (
-                        <p style={{ margin: 0, fontWeight: 600 }}>{r.dg}</p>
-                      )}
-                    </div>
+                    {isSelected && editedReport ? (
+                      <ReportEditor
+                        report={editedReport}
+                        lang={lang}
+                        t={t}
+                        updateZaglavlje={updateZaglavlje}
+                        updateSection={updateSection}
+                        addSection={addSection}
+                        removeSection={removeSection}
+                        dgToList={dgToList}
+                        dgToString={dgToString}
+                        updateDgItem={updateDgItem}
+                        addDgItem={addDgItem}
+                        removeDgItem={removeDgItem}
+                        updateKomentar={updateKomentar}
+                      />
+                    ) : (
+                      <ReportPreview report={r} lang={lang} t={t} />
+                    )}
                   </div>
                 );
               })}

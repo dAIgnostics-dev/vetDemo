@@ -20,6 +20,8 @@ const schema = a.schema({
     .mutation()
     .arguments({
       keywords: a.string().array(),
+      details: a.string(),
+      lang: a.string(),
     })
     .returns(a.string())
     .handler(a.handler.function(generateReport))

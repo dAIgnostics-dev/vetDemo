@@ -41,28 +41,86 @@ def _strip_dg_suffix(opis: str) -> str:
     """Ukloni 'Dg.:...' s kraja opisa ako postoji (duplikat jer se dg prikazuje odvojeno)."""
     return re.split(r'\s*\n\s*\nDg\.', opis, flags=re.IGNORECASE)[0].strip()
 
-SYSTEM_PROMPT = """
-Ti si iskusan veterinarski patolog koji piše histopatološke i citološke nalaze na hrvatskom jeziku. Tvoj zadatak je iz zadane liste ključnih riječi (lematizirani medicinski pojmovi izvučeni iz originalnog nalaza) rekonstruirati:
-    1) "opis" — strukturirani makroskopski/mikroskopski opis nalaza,
-    2) "dg"   — kratku, konkretnu dijagnozu u jednoj rečenici.
 
-PRAVILA STILA (obavezno):
-- Opis počinje frazom tipa: "Dostavljen je uzorak …", "Dostavljeni su razmasci …", "Dostavljeno tkivo čini …".
-- Koristi standardnu veterinarsko-patološku terminologiju (anizokarioza, mitoze, infiltrativan rast, nekroza, neutrofilni/limfocitni infiltrat, hiperplazija, metaplazija, pleomorfizam, itd.).
-- Spominji tip tkiva/organa ako ga keywords impliciraju (npr. "subkutis" → potkožje, "mliječna" → mliječna žlijezda, "limf" → limfni čvor).
-- Opis 4-10 rečenica; dijagnoza JEDNA rečenica, bez objašnjenja, završava točkom.
-- "dg" mora biti dijagnostički naziv (npr. "Tubulopapilarni karcinom mliječne žlijezde, stupanj malignosti II."), NE popis keywordsa.
+def _flat_to_report(dg, opis: str, komentar: Optional[str] = None) -> dict:
+    """Normaliziraj plosnati {dg, opis} (npr. iz baze) u rich schemu s jednom sekcijom."""
+    return {
+        "vrsta_nalaza": None,
+        "zaglavlje": {},
+        "sekcije": [{"naslov": None, "opis": _strip_dg_suffix(opis or ""), "dg": dg}],
+        "komentar": komentar,
+    }
 
-PRAVILA TOČNOSTI:
-- Koristi isključivo informacije podržane keywordsima ili uobičajen klinički kontekst za navedene pojmove. NE izmišljaj konkretne brojeve (postotke, dimenzije, mitotski indeks) osim ako keyword direktno ne sugerira.
-- Ako keywords sugeriraju upalu (neutrofil, limfocit, makrofag, piogranulomatozni) — opiši upalni infiltrat i izvedi upalnu Dg.
-- Ako keywords sugeriraju tumor (karcinom, sarkom, adenom, mastocitom, pleomorfizam, mitoze, infiltrativno) — opiši neoplastične karakteristike i izvedi tumorsku Dg.
-- Ako su keywords pretanki za sigurnu dijagnozu — formuliraj "dg" kao najvjerojatniji entitet ili opisni nalaz (npr. "Reaktivna hiperplazija limfnog čvora.", "Dilatirana apokrina žlijezda.").
-- TERMINOLOGIJA: kad postoji ustaljen latinski/internacionalni naziv koji se rutinski koristi u veterinarskoj patologiji, preferiraj ga (npr. "Seminoma testis", "Fibrosarcoma subcutis", "Mastocytoma"). Za upalne i opisne dijagnoze koristi hrvatski.
 
-OUTPUT:
-Vrati ISKLJUČIVO valjan JSON, bez markdown blokova, točno u ovom obliku:
-{"opis": "...", "dg": "..."}
+def _report_to_flat(report: dict) -> tuple[str, str]:
+    """Spljošti rich nalaz u (dg, opis) za pohranu/indeksiranje u bazi (BM25 retriever)."""
+    opis_parts: list[str] = []
+    dg_parts: list[str] = []
+    for sec in report.get("sekcije") or []:
+        naslov = (sec.get("naslov") or "").strip()
+        opis = (sec.get("opis") or "").strip()
+        if opis:
+            opis_parts.append(f"{naslov}: {opis}" if naslov else opis)
+        dg = sec.get("dg")
+        if isinstance(dg, list):
+            dg_parts.extend(str(d).strip() for d in dg if str(d).strip())
+        elif dg:
+            dg_parts.append(str(dg).strip())
+    return "; ".join(dg_parts), "\n\n".join(opis_parts)
+
+
+SYSTEM_PROMPT = """\
+Ti si veterinarski patolog koji piše profesionalne histopatološke i citološke nalaze.
+Iz zadanih Case details i Keywords rekonstruiraj nalaz i vrati ISKLJUČIVO strogi JSON objekt.
+
+STROGO PRAVILO IZLAZA:
+- Vrati SAMO jedan JSON objekt. Bez markdowna, bez ``` ograda, bez ikakvog teksta izvan objekta.
+- Shema:
+  {
+    "jezik": "hr" | "en",
+    "vrsta_nalaza": "histopatologija" | "citologija",
+    "zaglavlje": { "oznaka_uzorka": str?, "vrsta_uzorka": str?, "datum": str?, "doktor": str? },
+    "sekcije": [ { "naslov": str?, "opis": str, "dg": str | [str, ...] } ],
+    "komentar": str?
+  }
+- "sekcije" ima najmanje jedan element. Opcionalna polja koja nemaju vrijednost IZOSTAVI (ne šalji prazne stringove).
+- Ne izmišljaj vrijednosti zaglavlja, veličine, broj mitoza ni postotke kojih nema u unosu.
+
+JEZIK: Cijeli izlaz piši na jeziku "{jezik}" (hr = hrvatski, en = engleski).
+Latinske/internacionalne nazive dijagnoza koristi gdje su ustaljeni (npr. Seminoma testis, Fibrosarcoma subcutis, Mastocytoma) i ostavi ih istima u oba jezika.
+
+VRSTA NALAZA: sam odredi "vrsta_nalaza" iz konteksta i keywordsa. Pojmovi kao punktat, razmasci, aspirat, citološki, FNA => "citologija"; bioptat, ekscizija, tkivo, isječci, arhitektura tkiva => "histopatologija". Ako nije jasno, pretpostavi "histopatologija".
+
+STRUKTURA POLJA "opis" (proza, 4–10 rečenica, jedan odlomak):
+Za tumor (histopatologija) slijedi ovim redom, ispuštajući korake bez podatka:
+1) subgross: sijelo, oblik, veličina, celularnost, % zahvaćenog tkiva, način rasta, ograničenost, inkapsulacija, odnos prema rubovima;
+2) uzorak rasta i stroma;
+3) citološke značajke (oblik, veličina, granice, citoplazma, jezgra, jezgrica);
+4) posebne značajke entiteta ako postoje;
+5) atipija (pleomorfizam, divovske/multinuklearne, apoptoze);
+6) mitotska aktivnost (prosjek/raspon na 10 HPF, atipične mitoze);
+7) dokazi malignosti (invazija kapsule, nekroza %, emboli, krvarenje);
+8) dodatni nalazi (adneksalne/epidermalne promjene, upala, druga lezija).
+Za ne-neoplastičnu leziju: 1) subgross (sijelo, opseg, distribucija, tip procesa); 2) glavne promjene OPISANE I INTERPRETIRANE (dodano/upala nabrojana po prevalenciji i lokaciji/nedostaje); 3) etiološki agens ako postoji; 4) sporedne lezije.
+Za citologiju: dominantna stanična populacija, omjer populacija, pozadina, stanične značajke; bez tkivne arhitekture.
+Uvodna fraza (hr): "Dostavljeni uzorak…" / "Dostavljeni razmasci punktata…"; (en): "The submitted specimen…" / "The submitted aspirate smears…".
+
+POLJE "dg" (morfološka dijagnoza, jedna rečenica završava točkom):
+- Tumor: tkivo + naziv/tip tumora + malignost/gradus kad je primjenjivo.
+- Ne-neoplastično: organ + težina + trajanje + distribucija + tip lezije.
+- Više zasebnih entiteta u istoj sekciji => "dg" je niz stringova (bez vlastitih brojeva; frontend numerira).
+
+SEKCIJE:
+- Jedan uzorak/tvorba => jedna sekcija, "naslov" izostavljen.
+- Više organa/uzoraka (npr. Želudac, Tanko crijevo) => više sekcija, svaka s "naslov".
+
+"komentar" (opcionalno, 1–4 rečenice): diferencijalna dijagnoza, ograničenja uzorka, preporuke, klinička korelacija.
+
+PRIMJER 1 (izlaz):
+{"jezik":"hr","vrsta_nalaza":"histopatologija","zaglavlje":{"oznaka_uzorka":"HP 1005/13","vrsta_uzorka":"bioptat kože","datum":"12.03.2013."},"sekcije":[{"naslov":"Koža","opis":"Dostavljeni uzorak kože zahvaćen je dermalnom, ekspanzivnom, dobro ograničenom neinkapsuliranom tvorbom koja zauzima približno 70% dermisa u presjeku i ne dopire do rubova ekscizije. Tumor je građen od gusto zbijenih isprepletenih snopova i virova vretenastih stanica uloženih u oskudnu fibroznu stromu. Stanice su vretenaste, nejasnih granica, s umjerenom količinom svijetle citoplazme te ovalnom do nepravilnom jezgrom i jednom do dvije jezgrice. Prisutan je blag pleomorfizam, a mitoze variraju od 0 do 1 na 10 HPF. Ne uočavaju se nekroza niti vaskularni emboli.","dg":"Fibrosarcoma subcutis, stupanj malignosti II."}],"komentar":"Preporučamo provjeru potpunosti ekscizije i kliničko praćenje."}
+
+PRIMJER 2 (izlaz, po organima + numerirana dg + engleski):
+{"jezik":"en","vrsta_nalaza":"histopatologija","zaglavlje":{"vrsta_uzorka":"gastrointestinal biopsies"},"sekcije":[{"naslov":"Stomach","opis":"Sections of gastric mucosa show a locally extensive, moderate infiltrate expanding the lamina propria and separating the glands, composed predominantly of small mature lymphocytes and plasma cells with fewer neutrophils. The superficial mucosa shows glandular atrophy with reduced gland density and mild fibrosis of the lamina propria.","dg":["Chronic lymphoplasmacytic gastritis, moderate, diffuse","Mucosal atrophy, moderate"]},{"naslov":"Small intestine","opis":"Sections of duodenum show villous blunting and fusion with a moderate, diffuse lymphoplasmacytic infiltrate expanding the lamina propria between the crypts. Crypts are mildly hyperplastic and the surface epithelium is preserved.","dg":"Chronic lymphoplasmacytic duodenitis, moderate, diffuse."}],"komentar":"The changes are consistent with canine chronic inflammatory bowel disease (IBD). Clinical correlation and, if indicated, follow-up biopsies are recommended."}
 """
 
 
@@ -79,7 +137,7 @@ class Orchestrator:
         Returns:
             {
                 "source":  "router" | "none",
-                "results": [{"dg": str, "opis": str}, ...]
+                "results": [<rich report>, ...]   # normalizirani plosnati unosi iz baze
             }
         """
         query_text = ", ".join(kw.strip() for kw in keywords if kw.strip())
@@ -87,41 +145,48 @@ class Orchestrator:
         if matches:
             return {
                 "source": "router",
-                "results": [{"dg": m["dg"], "opis": _strip_dg_suffix(m["opis"] or "")} for m in matches],
+                "results": [_flat_to_report(m["dg"], m["opis"] or "") for m in matches],
             }
         print("[orchestrator] Router nije pronašao podudaranje — search_only mod, nema fallbacka.")
         return {"source": "none", "results": []}
 
-    def query(self, keywords: list[str]) -> dict:
+    def query(self, keywords: list[str], details: str = "", lang: str = "hr") -> dict:
         """
-        Generiraj nalaz direktno putem Sonneta (bez pretraživanja baze).
+        Generiraj nalaz direktno putem modela (bez pretraživanja baze).
 
         Returns:
             {
                 "source":  "sonnet",
-                "results": [{"dg": str, "opis": str}]
+                "results": [<rich report>]
             }
         """
-        print("[orchestrator] Generiram nalaz putem Sonneta...")
-        dg, opis = self._call_sonnet(keywords)
+        print("[orchestrator] Generiram nalaz putem modela...")
+        report = self._call_sonnet(keywords, details=details, lang=lang)
 
-        new_entry = self._write_back(keywords, dg, opis)
+        new_entry = self._write_back(keywords, report)
         self.retriever.add_entry(new_entry)
         print(f"[orchestrator] Novi unos zapisan u bazu: id={new_entry['id']}")
 
-        return {"source": "sonnet", "results": [{"dg": dg, "opis": opis}]}
+        return {"source": "sonnet", "results": [report]}
 
-    def _call_sonnet(self, keywords: list[str]) -> tuple[str, str]:
+    def _call_sonnet(self, keywords: list[str], details: str = "", lang: str = "hr") -> dict:
         kw_str = ", ".join(kw.strip() for kw in keywords if kw.strip())
-        prompt_text = f'Keywords: {kw_str}\n\nGeneriraj {{"opis": "...", "dg": "..."}}.'
+        lang = "en" if str(lang).lower().startswith("en") else "hr"
+        system_prompt = SYSTEM_PROMPT.replace("{jezik}", lang)
+        prompt_text = (
+            f"jezik: {lang}\n"
+            f"Case details: {details.strip()}\n"
+            f"Keywords: {kw_str}\n\n"
+            "Vrati SAMO JSON objekt prema shemi."
+        )
 
         body = json.dumps({
             "anthropic_version": "bedrock-2023-05-31",
-            "max_tokens": 1000,
+            "max_tokens": 1500,
             "system": [
                 {
                     "type": "text",
-                    "text": SYSTEM_PROMPT,
+                    "text": system_prompt,
                     "cache_control": {"type": "ephemeral"},
                 }
             ],
@@ -139,9 +204,35 @@ class Orchestrator:
         if not match:
             raise ValueError(f"Model nije vratio valjan JSON: {text[:200]}")
         parsed = json.loads(match.group())
-        return parsed["dg"], parsed["opis"]
+        return self._normalize_report(parsed, lang)
 
-    def _write_back(self, keywords: list[str], dg: str, opis: str) -> dict:
+    @staticmethod
+    def _normalize_report(parsed: dict, lang: str) -> dict:
+        """Osiguraj da rich nalaz ima očekivana polja; podrži i stari {opis, dg} oblik."""
+        if "sekcije" not in parsed and ("opis" in parsed or "dg" in parsed):
+            return _flat_to_report(parsed.get("dg", ""), parsed.get("opis", ""), parsed.get("komentar"))
+
+        sekcije = parsed.get("sekcije") or []
+        norm_sekcije = []
+        for sec in sekcije:
+            norm_sekcije.append({
+                "naslov": sec.get("naslov"),
+                "opis": sec.get("opis", ""),
+                "dg": sec.get("dg", ""),
+            })
+        if not norm_sekcije:
+            norm_sekcije = [{"naslov": None, "opis": "", "dg": ""}]
+
+        return {
+            "jezik": parsed.get("jezik", lang),
+            "vrsta_nalaza": parsed.get("vrsta_nalaza"),
+            "zaglavlje": parsed.get("zaglavlje") or {},
+            "sekcije": norm_sekcije,
+            "komentar": parsed.get("komentar"),
+        }
+
+    def _write_back(self, keywords: list[str], report: dict) -> dict:
+        dg, opis = _report_to_flat(report)
         new_entry = {
             "id": f"gen_{uuid.uuid4().hex[:8]}",
             "keywords": ", ".join(kw.strip() for kw in keywords if kw.strip()),
@@ -203,30 +294,29 @@ def lambda_handler(event, context):
     """
     AWS Lambda entry point — kompatibilan s postojećim AppSync/Amplify setupom.
 
-    Ulaz (AppSync mutation):  event.arguments.keywords = ["kw1", "kw2", ...]
-    Izlaz: JSON string {"opis": "...", "dg": "...", "source": "router"|"sonnet"}
+    Ulaz (AppSync mutation):  event.arguments = { keywords: [...], details?: str, lang?: str, action?: str }
+    Izlaz: JSON string { "source": "router"|"sonnet"|"none", "results": [<rich report>, ...] }
     """
-    keywords: list[str] = []
+    args: dict = {}
     if "arguments" in event:
-        keywords = event["arguments"].get("keywords") or []
+        args = event["arguments"] or {}
     elif "body" in event:
         body = event["body"]
         if isinstance(body, str):
             body = json.loads(body)
-        keywords = body.get("keywords") or []
+        args = body or {}
     else:
-        keywords = event.get("keywords") or []
+        args = event
 
-    action = ""
-    if "arguments" in event:
-        action = event["arguments"].get("action") or ""
-    if not action:
-        action = event.get("info", {}).get("fieldName", "")
+    keywords: list[str] = args.get("keywords") or []
+    details: str = args.get("details") or ""
+    lang: str = args.get("lang") or "hr"
+
+    action = args.get("action") or event.get("info", {}).get("fieldName", "")
 
     if action == "search" or action == "searchDatabase":
         result = _get_orchestrator().search(keywords)
     else:
-        result = _get_orchestrator().query(keywords)
-
+        result = _get_orchestrator().query(keywords, details=details, lang=lang)
 
     return json.dumps(result, ensure_ascii=False)
