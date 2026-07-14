@@ -33,6 +33,7 @@ import '@aws-amplify/ui-react/styles.css';
 import outputs from '../amplify_outputs.json';
 import { translations } from './translations';
 import taxonomy from '../amplify/functions/generate-report/taxonomy.json';
+import jpcCases from '../amplify/functions/generate-report/jpc_cases.json';
 import './index.css';
 
 Amplify.configure(outputs);
@@ -54,6 +55,46 @@ function taxLabel(kind, code, lang) {
   return item ? (item[lang] || item.en || code) : code;
 }
 
+// ─── JPC klasifikacijski kod (System–Etiology + broj) ───
+function jpcLetter(kind, code) {
+  if (!code) return '';
+  const item = (TAX[kind] || []).find((x) => x.code === code);
+  return item?.jpc || '';
+}
+// Prefiks iz klasifikacije, npr. INTEGUMENT + [NEOPLASTIC] → "I-N".
+function jpcPrefix(klas) {
+  if (!klas) return '';
+  const s = jpcLetter('system', klas.system);
+  const e = (klas.etiology && klas.etiology.length) ? jpcLetter('etiology', klas.etiology[0]) : '';
+  return s && e ? `${s}-${e}` : '';
+}
+function jpcTokens(s) {
+  return (String(s || '').toLowerCase().match(/[a-z]+/g) || []).filter((w) => w.length > 3);
+}
+// Najbliži konkretni JPC slučaj unutar prefiksa (po preklapanju riječi s dijagnozom).
+function jpcClosest(klas, dgText) {
+  const prefix = jpcPrefix(klas);
+  if (!prefix || !dgText) return null;
+  const cand = (jpcCases.cases || []).filter((c) => c.code.startsWith(prefix));
+  if (!cand.length) return null;
+  const qt = new Set(jpcTokens(dgText));
+  if (!qt.size) return null;
+  let best = null, bestScore = 0;
+  for (const c of cand) {
+    let sc = 0;
+    for (const tkn of jpcTokens(c.diagnosis)) if (qt.has(tkn)) sc++;
+    if (sc > bestScore) { bestScore = sc; best = c; }
+  }
+  return bestScore >= 2 ? best : null;
+}
+// Prikaz: puni kod + engleski opis ako je pouzdan pogodak, inače samo prefiks.
+function jpcCodeLabel(klas, dgText) {
+  const prefix = jpcPrefix(klas);
+  if (!prefix) return '';
+  const close = jpcClosest(klas, dgText);
+  return close ? `${close.code} — ${close.diagnosis}` : prefix;
+}
+
 function normalizeKlas(k) {
   k = k || {};
   let et = k.etiology;
@@ -63,6 +104,26 @@ function normalizeKlas(k) {
     system: k.system || null,
     etiology: Array.isArray(et) ? et.filter(Boolean) : [],
   };
+}
+
+// Pogodi tip uzorka (vrsta_uzorka) iz ključnih riječi / teksta — samo kao fallback
+// ako ga model nije popunio. NE određuje urudžbeni broj (to nije izvedivo iz sadržaja).
+const SAMPLE_TYPE_RULES = [
+  { re: /punktat|razmas|aspirat|citolog|fna/i, hr: 'citološki punktat', en: 'cytology aspirate' },
+  { re: /limf(ni|ni čvor|no)?/i, hr: 'punktat limfnog čvora', en: 'lymph node aspirate' },
+  { re: /subkut|potkož|dermis|kož[aei]|kožn/i, hr: 'bioptat kože', en: 'skin biopsy' },
+  { re: /mliječn|mamm|dojk/i, hr: 'bioptat mliječne žlijezde', en: 'mammary biopsy' },
+  { re: /testis|sjemenik/i, hr: 'bioptat testisa', en: 'testicular biopsy' },
+  { re: /slezen|splen/i, hr: 'bioptat slezene', en: 'splenic biopsy' },
+  { re: /želudac|želučan|crijev|duoden|gastro|intestin/i, hr: 'bioptat probavnog trakta', en: 'GI biopsy' },
+  { re: /štitnjač|thyro/i, hr: 'bioptat štitnjače', en: 'thyroid biopsy' },
+  { re: /jetr|hepat/i, hr: 'bioptat jetre', en: 'liver biopsy' },
+  { re: /bubreg|renal|nefr/i, hr: 'bioptat bubrega', en: 'renal biopsy' },
+];
+function guessSampleType(text, lang) {
+  const en = lang === 'en';
+  for (const r of SAMPLE_TYPE_RULES) if (r.re.test(text)) return en ? r.en : r.hr;
+  return '';
 }
 
 // Izvuci keyword-like pojmove iz slobodnog teksta Case detailsa.
@@ -140,7 +201,9 @@ function formatReportText(report, lang) {
   if (k.system) kParts.push(taxLabel('system', k.system, langKey));
   if (k.etiology && k.etiology.length) kParts.push(k.etiology.map((c) => taxLabel('etiology', c, langKey)).join(', '));
   if (kParts.length) lines.push(kParts.join(' · '));
-  if (zLine || kParts.length) lines.push('');
+  const jpc = jpcCodeLabel(k, reportDgSummary(report));
+  if (jpc) lines.push(`${en ? 'JPC code' : 'JPC kôd'}: ${jpc}`);
+  if (zLine || kParts.length || jpc) lines.push('');
   (report.sekcije || []).forEach((s) => {
     if (s.naslov && s.naslov.trim()) lines.push(`${s.naslov.trim()}:`);
     if (s.opis && s.opis.trim()) lines.push(s.opis.trim());
@@ -213,11 +276,16 @@ function ReportPreview({ report, lang, t }) {
         <p style={{ margin: '0 0 0.5rem', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>{zLine}</p>
       )}
       {kChips.length > 0 && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', marginBottom: '0.75rem' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', marginBottom: '0.5rem' }}>
           {kChips.map((c, i) => (
             <span key={i} style={{ fontSize: '0.72rem', fontWeight: 600, background: 'var(--bg-subtle, #f1f5f9)', color: 'var(--text-muted)', padding: '0.15rem 0.5rem', borderRadius: '999px' }}>{c}</span>
           ))}
         </div>
+      )}
+      {jpcCodeLabel(k, reportDgSummary(report)) && (
+        <p style={{ margin: '0 0 0.75rem', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+          <strong>{t('jpc_code')}:</strong> {jpcCodeLabel(k, reportDgSummary(report))}
+        </p>
       )}
       {(report.sekcije || []).map((s, i) => (
         <div key={i} style={{ marginBottom: '1rem' }}>
@@ -396,6 +464,11 @@ function ReportEditor({ report, lang, t, updateZaglavlje, updateKlas, toggleEtio
           <div>
             <div style={SECTION_LABEL}>{t('cls_section')}</div>
             <KlasControls value={report.klasifikacija} lang={lang} t={t} onSelect={updateKlas} onToggleEtiology={toggleEtiology} />
+            {jpcCodeLabel(report.klasifikacija, reportDgSummary(report)) && (
+              <p style={{ margin: '0.6rem 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                <strong>{t('jpc_code')}:</strong> {jpcCodeLabel(report.klasifikacija, reportDgSummary(report))}
+              </p>
+            )}
           </div>
         </div>
       </Collapsible>
@@ -878,7 +951,7 @@ function GeneratorContent({ signOut, user }) {
             setReport('');
             if (list.length === 1) {
               setSelectedIdx(0);
-              setEditedReport(cloneReport(list[0]));
+              setEditedReport(cloneReport(applyHeaderDefaults(list[0])));
             } else {
               setSelectedIdx(null);
               setEditedReport(null);
@@ -1010,6 +1083,26 @@ function GeneratorContent({ signOut, user }) {
     ...cls.etiology.map((c) => taxLabel('etiology', c, clsLangKey)),
   ].filter(Boolean).join(' · ') || t('cls_auto');
 
+  // Automatsko popunjavanje zaglavlja (samo prazna polja) pri generiranju.
+  const applyHeaderDefaults = (rep) => {
+    const doctor = userProfile.firstName && userProfile.lastName
+      ? `${t('doctor_prefix')} ${userProfile.firstName} ${userProfile.lastName}`
+      : (user?.signInDetails?.loginId || '');
+    const yy = String(new Date().getFullYear()).slice(-2);
+    const seq = parseInt(localStorage.getItem('vet_hp_seq') || '1', 10) || 1;
+    const sampleText = `${getKeywordInputs().join(' ')} ${details}`;
+
+    const z = { ...(rep.zaglavlje || {}) };
+    if (!z.oznaka_uzorka) z.oznaka_uzorka = `HP ${seq}/${yy}`;
+    if (!z.datum) z.datum = new Date().toLocaleDateString(lang === 'hr' ? 'hr-HR' : 'en-GB');
+    if (!z.doktor) z.doktor = doctor;
+    if (!z.vrsta_uzorka) {
+      const guess = guessSampleType(sampleText, lang);
+      if (guess) z.vrsta_uzorka = guess;
+    }
+    return { ...rep, zaglavlje: z };
+  };
+
   const activeReport = selectedIdx !== null && editedReport
     ? formatReportText(editedReport, lang)
     : report;
@@ -1026,6 +1119,9 @@ function GeneratorContent({ signOut, user }) {
         keywords: keywords.filter(k => k.trim() !== ''),
         report: activeReport
       });
+      // Nakon spremanja povećaj urudžbeni brojač (HP N/god) za sljedeći nalaz.
+      const seq = parseInt(localStorage.getItem('vet_hp_seq') || '1', 10) || 1;
+      localStorage.setItem('vet_hp_seq', String(seq + 1));
       alert('✅ Diagnosis successfully saved to your history!');
       fetchHistory(); // Refresh history if panel is open
     } catch (error) {
@@ -1125,10 +1221,12 @@ function GeneratorContent({ signOut, user }) {
         if (kl.animal_group) kParts.push(taxLabel('animal_group', kl.animal_group, langKey));
         if (kl.system) kParts.push(taxLabel('system', kl.system, langKey));
         if (kl.etiology && kl.etiology.length) kParts.push(kl.etiology.map((c) => taxLabel('etiology', c, langKey)).join(', '));
-        if (zLine || kParts.length) {
+        const jpc = jpcCodeLabel(kl, reportDgSummary(editedReport));
+        if (zLine || kParts.length || jpc) {
           htmlContent += `<div style="margin-bottom: 20px;">`;
           if (zLine) htmlContent += `<p style="margin: 0 0 4px 0; font-size: 13px; font-weight: 600; color: #475569;">${esc(zLine)}</p>`;
-          if (kParts.length) htmlContent += `<p style="margin: 0; font-size: 12px; color: #64748b;">${esc(kParts.join(' · '))}</p>`;
+          if (kParts.length) htmlContent += `<p style="margin: 0 0 2px 0; font-size: 12px; color: #64748b;">${esc(kParts.join(' · '))}</p>`;
+          if (jpc) htmlContent += `<p style="margin: 0; font-size: 12px; color: #64748b;"><strong>${en ? 'JPC code' : 'JPC kôd'}:</strong> ${esc(jpc)}</p>`;
           htmlContent += `</div>`;
         }
 

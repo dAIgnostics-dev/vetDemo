@@ -1,0 +1,5257 @@
+{
+ "_source": "JPC Veterinary Systemic Pathology Online (VSPO) — https://www.askjpc.org/vspo/",
+ "_note": "Kod = <System><->< Etiology><broj>. system/etiology mapirani na taxonomy.json kodove. diagnosis = puni opis (dijagnoza, tkivo, vrsta).",
+ "_count": 875,
+ "cases": [
+  {
+   "code": "C-B01",
+   "system": "CARDIOVASCULAR",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Salmonella pullorum, heart, chicken"
+  },
+  {
+   "code": "C-B02",
+   "system": "CARDIOVASCULAR",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Streptococcus pneumoniae, heart, guinea pig"
+  },
+  {
+   "code": "C-B03",
+   "system": "CARDIOVASCULAR",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Mycobacterium avium ssp. paratuberculosis, heart, ox"
+  },
+  {
+   "code": "C-F01",
+   "system": "CARDIOVASCULAR",
+   "etiology": "FUNGAL",
+   "diagnosis": "Coccidioides immitis, heart, dog"
+  },
+  {
+   "code": "C-M01",
+   "system": "CARDIOVASCULAR",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Dystrophic mineralization, heart, mouse"
+  },
+  {
+   "code": "C-M02",
+   "system": "CARDIOVASCULAR",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Rhabdomyomatosis, heart, guinea pig"
+  },
+  {
+   "code": "C-M03",
+   "system": "CARDIOVASCULAR",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Endocardial fibroelastosis, heart, cat"
+  },
+  {
+   "code": "C-M04",
+   "system": "CARDIOVASCULAR",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Polyarteritis nodosa, mesenteric vessels, rat"
+  },
+  {
+   "code": "C-M05",
+   "system": "CARDIOVASCULAR",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Atherosclerosis, heart, dog"
+  },
+  {
+   "code": "C-M06",
+   "system": "CARDIOVASCULAR",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Vitamin E/Selenium Imbalance, heart, pig"
+  },
+  {
+   "code": "C-M07A",
+   "system": "CARDIOVASCULAR",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Aotus cardiomyopathy, heart, owl monkey"
+  },
+  {
+   "code": "C-M07B",
+   "system": "CARDIOVASCULAR",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Aotus cardiomyopathy, lung, owl monkey"
+  },
+  {
+   "code": "C-M07C",
+   "system": "CARDIOVASCULAR",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Aotus cardiomyopathy, liver, owl monkey"
+  },
+  {
+   "code": "C-M08",
+   "system": "CARDIOVASCULAR",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Myocardial epithelial inclusions, Heart, cow"
+  },
+  {
+   "code": "C-M09",
+   "system": "CARDIOVASCULAR",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Endomyocarditis (EMC), Heart, cat"
+  },
+  {
+   "code": "C-M10",
+   "system": "CARDIOVASCULAR",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Hypertrophic cardiomyopathy, heart"
+  },
+  {
+   "code": "C-M11",
+   "system": "CARDIOVASCULAR",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Traumatic pericarditis, Heart, cow"
+  },
+  {
+   "code": "C-M12",
+   "system": "CARDIOVASCULAR",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Feline systemic reactive angioendotheliomatosis, Heart, cat"
+  },
+  {
+   "code": "C-N01",
+   "system": "CARDIOVASCULAR",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Schwannoma, Heart, rat"
+  },
+  {
+   "code": "C-N02",
+   "system": "CARDIOVASCULAR",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Hemangiosarcoma, heart, dog"
+  },
+  {
+   "code": "C-N03",
+   "system": "CARDIOVASCULAR",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Peripheral nerve sheath tumor, heart, Ox"
+  },
+  {
+   "code": "C-P01",
+   "system": "CARDIOVASCULAR",
+   "etiology": "PARASITIC",
+   "diagnosis": "Spirocerca lupi infection, aorta, dog"
+  },
+  {
+   "code": "C-P02",
+   "system": "CARDIOVASCULAR",
+   "etiology": "PARASITIC",
+   "diagnosis": "Strongylus vulgaris infection, artery, horse"
+  },
+  {
+   "code": "C-P03",
+   "system": "CARDIOVASCULAR",
+   "etiology": "PARASITIC",
+   "diagnosis": "Dirofilaria immitis infection, lung, dog"
+  },
+  {
+   "code": "C-P04",
+   "system": "CARDIOVASCULAR",
+   "etiology": "PARASITIC",
+   "diagnosis": "Cysticercosis, heart, ox"
+  },
+  {
+   "code": "C-P05",
+   "system": "CARDIOVASCULAR",
+   "etiology": "PARASITIC",
+   "diagnosis": "Acanthamoeba sp. infection, heart, dog"
+  },
+  {
+   "code": "C-P06",
+   "system": "CARDIOVASCULAR",
+   "etiology": "PARASITIC",
+   "diagnosis": "Chagas' disease, heart, dog"
+  },
+  {
+   "code": "C-V01",
+   "system": "CARDIOVASCULAR",
+   "etiology": "VIRAL",
+   "diagnosis": "Canine parvoviral type 2 infection, heart, dog"
+  },
+  {
+   "code": "C-V02",
+   "system": "CARDIOVASCULAR",
+   "etiology": "VIRAL",
+   "diagnosis": "Encephalomyocarditis virus infection, heart, pig"
+  },
+  {
+   "code": "C-V03",
+   "system": "CARDIOVASCULAR",
+   "etiology": "VIRAL",
+   "diagnosis": "Epizootic Hemorrhagic Disease (EHD) of Deer, heart, deer"
+  },
+  {
+   "code": "C-V04",
+   "system": "CARDIOVASCULAR",
+   "etiology": "VIRAL",
+   "diagnosis": "West Nile virus infection, heart, Chilean flamingo"
+  },
+  {
+   "code": "C-V05",
+   "system": "CARDIOVASCULAR",
+   "etiology": "VIRAL",
+   "diagnosis": "Elephant endotheliotropic herpesvirus, Heart/Liver, Elephant"
+  },
+  {
+   "code": "D-B01",
+   "system": "DIGESTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Salmonella enteritidis infection, Liver, Guinea pig"
+  },
+  {
+   "code": "D-B02",
+   "system": "DIGESTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Clostridium perfringens type C infection, small intestine, horse"
+  },
+  {
+   "code": "D-B03",
+   "system": "DIGESTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Ulcerative enteritis, small intestine, quail"
+  },
+  {
+   "code": "D-B04",
+   "system": "DIGESTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Braxy, abomasum, ox"
+  },
+  {
+   "code": "D-B05A",
+   "system": "DIGESTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Fusobacterium necrophorum, liver, sheep"
+  },
+  {
+   "code": "D-B05B",
+   "system": "DIGESTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Fusobacterium necrophorum, esophagus, larynx, deer"
+  },
+  {
+   "code": "D-B06A",
+   "system": "DIGESTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Tyzzer's disease, liver, horse"
+  },
+  {
+   "code": "D-B06C",
+   "system": "DIGESTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Tyzzers disease colitis, Colon, Cat"
+  },
+  {
+   "code": "D-B07",
+   "system": "DIGESTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Bacillary dysentery, colon, Rhesus monkey"
+  },
+  {
+   "code": "D-B09",
+   "system": "DIGESTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Paratuberculosis, small intestine, mesentery, adipose tissue, ox"
+  },
+  {
+   "code": "D-B10",
+   "system": "DIGESTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Avian mycobacteriosis, liver, quail"
+  },
+  {
+   "code": "D-B11",
+   "system": "DIGESTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Yersinia enterocolitica infection, colon, liver, African green monkey"
+  },
+  {
+   "code": "D-B12",
+   "system": "DIGESTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Psittacosis, liver, Amazon parrot"
+  },
+  {
+   "code": "D-B13",
+   "system": "DIGESTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Enterotoxigenic colibacillosis, small intestine, pig"
+  },
+  {
+   "code": "D-B14",
+   "system": "DIGESTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Tularemia, liver, beaver"
+  },
+  {
+   "code": "D-B15A",
+   "system": "DIGESTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Intestinal adenomatosis complex of swine, ileum, pig"
+  },
+  {
+   "code": "D-B15B",
+   "system": "DIGESTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Proliferative colitis, colon, ferret"
+  },
+  {
+   "code": "D-B15D",
+   "system": "DIGESTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Proliferative ileitis, small intestine, hamster"
+  },
+  {
+   "code": "D-B16",
+   "system": "DIGESTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Swine dysentery, colon, pig"
+  },
+  {
+   "code": "D-B17",
+   "system": "DIGESTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Bacillary hemoglobinuria, liver, ox"
+  },
+  {
+   "code": "D-B18A",
+   "system": "DIGESTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Helicobacter infection, stomach, ferret"
+  },
+  {
+   "code": "D-B18C",
+   "system": "DIGESTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Helicobacter infection, liver, mouse"
+  },
+  {
+   "code": "D-F01",
+   "system": "DIGESTIVE",
+   "etiology": "FUNGAL",
+   "diagnosis": "Histoplasma capsulatum infection, colon, dog"
+  },
+  {
+   "code": "D-F02",
+   "system": "DIGESTIVE",
+   "etiology": "FUNGAL",
+   "diagnosis": "Mycotic rumenitis, rumen, ox"
+  },
+  {
+   "code": "D-F03",
+   "system": "DIGESTIVE",
+   "etiology": "FUNGAL",
+   "diagnosis": "Prototheca sp. infection, colon, dog"
+  },
+  {
+   "code": "D-F04",
+   "system": "DIGESTIVE",
+   "etiology": "FUNGAL",
+   "diagnosis": "Pythiosis, small intestine, dog"
+  },
+  {
+   "code": "D-F05",
+   "system": "DIGESTIVE",
+   "etiology": "FUNGAL",
+   "diagnosis": "Candida albicans, esophagus, non-human primate"
+  },
+  {
+   "code": "D-F06",
+   "system": "DIGESTIVE",
+   "etiology": "FUNGAL",
+   "diagnosis": "Macrorhabdus ornithogaster, isthmus, ventriculus, proventriculus,, Canary"
+  },
+  {
+   "code": "D-M01A",
+   "system": "DIGESTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Feline eosinophilic granuloma complex, oral mucosa, cat"
+  },
+  {
+   "code": "D-M01B",
+   "system": "DIGESTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Canine oral eosinophilic granuloma, oral mucosa, dog"
+  },
+  {
+   "code": "D-M02",
+   "system": "DIGESTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Eosinophilic enteritis, small intestine, horse"
+  },
+  {
+   "code": "D-M03",
+   "system": "DIGESTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Chronic hypertrophic gastritis, stomach, dog"
+  },
+  {
+   "code": "D-M04",
+   "system": "DIGESTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Mucoid enteropathy, ileum, rabbit"
+  },
+  {
+   "code": "D-M05",
+   "system": "DIGESTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Intestinal emphysema, small intestine, pig"
+  },
+  {
+   "code": "D-M06",
+   "system": "DIGESTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Equine serum hepatitis, liver, horse"
+  },
+  {
+   "code": "D-M07",
+   "system": "DIGESTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Lymphocytic cholangiohepatitis, liver, cat"
+  },
+  {
+   "code": "D-M08",
+   "system": "DIGESTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Uremic gastropathy, stomach, dog"
+  },
+  {
+   "code": "D-M09",
+   "system": "DIGESTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Vitamin A deficiency, esophagus, chicken"
+  },
+  {
+   "code": "D-M10",
+   "system": "DIGESTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Hepatosis dietetica, liver, pig"
+  },
+  {
+   "code": "D-M11",
+   "system": "DIGESTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Hepatic lipidosis, liver, donkey"
+  },
+  {
+   "code": "D-M12",
+   "system": "DIGESTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Canine necrotizing sialometaplasia, salivary gland, dog"
+  },
+  {
+   "code": "D-M13",
+   "system": "DIGESTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Congenital portosystemic shunt (PSS), liver, dog"
+  },
+  {
+   "code": "D-M14",
+   "system": "DIGESTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Gastric heteropy, jejunum, dog"
+  },
+  {
+   "code": "D-M15",
+   "system": "DIGESTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Acute pancreatic necrosis, pancreas, dog"
+  },
+  {
+   "code": "D-M16",
+   "system": "DIGESTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Lymphangiectasia, small intestine, dog"
+  },
+  {
+   "code": "D-M17",
+   "system": "DIGESTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Canine chronic hepatitis (CCH), liver, dog"
+  },
+  {
+   "code": "D-M18",
+   "system": "DIGESTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Salivary mucocele, Salivary gland, dog"
+  },
+  {
+   "code": "D-M19",
+   "system": "DIGESTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Eosinophilic sclerosing fibroplasi, Stomach, Cat"
+  },
+  {
+   "code": "D-M20",
+   "system": "DIGESTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Hemochromatosis, Liver, Dog"
+  },
+  {
+   "code": "D-M21",
+   "system": "DIGESTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Intestinal pseudo-obstruction, stomach, small intestine, large intestine, Dog"
+  },
+  {
+   "code": "D-N01",
+   "system": "DIGESTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Fibromatous epulis of periodontal ligament origin / peripheral odontogenic fibroma, gingiva, dog"
+  },
+  {
+   "code": "D-N02A",
+   "system": "DIGESTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Odontoameloblastoma, gingiva, rhesus monkey"
+  },
+  {
+   "code": "D-N02B",
+   "system": "DIGESTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Canine acanthomatous ameloblastoma, gingiva, dog"
+  },
+  {
+   "code": "D-N02C",
+   "system": "DIGESTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Ameloblastoma, Gingiva, Mouse"
+  },
+  {
+   "code": "D-N03",
+   "system": "DIGESTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Hepatocellular carcinoma, liver, woodchuck"
+  },
+  {
+   "code": "D-N04",
+   "system": "DIGESTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Mast cell tumor, small intestine, cat"
+  },
+  {
+   "code": "D-N05A",
+   "system": "DIGESTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Adenocarcinoma, duodenum, pancreas, rhesus monkey"
+  },
+  {
+   "code": "D-N05B",
+   "system": "DIGESTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Adenocarcinoma, colon, cotton-top tamarin"
+  },
+  {
+   "code": "D-N05C",
+   "system": "DIGESTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Adenocarcinoma, pancreatic hyalinizing, pancreas, dog"
+  },
+  {
+   "code": "D-N06",
+   "system": "DIGESTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Anal sac gland adenocarcinoma, anal sac gland, dog"
+  },
+  {
+   "code": "D-N07",
+   "system": "DIGESTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Carcinoid, cecum, dog"
+  },
+  {
+   "code": "D-N08",
+   "system": "DIGESTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Gastric squamous cell carcinoma, stomach, horse"
+  },
+  {
+   "code": "D-N09",
+   "system": "DIGESTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Cholangiocarcinoma/papilloma, liver, oropharynx, Military macaw"
+  },
+  {
+   "code": "D-N10",
+   "system": "DIGESTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Plasmacytoma, rectum, dog"
+  },
+  {
+   "code": "D-N11",
+   "system": "DIGESTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Salivary adenocarcinoma, Salivary gland, Cat"
+  },
+  {
+   "code": "D-N12",
+   "system": "DIGESTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Myoepithelioma, Salivary gland, Mouse"
+  },
+  {
+   "code": "D-P01A",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Coccidiosis - Eimeria tenella, cecum, chicken"
+  },
+  {
+   "code": "D-P01B",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Coccidiosis - Eimeria macusaniensis, Small intestine, Alpaca"
+  },
+  {
+   "code": "D-P02",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Hepatic coccidiosis, liver, rabbit"
+  },
+  {
+   "code": "D-P03A",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Amebiasis, liver, mesentery, kidney, Pilot black snake"
+  },
+  {
+   "code": "D-P03B",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Amebiasis, colon, snake"
+  },
+  {
+   "code": "D-P03C",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Amebiasis, colon, Golden Lion tamarin"
+  },
+  {
+   "code": "D-P04",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Hepatocystis kochi infection, liver, African green monkey"
+  },
+  {
+   "code": "D-P05",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Histomoniasis, liver, cecum, chicken"
+  },
+  {
+   "code": "D-P06A",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Cryptosporidia sp. infection, stomach, boa constrictor"
+  },
+  {
+   "code": "D-P06B",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Cryptosporidia sp. infection, bile duct, rhesus macaque"
+  },
+  {
+   "code": "D-P07",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Spironucleus muris infection, small intestine, mouse"
+  },
+  {
+   "code": "D-P08",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Draschia megastoma infection, stomach, horse"
+  },
+  {
+   "code": "D-P09",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Prosthenorchis elegans infection, ileum, Moustached tamarin"
+  },
+  {
+   "code": "D-P10",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Spirocerca lupi infection, esophagus, dog"
+  },
+  {
+   "code": "D-P11",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Heterakis isolonche infection, cecum, Golden pheasant"
+  },
+  {
+   "code": "D-P12A",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Oxyuriasis, colon, chimpanzee"
+  },
+  {
+   "code": "D-P12B",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Oxyuriasis, colon, mouse"
+  },
+  {
+   "code": "D-P13",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Ostertagiasis, abomasum, ox"
+  },
+  {
+   "code": "D-P14",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Nochtiasis, stomach, Rhesus monkey"
+  },
+  {
+   "code": "D-P15",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Tetrameriasis, proventriculus, pigeon"
+  },
+  {
+   "code": "D-P16",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Trichostrongylosis, small intestine, Cebus monkey"
+  },
+  {
+   "code": "D-P17",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Strongyloidiasis, small intestine, gibbon"
+  },
+  {
+   "code": "D-P18",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Rodentolepiasis, small intestine, mouse"
+  },
+  {
+   "code": "D-P19",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Athesmia foxi infection, liver, squirrel monkey"
+  },
+  {
+   "code": "D-P20",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Schistosomiasis, liver, mouse"
+  },
+  {
+   "code": "D-P21A",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Capillarial hepatitis, Liver, Hare"
+  },
+  {
+   "code": "D-P21B",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Capillarial ingluvitis, Crop, Guinea fowl"
+  },
+  {
+   "code": "D-P22",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Cysticercosis, liver, mouse"
+  },
+  {
+   "code": "D-P23",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Liver fluke disease, liver, ox"
+  },
+  {
+   "code": "D-P24A",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Hemomelasma ilei, small intestine, serosa, horse"
+  },
+  {
+   "code": "D-P24B",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Cyathostomiasis, cecum, horse"
+  },
+  {
+   "code": "D-P25",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Trichostrongyliasis, stomach, cat"
+  },
+  {
+   "code": "D-P26",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Trichospiruriasis, pancreas, duodenum, lymph node, marmoset"
+  },
+  {
+   "code": "D-P27A",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Distomiasis, liver, ox"
+  },
+  {
+   "code": "D-P27B",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Distomiasis, liver, Cat"
+  },
+  {
+   "code": "D-P28A",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Echinococcus multilocularis, liver, Barbary ape"
+  },
+  {
+   "code": "D-P28B",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Echinococcus granulosus, Liver, Horse"
+  },
+  {
+   "code": "D-P29",
+   "system": "DIGESTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Oesophagostomum spp, Large intestine, monkey"
+  },
+  {
+   "code": "D-T01",
+   "system": "DIGESTIVE",
+   "etiology": "TOXIC",
+   "diagnosis": "Cocklebur intoxication, liver, pig"
+  },
+  {
+   "code": "D-T02",
+   "system": "DIGESTIVE",
+   "etiology": "TOXIC",
+   "diagnosis": "Gossypol toxicity, liver, pig"
+  },
+  {
+   "code": "D-T03",
+   "system": "DIGESTIVE",
+   "etiology": "TOXIC",
+   "diagnosis": "Aflatoxicosis, liver, ox"
+  },
+  {
+   "code": "D-T04A",
+   "system": "DIGESTIVE",
+   "etiology": "TOXIC",
+   "diagnosis": "Pyrrolizidine alkaloid toxicity, liver, ox"
+  },
+  {
+   "code": "D-T04B",
+   "system": "DIGESTIVE",
+   "etiology": "TOXIC",
+   "diagnosis": "Pyrrolizidine alkaloid hepatopathy, Liver, Horse"
+  },
+  {
+   "code": "D-T05",
+   "system": "DIGESTIVE",
+   "etiology": "TOXIC",
+   "diagnosis": "Inherited copper toxicosis of Bedlington terriers, liver, dog"
+  },
+  {
+   "code": "D-T06",
+   "system": "DIGESTIVE",
+   "etiology": "TOXIC",
+   "diagnosis": "Mycotic lupinosis, liver, sheep"
+  },
+  {
+   "code": "D-T07",
+   "system": "DIGESTIVE",
+   "etiology": "TOXIC",
+   "diagnosis": "Mebendazole toxicity, liver, dog"
+  },
+  {
+   "code": "D-T08",
+   "system": "DIGESTIVE",
+   "etiology": "TOXIC",
+   "diagnosis": "Acetaminophen toxicity, liver, dog"
+  },
+  {
+   "code": "D-T09",
+   "system": "DIGESTIVE",
+   "etiology": "TOXIC",
+   "diagnosis": "Zinc toxicity, pancreas, American Eider duck"
+  },
+  {
+   "code": "D-T10",
+   "system": "DIGESTIVE",
+   "etiology": "TOXIC",
+   "diagnosis": "Non-steroidal anti-inflammatory drugs (NSAIDs) toxicity, colon, horse"
+  },
+  {
+   "code": "D-T11",
+   "system": "DIGESTIVE",
+   "etiology": "TOXIC",
+   "diagnosis": "Microcystin-LR toxicity, liver, ox"
+  },
+  {
+   "code": "D-T12",
+   "system": "DIGESTIVE",
+   "etiology": "TOXIC",
+   "diagnosis": "Lantana toxicosis, liver, ox"
+  },
+  {
+   "code": "D-T13",
+   "system": "DIGESTIVE",
+   "etiology": "TOXIC",
+   "diagnosis": "Sporidesmin toxicosis (facial eczema), liver, sheep"
+  },
+  {
+   "code": "D-T14",
+   "system": "DIGESTIVE",
+   "etiology": "TOXIC",
+   "diagnosis": "Arsenic toxicity, rumen, ox"
+  },
+  {
+   "code": "D-V01",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Feline panleukopenia, small intestine, lymph node, cat"
+  },
+  {
+   "code": "D-V02",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Canine Parvovirus-2 infection, small intestine, dog"
+  },
+  {
+   "code": "D-V03",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Canine coronavirus infection, small intestine, dog"
+  },
+  {
+   "code": "D-V04A",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Mouse hepatitis, liver, mouse"
+  },
+  {
+   "code": "D-V04B",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Lethal Intestinal Virus of Infant Mice (LIVIM), small intestine, mouse"
+  },
+  {
+   "code": "D-V05",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Rat sialodacryoadenitis virus (SDAV) infection, salivary glands, lymph node, rat"
+  },
+  {
+   "code": "D-V06",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Transmissible Gastroenteritis (TGE), small intestine, pig"
+  },
+  {
+   "code": "D-V07",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Epizootic Diarrhea of Infant Mice (EDIM), small intestine, mouse"
+  },
+  {
+   "code": "D-V08",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Infectious Diarrhea of Infant Rats (IDIR), small intestine, rat"
+  },
+  {
+   "code": "D-V09A",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Bovine viral diarrhea, mucosal disease, colon, ox"
+  },
+  {
+   "code": "D-V09B",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Bovine viral diarrhea, mucosal disease, esophagus, lymph node, ox"
+  },
+  {
+   "code": "D-V10",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Duck virus enteritis, liver, spleen, lung, Muscovy duck"
+  },
+  {
+   "code": "D-V11",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Vesicular stomatitis, oral mucosa, ox"
+  },
+  {
+   "code": "D-V12",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Guinea pig cytomegalovirus infection, salivary gland, guinea pig"
+  },
+  {
+   "code": "D-V13",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Pacheco's disease, liver, Cockatoo"
+  },
+  {
+   "code": "D-V14",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Herpesvirus saimiri type 1 (HVS-1) infection, liver, marmoset"
+  },
+  {
+   "code": "D-V15",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Malignant catarrhal fever (MCF), colon, ox"
+  },
+  {
+   "code": "D-V16",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Bluetongue, tongue, sheep"
+  },
+  {
+   "code": "D-V17",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Foot-and-mouth disease (FMD), tongue, Kudu"
+  },
+  {
+   "code": "D-V18",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Rift Valley Fever, liver, gallbladder, sheep"
+  },
+  {
+   "code": "D-V19",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Infectious canine hepatitis (ICH), liver, dog"
+  },
+  {
+   "code": "D-V20A",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Inclusion body hepatitis (IBH), liver, chicken"
+  },
+  {
+   "code": "D-V20B",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Turkey hemorrhagic enteritis virus, spleen, intestine, turkey"
+  },
+  {
+   "code": "D-V21A",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Bovine papular stomatitis, rumen, tongue, ox"
+  },
+  {
+   "code": "D-V21B",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Bovine papular stomatitis, esophagus, ox"
+  },
+  {
+   "code": "D-V22",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Contagious ecthyma, tongue, sheep"
+  },
+  {
+   "code": "D-V23",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Yellow Fever, liver, rhesus monkey"
+  },
+  {
+   "code": "D-V24",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Retroperitoneal fibromatosis, small intestine, rhesus monkey"
+  },
+  {
+   "code": "D-V25",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Highly pathogenic avian influenza (HPAI), pancreas, chicken"
+  },
+  {
+   "code": "D-V26",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Infectious pancreatic necrosis (IPN), pancreas, pyloric ceca, trout"
+  },
+  {
+   "code": "D-V27",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Callitrichid hepatitis (CH), liver, Golden lion tamarin"
+  },
+  {
+   "code": "D-V28",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Rinderpest, colon, ox"
+  },
+  {
+   "code": "D-V29",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Wesselsbron disease, liver, sheep"
+  },
+  {
+   "code": "D-V30",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Inclusion body disease (IBD) of boid snakes and Zygomycosis, intestine, Boa constrictor"
+  },
+  {
+   "code": "D-V31",
+   "system": "DIGESTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Rabbit hemorrhagic disease (RHD), liver, spleen, lung, rabbit"
+  },
+  {
+   "code": "E-M01A",
+   "system": "ENDOCRINE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Lymphocytic insulitis, pancreas, rat"
+  },
+  {
+   "code": "E-M01B",
+   "system": "ENDOCRINE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Lymphocytic thyroiditis, thyroid gland, rat"
+  },
+  {
+   "code": "E-M02A",
+   "system": "ENDOCRINE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Cystic remnant of the craniopharyngeal duct (Rathke's pouch), pituitary gland, dog"
+  },
+  {
+   "code": "E-M02B",
+   "system": "ENDOCRINE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Pituitary pseudocysts, pituitary gland, maned wolf"
+  },
+  {
+   "code": "E-M03",
+   "system": "ENDOCRINE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Islet amyloidosis, pancreas, cat"
+  },
+  {
+   "code": "E-M04A",
+   "system": "ENDOCRINE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Iatrogenic adrenocortical atrophy, adrenal gland, dog"
+  },
+  {
+   "code": "E-M04B",
+   "system": "ENDOCRINE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Idiopathic adrenocortical atrophy, adrenal gland, dog"
+  },
+  {
+   "code": "E-M05",
+   "system": "ENDOCRINE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Primary hypoadrenocorticism, adrenal gland, dog"
+  },
+  {
+   "code": "E-N01",
+   "system": "ENDOCRINE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Adenoma of the pars distalis, pituitary gland, dog"
+  },
+  {
+   "code": "E-N02",
+   "system": "ENDOCRINE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Adenoma of the pars intermedia, pituitary gland, horse"
+  },
+  {
+   "code": "E-N03",
+   "system": "ENDOCRINE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Adenomatous thyroid hyperplasia, thyroid gland, cat"
+  },
+  {
+   "code": "E-N04A",
+   "system": "ENDOCRINE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Follicular adenoma, thyroid gland, dog"
+  },
+  {
+   "code": "E-N04B",
+   "system": "ENDOCRINE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Follicular carcinoma, thyroid gland, dog"
+  },
+  {
+   "code": "E-N04C",
+   "system": "ENDOCRINE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Follicular adenoma, thyroid gland, dog"
+  },
+  {
+   "code": "E-N05",
+   "system": "ENDOCRINE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "C cell carcinoma, thyroid gland, rat"
+  },
+  {
+   "code": "E-N06A",
+   "system": "ENDOCRINE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Pheochromocytoma, adrenal gland, ox"
+  },
+  {
+   "code": "E-N06B",
+   "system": "ENDOCRINE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Malignant pheochromocytoma, adrenal gland, dog"
+  },
+  {
+   "code": "E-N07A",
+   "system": "ENDOCRINE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Parathyroid adenoma, parathyroid gland, dog"
+  },
+  {
+   "code": "E-N07B",
+   "system": "ENDOCRINE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Parathyroid hyperplasia, parathyroid gland, dog"
+  },
+  {
+   "code": "E-N08",
+   "system": "ENDOCRINE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Nodular adrenocortical hyperplasia, adrenal gland, dog"
+  },
+  {
+   "code": "E-N09",
+   "system": "ENDOCRINE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Adrenocortical carcinoma, adrenal gland, dog"
+  },
+  {
+   "code": "E-N10",
+   "system": "ENDOCRINE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Islet cell tumor, pancreas, dog"
+  },
+  {
+   "code": "E-N11",
+   "system": "ENDOCRINE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Chemodectoma, fibroadipose tissue, dog"
+  },
+  {
+   "code": "E-N12",
+   "system": "ENDOCRINE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Carcinoid, cecum, dog"
+  },
+  {
+   "code": "E-N13",
+   "system": "ENDOCRINE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Hyperplastic goiter, thyroid gland, ox"
+  },
+  {
+   "code": "E-P01",
+   "system": "ENDOCRINE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Toxoplasmosis, adrenal gland, cat"
+  },
+  {
+   "code": "E-P02",
+   "system": "ENDOCRINE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Pentastomiasis, adipose tissue, Cynomolgus monkey"
+  },
+  {
+   "code": "E-V01",
+   "system": "ENDOCRINE",
+   "etiology": "VIRAL",
+   "diagnosis": "Pseudorabies, adrenal gland, pig"
+  },
+  {
+   "code": "H-B01A",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Anthrax, Spleen, Lung, Bull"
+  },
+  {
+   "code": "H-B01B",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Anthrax, Lymph node, Pig"
+  },
+  {
+   "code": "H-B02",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Cervical lymphadenitis (lumps), Lymph node, Guinea pig"
+  },
+  {
+   "code": "H-B03",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Johne's disease, Lymph node, Cow"
+  },
+  {
+   "code": "H-B04",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Yersiniosis, Lymph node, Blesbok"
+  },
+  {
+   "code": "H-B05",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Plague, lymph node, lung, Prairie dog"
+  },
+  {
+   "code": "H-B06",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Caseous lymphadenitis, Lymph node, Sheep"
+  },
+  {
+   "code": "H-B07A",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Wooden tongue, Lymph node, Cow"
+  },
+  {
+   "code": "H-B07B",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Wooden tongue, Tongue, cow"
+  },
+  {
+   "code": "H-B08",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Tularemia, Spleen, lymph node, Rat"
+  },
+  {
+   "code": "H-B09",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Cat scratch disease, Lymph node, Man"
+  },
+  {
+   "code": "H-B10A",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Salmon poisoning disease, Lymph node, Dog"
+  },
+  {
+   "code": "H-B10B",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Salmon poisoning disease, Spleen, Dog"
+  },
+  {
+   "code": "H-B10C",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Salmon poisoning disease, Skeletal muscle, gills, Salmon"
+  },
+  {
+   "code": "H-B11",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Canine ehrlichiosis, Blood, Dog"
+  },
+  {
+   "code": "H-F01",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "FUNGAL",
+   "diagnosis": "Sporothricosis, Lymph node, Dolphin"
+  },
+  {
+   "code": "H-M01",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Pelger-Huet Anomaly, Blood, Dog"
+  },
+  {
+   "code": "H-M02",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Combined immunodeficiency (CID), Spleen, Thymus, Pancreas, Foal"
+  },
+  {
+   "code": "H-M03",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Congenital dyserythropoiesis and dyskeratosis, Bone marrow, Skin, Calf"
+  },
+  {
+   "code": "H-M04",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Bovine leukocyte adhesion deficiency (BLAD), Spleen, Bone marrow, Calf"
+  },
+  {
+   "code": "H-N01",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Thymoma, Thymus, Dog"
+  },
+  {
+   "code": "H-N02",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Lymphoma, Lymph node, Cat"
+  },
+  {
+   "code": "H-N03",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Histiocytic sarcoma, Liver, Mouse"
+  },
+  {
+   "code": "H-N04",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Myelolipoma, Liver, Chicken"
+  },
+  {
+   "code": "H-N05A",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Lymphoma, Marginal zone (MZL), lymph node, dog"
+  },
+  {
+   "code": "H-N05B",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "T-zone lymphoma, Lymph node, Dog"
+  },
+  {
+   "code": "H-P01",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "PARASITIC",
+   "diagnosis": "Mycoplasma haemocanis infection, Blood, Dog"
+  },
+  {
+   "code": "H-P02",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "PARASITIC",
+   "diagnosis": "Babesiosis, Blood, Dog"
+  },
+  {
+   "code": "H-P03A",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "PARASITIC",
+   "diagnosis": "Malaria, Blood, Cynomolgus macaque"
+  },
+  {
+   "code": "H-P03B",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "PARASITIC",
+   "diagnosis": "Malaria, Spleen, LN, liver, Cynomolgus macaque"
+  },
+  {
+   "code": "H-P04",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "PARASITIC",
+   "diagnosis": "Cytauxzoonosis, Lymph node, Liver, Lung, Cat"
+  },
+  {
+   "code": "H-P05A",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "PARASITIC",
+   "diagnosis": "East Coast Fever, Lymph node, Bull"
+  },
+  {
+   "code": "H-P05B",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "PARASITIC",
+   "diagnosis": "East Coast Fever, Cerebrum, Bull"
+  },
+  {
+   "code": "H-P06",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "PARASITIC",
+   "diagnosis": "Leucocytozoon sp. infection, Heart, Parakeet"
+  },
+  {
+   "code": "H-P07",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "PARASITIC",
+   "diagnosis": "Leishmania sp. infection, Spleen, Liver, Dog"
+  },
+  {
+   "code": "H-P08",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "PARASITIC",
+   "diagnosis": "Schistosomiasis, Lymph node, Liver, Cynomolgus monkey"
+  },
+  {
+   "code": "H-P09",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "PARASITIC",
+   "diagnosis": "Systemic isosporosis, Atoxoplasmosis, Intestines, bird"
+  },
+  {
+   "code": "H-V01",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "VIRAL",
+   "diagnosis": "Marek's disease, Feathered skin, Chicken"
+  },
+  {
+   "code": "H-V02",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "VIRAL",
+   "diagnosis": "Herpesviral lymphoma, Liver, Owl monkey"
+  },
+  {
+   "code": "H-V03",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "VIRAL",
+   "diagnosis": "Pacheco's disease, Thymus, Spleen, Liver, Macaw"
+  },
+  {
+   "code": "H-V04",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "VIRAL",
+   "diagnosis": "Simian Hemorrhagic Fever (SHF), Spleen, Rhesus monkey"
+  },
+  {
+   "code": "H-V05",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "VIRAL",
+   "diagnosis": "African swine fever, Spleen, Pig"
+  },
+  {
+   "code": "H-V06",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "VIRAL",
+   "diagnosis": "Classical Swine Fever (CSF), Spleen, pig"
+  },
+  {
+   "code": "H-V07",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "VIRAL",
+   "diagnosis": "Infectious Bursal Disease (IBD), Bursa of Fabricius, Chicken"
+  },
+  {
+   "code": "H-V08",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "VIRAL",
+   "diagnosis": "Marble spleen disease (MSD), Spleen, Pheasant"
+  },
+  {
+   "code": "H-V09",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "VIRAL",
+   "diagnosis": "Canine Parvovirus-2 (CPV-2) infection, Spleen, Dog"
+  },
+  {
+   "code": "H-V10",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "VIRAL",
+   "diagnosis": "Equine Infectious Anemia, Liver, Horse"
+  },
+  {
+   "code": "H-V11",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "VIRAL",
+   "diagnosis": "Postweaning multisystemic wasting syndrome, Lymph node, Pig"
+  },
+  {
+   "code": "H-V12",
+   "system": "HEMOLYMPHATIC",
+   "etiology": "VIRAL",
+   "diagnosis": "Ebola virus infection, spleen, liver, African green monkey"
+  },
+  {
+   "code": "I-B01",
+   "system": "INTEGUMENT",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Dermatophilosis, haired skin, deer"
+  },
+  {
+   "code": "I-B02",
+   "system": "INTEGUMENT",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Botryomycosis, fibrovascular tissue, rat"
+  },
+  {
+   "code": "I-B03",
+   "system": "INTEGUMENT",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Feline leprosy, haired skin, cat"
+  },
+  {
+   "code": "I-B04",
+   "system": "INTEGUMENT",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Lepromatous leprosy, haired skin, chimpanzee"
+  },
+  {
+   "code": "I-B05",
+   "system": "INTEGUMENT",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Nocardiosis, haired skin, dog"
+  },
+  {
+   "code": "I-B06",
+   "system": "INTEGUMENT",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Actinomycosis, haired skin, dog"
+  },
+  {
+   "code": "I-B07",
+   "system": "INTEGUMENT",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Venereal spirochetosis, mucucutaneous junction, rabbit"
+  },
+  {
+   "code": "I-B08",
+   "system": "INTEGUMENT",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Swine erysipelas, haired skin, pig"
+  },
+  {
+   "code": "I-B09",
+   "system": "INTEGUMENT",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Staphylococcal dermatitis, haired skin, pig"
+  },
+  {
+   "code": "I-F01",
+   "system": "INTEGUMENT",
+   "etiology": "FUNGAL",
+   "diagnosis": "Zygomycosis, haired skin, dog"
+  },
+  {
+   "code": "I-F02",
+   "system": "INTEGUMENT",
+   "etiology": "FUNGAL",
+   "diagnosis": "Pythiosis, haired skin, dog"
+  },
+  {
+   "code": "I-F03",
+   "system": "INTEGUMENT",
+   "etiology": "FUNGAL",
+   "diagnosis": "Aspergillosis, scaled skin, alligator"
+  },
+  {
+   "code": "I-F04",
+   "system": "INTEGUMENT",
+   "etiology": "FUNGAL",
+   "diagnosis": "Phaeohyphomycosis, haired skin, cat"
+  },
+  {
+   "code": "I-F05",
+   "system": "INTEGUMENT",
+   "etiology": "FUNGAL",
+   "diagnosis": "Hyalohyphomycosis (paecilomycosis), haired skin, rhesus macaque"
+  },
+  {
+   "code": "I-F06",
+   "system": "INTEGUMENT",
+   "etiology": "FUNGAL",
+   "diagnosis": "Blastomycosis, haired skin, dog"
+  },
+  {
+   "code": "I-F07",
+   "system": "INTEGUMENT",
+   "etiology": "FUNGAL",
+   "diagnosis": "Sporothricosis, pinna, cat"
+  },
+  {
+   "code": "I-F08",
+   "system": "INTEGUMENT",
+   "etiology": "FUNGAL",
+   "diagnosis": "Cryptococcosis, mucous membrane, monkey"
+  },
+  {
+   "code": "I-F09",
+   "system": "INTEGUMENT",
+   "etiology": "FUNGAL",
+   "diagnosis": "Lobo's disease, nonhaired skin, dolphin"
+  },
+  {
+   "code": "I-F10",
+   "system": "INTEGUMENT",
+   "etiology": "FUNGAL",
+   "diagnosis": "Chytridiomycosis, skin, frog"
+  },
+  {
+   "code": "I-F11",
+   "system": "INTEGUMENT",
+   "etiology": "FUNGAL",
+   "diagnosis": "Dermatophytosis, haired skin, dog"
+  },
+  {
+   "code": "I-F12",
+   "system": "INTEGUMENT",
+   "etiology": "FUNGAL",
+   "diagnosis": "Feline dermatophytic pseudomycetoma, haired skin, cat"
+  },
+  {
+   "code": "I-F13",
+   "system": "INTEGUMENT",
+   "etiology": "FUNGAL",
+   "diagnosis": "African histoplasmosis, haired skin, baboon"
+  },
+  {
+   "code": "I-F14",
+   "system": "INTEGUMENT",
+   "etiology": "FUNGAL",
+   "diagnosis": "Saprolegnia, scaled skin, Tigerfish"
+  },
+  {
+   "code": "I-M01",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Positive tuberculin test, haired skin, rhesus monkey"
+  },
+  {
+   "code": "I-M02",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Allergic dermatitis, haired skin, dog"
+  },
+  {
+   "code": "I-M03",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Xanthomatosis, feathered skin, parakeet"
+  },
+  {
+   "code": "I-M04",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Full-thickness thermal or chemical burn., haired skin, rabbit"
+  },
+  {
+   "code": "I-M05",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Cutaneous amyloidosis, subcutis, horse"
+  },
+  {
+   "code": "I-M06",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Acanthosis nigricans, haired skin, dog"
+  },
+  {
+   "code": "I-M07",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Dermatosparaxis, haired skin, dog"
+  },
+  {
+   "code": "I-M08",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Ichthyosis fetalis, haired skin, ox"
+  },
+  {
+   "code": "I-M09",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Schnauzer comedo syndrome, haired skin, dog"
+  },
+  {
+   "code": "I-M10",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Systemic reactive histiocytosis, pinna, dog"
+  },
+  {
+   "code": "I-M11A",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Indolent ulcer, lip, cat"
+  },
+  {
+   "code": "I-M11B",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Equine nodular collagenolytic granuloma, haired skin, horse"
+  },
+  {
+   "code": "I-M12",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Idiopathic sterile nodular panniculitis, haired skin, dog"
+  },
+  {
+   "code": "I-M13",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Calcinosis circumscripta, haired skin, dog"
+  },
+  {
+   "code": "I-M14",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Porcine juvenile pustular psoriasiform dermatitis, haired skin, pig"
+  },
+  {
+   "code": "I-M15",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Cutaneous mucinosis, haired skin, dog"
+  },
+  {
+   "code": "I-M16",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Superficial necrolytic dermatitis (SND), haired skin, dog"
+  },
+  {
+   "code": "I-M17",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Sterile granuloma/pyogranuloma syndrome, haired skin, dog"
+  },
+  {
+   "code": "I-M18",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Zinc deficiency, haired skin, pig"
+  },
+  {
+   "code": "I-M19",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Auricular chondritis, pinna, rat"
+  },
+  {
+   "code": "I-M20",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Laminitis, hoof, horse"
+  },
+  {
+   "code": "I-M21",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Juvenile hypopituitarism, haired skin, dog"
+  },
+  {
+   "code": "I-M22",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Hypothyroidism, haired skin, dog"
+  },
+  {
+   "code": "I-M23",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Hyperadrenocorticism, haired skin, dog"
+  },
+  {
+   "code": "I-M24",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Hyperestrogenism, haired skin, mammary gland, dog"
+  },
+  {
+   "code": "I-M25",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Pemphigus vulgaris, mucocutaneous junction, dog"
+  },
+  {
+   "code": "I-M26",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Pemphigus foliaceous, haired skin, dog"
+  },
+  {
+   "code": "I-M27",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Bullous pemphigoid, haired skin, horse"
+  },
+  {
+   "code": "I-M28",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Systemic lupus erythematosus (SLE), planum nasale, dog"
+  },
+  {
+   "code": "I-M29",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Erythema multiforme, haired skin, dog"
+  },
+  {
+   "code": "I-M30",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Color mutant alopecia, haired skin, dog"
+  },
+  {
+   "code": "I-M31",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Feline paraneoplastic alopecia, haired skin, cat"
+  },
+  {
+   "code": "I-M32",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Feline plasma cell pododermatitis, skin, cat"
+  },
+  {
+   "code": "I-M33",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Porcine dermatitis and nephropathy syndrome (PDNS), haired skin, kidney, pig"
+  },
+  {
+   "code": "I-M34",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Acral lick dermatitis, haired skin, dog"
+  },
+  {
+   "code": "I-M35",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Post-rabies vaccination panniculitis, haired skin, dog"
+  },
+  {
+   "code": "I-M36",
+   "system": "INTEGUMENT",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Sebaceous adenitis, haired skin, Dog"
+  },
+  {
+   "code": "I-N01A",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Infundibular keratinizing acanthoma, haired skin, dog"
+  },
+  {
+   "code": "I-N01B",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Trichoepithelioma, haired skin, dog"
+  },
+  {
+   "code": "I-N01C",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Tricholemmoma, haired skin, dog"
+  },
+  {
+   "code": "I-N01D",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Pilomatricoma, haired skin, dog"
+  },
+  {
+   "code": "I-N01E",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Tricholemmoma, isthmic type, haired skin, dog"
+  },
+  {
+   "code": "I-N02",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Trichofolliculoma, haired skin, guinea pig"
+  },
+  {
+   "code": "I-N03A",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Trichoblastoma, haired skin, dog"
+  },
+  {
+   "code": "I-N03B",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Trichoblastoma, skin, cat"
+  },
+  {
+   "code": "I-N04A",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Squamous cell carcinoma, subungual, digit, dog"
+  },
+  {
+   "code": "I-N04B",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Squamous cell carcinoma, haired skin, dog"
+  },
+  {
+   "code": "I-N04C",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Bowenoid in situ carcinoma, Haired skin, Cat"
+  },
+  {
+   "code": "I-N05",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Keratoacanthoma, feathered skin, chicken"
+  },
+  {
+   "code": "I-N06A",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Apocrine gland adenoma, cystic, haired skin, dog"
+  },
+  {
+   "code": "I-N06B",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Apocrine gland adenocarcinoma, haired skin, dog"
+  },
+  {
+   "code": "I-N07",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Apocrine ductular adenoma, haired skin, dog"
+  },
+  {
+   "code": "I-N08",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Adenocarcinoma of the apocrine glands of the anal sac, anal sac, dog"
+  },
+  {
+   "code": "I-N09",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Benign mixed ceruminous gland tumor, haired skin, dog"
+  },
+  {
+   "code": "I-N10A",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Nodular sebaceous hyperplasia, haired skin, dog"
+  },
+  {
+   "code": "I-N10B",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Sebaceous epithelioma, haired skin, dog"
+  },
+  {
+   "code": "I-N11",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Zymbal's gland carcinoma, Zymbal's gland, rat"
+  },
+  {
+   "code": "I-N12A",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Perianal (hepatoid) gland adenoma, haired skin, dog"
+  },
+  {
+   "code": "I-N12B",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Perianal (hepatoid) gland carcinoma, haired skin, dog"
+  },
+  {
+   "code": "I-N13A",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Peripheral nerve sheath tumor of the skin and subcutis (hemangiopericytoma), subcutis, dog"
+  },
+  {
+   "code": "I-N13B",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Malignant peripheral nerve sheath tumor of the skin and subcutis (hemangiopericytoma), haired skin, dog"
+  },
+  {
+   "code": "I-N14",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Hibernoma, haired skin, rat"
+  },
+  {
+   "code": "I-N15A",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Fibroma, haired skin, dog"
+  },
+  {
+   "code": "I-N15B",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Fibrosarcoma, mucosa, cat"
+  },
+  {
+   "code": "I-N15C",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Keloidal fibroma, skin, dog"
+  },
+  {
+   "code": "I-N16A",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Vaccine-associated fibrosarcoma, subcutis, cat"
+  },
+  {
+   "code": "I-N16B",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Vaccine-associated granuloma, haired skin, cat"
+  },
+  {
+   "code": "I-N17",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Equine sarcoid, haired skin, horse"
+  },
+  {
+   "code": "I-N18A",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Lipoma, subcutis, dog"
+  },
+  {
+   "code": "I-N18B",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Infiltrative lipoma, haired skin, dog"
+  },
+  {
+   "code": "I-N18C",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Liposarcoma, haired skin and subcutis, dog"
+  },
+  {
+   "code": "I-N19A",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Hemangioma, haired skin, dog"
+  },
+  {
+   "code": "I-N19B",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Hemangiosarcoma, haired skin, dog"
+  },
+  {
+   "code": "I-N19C",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Epithelioid hemangiosarcoma, eyelid, pony"
+  },
+  {
+   "code": "I-N20",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Scrotal vascular hamartoma, scrotum, dog"
+  },
+  {
+   "code": "I-N21A",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Mast cell tumor, haired skin, dog"
+  },
+  {
+   "code": "I-N21C",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Mast cell tumor, subcutis, horse"
+  },
+  {
+   "code": "I-N21D",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Mast cell tumor, haired skin, cat"
+  },
+  {
+   "code": "I-N22",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Cutaneous histiocytoma, haired skin, dog"
+  },
+  {
+   "code": "I-N23A",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Plasmacytoma, haired skin, dog"
+  },
+  {
+   "code": "I-N23B",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Plasmacytoma with amyloid, haired skin, Dog"
+  },
+  {
+   "code": "I-N24A",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Melanocytoma, haired skin, dog"
+  },
+  {
+   "code": "I-N24B",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Malignant melanoma, haired skin, dog"
+  },
+  {
+   "code": "I-N25A",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Lymphoma, haired skin, horse"
+  },
+  {
+   "code": "I-N25B",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Lymphoma, haired skin, cow"
+  },
+  {
+   "code": "I-N26A",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Epitheliotropic lymphoma, haired skin, dog"
+  },
+  {
+   "code": "I-N26B",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Epitheliotropic lymphoma, haired skin, dog"
+  },
+  {
+   "code": "I-N27A",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Histiocytic sarcoma, haired skin, dog"
+  },
+  {
+   "code": "I-N27B",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Undifferentiated pleomorphic sarcoma, haired skin, cat"
+  },
+  {
+   "code": "I-N28",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Acrochordon, haired skin, dog"
+  },
+  {
+   "code": "I-N29",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Hygroma, haired skin, dog"
+  },
+  {
+   "code": "I-N30",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Iridophoroma, skin, Boa constrictor"
+  },
+  {
+   "code": "I-N31",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Subungual keratoacanthoma, digit, dog"
+  },
+  {
+   "code": "I-N32",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Nail bed epidermal inclusion cyst, haired skin, dog"
+  },
+  {
+   "code": "I-N33",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Cutaneous clear cell adnexal carcinoma, haired skin, dog"
+  },
+  {
+   "code": "I-N34",
+   "system": "INTEGUMENT",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Metastatic pulmonary carcinoma, haired skin and bone, cat"
+  },
+  {
+   "code": "I-P01",
+   "system": "INTEGUMENT",
+   "etiology": "PARASITIC",
+   "diagnosis": "Onchocerciasis, haired skin, horse"
+  },
+  {
+   "code": "I-P02",
+   "system": "INTEGUMENT",
+   "etiology": "PARASITIC",
+   "diagnosis": "Stephanofilariasis, haired skin, ox"
+  },
+  {
+   "code": "I-P03",
+   "system": "INTEGUMENT",
+   "etiology": "PARASITIC",
+   "diagnosis": "Habronemiasis, haired skin, horse"
+  },
+  {
+   "code": "I-P04",
+   "system": "INTEGUMENT",
+   "etiology": "PARASITIC",
+   "diagnosis": "Peloderiasis, haired skin, dog"
+  },
+  {
+   "code": "I-P05",
+   "system": "INTEGUMENT",
+   "etiology": "PARASITIC",
+   "diagnosis": "Anatrichosomiasis, nasal mucosa, Cynomolgus macaque"
+  },
+  {
+   "code": "I-P06",
+   "system": "INTEGUMENT",
+   "etiology": "PARASITIC",
+   "diagnosis": "Sarcoptic mange, haired skin, dog"
+  },
+  {
+   "code": "I-P07A",
+   "system": "INTEGUMENT",
+   "etiology": "PARASITIC",
+   "diagnosis": "Demodicosis, haired skin, dog"
+  },
+  {
+   "code": "I-P07B",
+   "system": "INTEGUMENT",
+   "etiology": "PARASITIC",
+   "diagnosis": "Demodicosis, haired skin, pig"
+  },
+  {
+   "code": "I-P08",
+   "system": "INTEGUMENT",
+   "etiology": "PARASITIC",
+   "diagnosis": "Notoedric mange, pinna, cat"
+  },
+  {
+   "code": "I-P09",
+   "system": "INTEGUMENT",
+   "etiology": "PARASITIC",
+   "diagnosis": "Psorergatiasis, haired skin, flying squirrel"
+  },
+  {
+   "code": "I-P10",
+   "system": "INTEGUMENT",
+   "etiology": "PARASITIC",
+   "diagnosis": "Psoroptic otitis, pinna, rabbit"
+  },
+  {
+   "code": "I-P11",
+   "system": "INTEGUMENT",
+   "etiology": "PARASITIC",
+   "diagnosis": "Laminosioptiasis, feathered skin, chicken"
+  },
+  {
+   "code": "I-P12",
+   "system": "INTEGUMENT",
+   "etiology": "PARASITIC",
+   "diagnosis": "Knemidokoptiasis, stratum corneum, chicken"
+  },
+  {
+   "code": "I-P13",
+   "system": "INTEGUMENT",
+   "etiology": "PARASITIC",
+   "diagnosis": "Chrysomyiasis, subcutis, dog"
+  },
+  {
+   "code": "I-P14",
+   "system": "INTEGUMENT",
+   "etiology": "PARASITIC",
+   "diagnosis": "Besnoitiosis, haired skin, ox"
+  },
+  {
+   "code": "I-P15",
+   "system": "INTEGUMENT",
+   "etiology": "PARASITIC",
+   "diagnosis": "Leishmaniasis, haired skin, dog"
+  },
+  {
+   "code": "I-P16",
+   "system": "INTEGUMENT",
+   "etiology": "PARASITIC",
+   "diagnosis": "Ichthyophthirius multifilis, skin, Cardinal tetra"
+  },
+  {
+   "code": "I-P17",
+   "system": "INTEGUMENT",
+   "etiology": "PARASITIC",
+   "diagnosis": "Neosporosis, haired skin, dog"
+  },
+  {
+   "code": "I-P18",
+   "system": "INTEGUMENT",
+   "etiology": "PARASITIC",
+   "diagnosis": "Capillariasis, skin, frog, African clawed"
+  },
+  {
+   "code": "I-T01",
+   "system": "INTEGUMENT",
+   "etiology": "TOXIC",
+   "diagnosis": "Thallium toxicity, haired skin, dog"
+  },
+  {
+   "code": "I-T02",
+   "system": "INTEGUMENT",
+   "etiology": "TOXIC",
+   "diagnosis": "Hairy vetch toxicity, haired skin, ox"
+  },
+  {
+   "code": "I-V01A",
+   "system": "INTEGUMENT",
+   "etiology": "VIRAL",
+   "diagnosis": "Papilloma (viral), haired skin, dog"
+  },
+  {
+   "code": "I-V01B",
+   "system": "INTEGUMENT",
+   "etiology": "VIRAL",
+   "diagnosis": "Inverted papilloma, haired skin, dog"
+  },
+  {
+   "code": "I-V01C",
+   "system": "INTEGUMENT",
+   "etiology": "VIRAL",
+   "diagnosis": "Papilloma, haired skin, ox"
+  },
+  {
+   "code": "I-V02",
+   "system": "INTEGUMENT",
+   "etiology": "VIRAL",
+   "diagnosis": "Deer fibroma, haired skin, deer"
+  },
+  {
+   "code": "I-V03A",
+   "system": "INTEGUMENT",
+   "etiology": "VIRAL",
+   "diagnosis": "Budgerigar fledgeling disease (BFD), feathered skin, budgerigar"
+  },
+  {
+   "code": "I-V03B",
+   "system": "INTEGUMENT",
+   "etiology": "VIRAL",
+   "diagnosis": "Budgerigar fledgling disease (BFD), kidney, buderigar"
+  },
+  {
+   "code": "I-V04",
+   "system": "INTEGUMENT",
+   "etiology": "VIRAL",
+   "diagnosis": "Psittacine beak and feather disease, feathered skin, cockatoo"
+  },
+  {
+   "code": "I-V05",
+   "system": "INTEGUMENT",
+   "etiology": "VIRAL",
+   "diagnosis": "Fowl pox, feathered skin, chicken"
+  },
+  {
+   "code": "I-V06",
+   "system": "INTEGUMENT",
+   "etiology": "VIRAL",
+   "diagnosis": "Ectromelia, haired skin, mouse"
+  },
+  {
+   "code": "I-V07",
+   "system": "INTEGUMENT",
+   "etiology": "VIRAL",
+   "diagnosis": "Molluscum contagiosum, haired skin, kangaroo"
+  },
+  {
+   "code": "I-V08",
+   "system": "INTEGUMENT",
+   "etiology": "VIRAL",
+   "diagnosis": "Yaba disease, haired skin, baboon"
+  },
+  {
+   "code": "I-V09A",
+   "system": "INTEGUMENT",
+   "etiology": "VIRAL",
+   "diagnosis": "Shope fibroma, haired skin, rabbit"
+  },
+  {
+   "code": "I-V09B",
+   "system": "INTEGUMENT",
+   "etiology": "VIRAL",
+   "diagnosis": "Squirrel fibroma, haired skin, squirrel"
+  },
+  {
+   "code": "I-V10",
+   "system": "INTEGUMENT",
+   "etiology": "VIRAL",
+   "diagnosis": "Myxomatosis, mucocutaneous junction, rabbit"
+  },
+  {
+   "code": "I-V11",
+   "system": "INTEGUMENT",
+   "etiology": "VIRAL",
+   "diagnosis": "Contagious ecthyma, mucocutaneous junction, sheep"
+  },
+  {
+   "code": "I-V12A",
+   "system": "INTEGUMENT",
+   "etiology": "VIRAL",
+   "diagnosis": "Canine distemper, haired skin, dog"
+  },
+  {
+   "code": "I-V12B",
+   "system": "INTEGUMENT",
+   "etiology": "VIRAL",
+   "diagnosis": "Canine distemper, mucocutaneous junction, dog"
+  },
+  {
+   "code": "I-V13",
+   "system": "INTEGUMENT",
+   "etiology": "VIRAL",
+   "diagnosis": "Marek's disease, skin leukosis, feathered skin, chicken"
+  },
+  {
+   "code": "I-V14",
+   "system": "INTEGUMENT",
+   "etiology": "VIRAL",
+   "diagnosis": "San Miguel sea lion virus infection, haired skin, California sea lion"
+  },
+  {
+   "code": "I-V15",
+   "system": "INTEGUMENT",
+   "etiology": "VIRAL",
+   "diagnosis": "Lymphocystis disease (LD), scaled skin, striped bass"
+  },
+  {
+   "code": "I-V16",
+   "system": "INTEGUMENT",
+   "etiology": "VIRAL",
+   "diagnosis": "Simian varicella, mucocutaneous junction, cynomolgus macaque"
+  },
+  {
+   "code": "M-B01",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Blackleg, skeletal muscle, ox"
+  },
+  {
+   "code": "M-B02",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Staphylococcus aureus infection, tibia, chicken"
+  },
+  {
+   "code": "M-B03",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Enterococcus cecorum, vertebrae, chicken"
+  },
+  {
+   "code": "M-M01",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Multiple cartilaginous exostoses (MCE), radius, horse"
+  },
+  {
+   "code": "M-M02",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Bovine congenital osteopetrosis, long bone, ox"
+  },
+  {
+   "code": "M-M03",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Spider lamb syndrome, vertebrae, sheep"
+  },
+  {
+   "code": "M-M04",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Osteogenesis and dentinogenesis imperfecta, alveolar bone, sheep"
+  },
+  {
+   "code": "M-M05",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Congenital hyperostosis, radius,ulna, pig"
+  },
+  {
+   "code": "M-M06",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Congenital muscular dystrophy, skeletal muscle, dog"
+  },
+  {
+   "code": "M-M07",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Scurvy, tibia, femur, guinea pig"
+  },
+  {
+   "code": "M-M08",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Rickets, long bone, cormorant"
+  },
+  {
+   "code": "M-M09A",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Simian bone disease, mandible, spider monkey"
+  },
+  {
+   "code": "M-M09B",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Simian bone disease, long bone, spider monkey"
+  },
+  {
+   "code": "M-M10A",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Nutritional secondary hyperparathyroidism with fibrous osteodystrophy, maxilla, camel"
+  },
+  {
+   "code": "M-M10B",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Renal secondary hyperparathyroidism with fibrous osteodystrophy, maxilla, dog"
+  },
+  {
+   "code": "M-M11",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Nutritional myopathy, skeletal muscle, feathered skin, heart, great blue heron"
+  },
+  {
+   "code": "M-M12A",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Eosinophilic myositis, skeletal muscle, dog"
+  },
+  {
+   "code": "M-M12B",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Eosinophilic myositis, skeletal muscle, ox"
+  },
+  {
+   "code": "M-M13",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Myofibrillar hypoplasia, skeletal muscle, pig"
+  },
+  {
+   "code": "M-M14",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Equine rhabdomyolysis syndrome, skeletal muscle, horse"
+  },
+  {
+   "code": "M-M15",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Aseptic necrosis of the femoral head, femur, dog"
+  },
+  {
+   "code": "M-M16",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Osteoporosis, rib, dog"
+  },
+  {
+   "code": "M-M17",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Hypertrophic osteodystrophy (HOD), long bone, dog"
+  },
+  {
+   "code": "M-M18",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Craniomandibular osteopathy, mandible, dog"
+  },
+  {
+   "code": "M-M19",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Osteochondrosis, stifle joint, Guinea pig"
+  },
+  {
+   "code": "M-M20",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Equine polysaccharide storage myopathy (EPSSM), skeletal muscle, horse"
+  },
+  {
+   "code": "M-M21",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Osteochondrosis, joint, horse"
+  },
+  {
+   "code": "M-N01",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Chordoma, haired skin, ferret"
+  },
+  {
+   "code": "M-N02",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Osteosarcoma, radius, dog"
+  },
+  {
+   "code": "M-N03",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Chondrosarcoma, tibial tarsal bone, dog"
+  },
+  {
+   "code": "M-N04",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Multilobular tumor of bone, skull, dog"
+  },
+  {
+   "code": "M-N05",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Hypertrophic osteopathy, radius, dog"
+  },
+  {
+   "code": "M-N06",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Subungual keratoacanthoma, digit, dog"
+  },
+  {
+   "code": "M-N07",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "myxoma/myxosarcoma, joint, dog"
+  },
+  {
+   "code": "M-N08",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Rhabdomyosarcoma, Skeletal muscle, mouse"
+  },
+  {
+   "code": "M-P01",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "PARASITIC",
+   "diagnosis": "American canine hepatozoonosis, skeletal muscle, dog"
+  },
+  {
+   "code": "M-P02",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "PARASITIC",
+   "diagnosis": "Trichinellosis, skeletal muscle, pig"
+  },
+  {
+   "code": "M-P03",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "PARASITIC",
+   "diagnosis": "Cysticercosis, skeletal muscle, ox"
+  },
+  {
+   "code": "M-P04",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "PARASITIC",
+   "diagnosis": "Sarcocystosis, skeletal muscle, rhesus monkey"
+  },
+  {
+   "code": "M-P05",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "PARASITIC",
+   "diagnosis": "Whirling disease, head, trout"
+  },
+  {
+   "code": "M-P06",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "PARASITIC",
+   "diagnosis": "Tetrahymena corlissi, Skeletal muscle, fish"
+  },
+  {
+   "code": "M-T01",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "TOXIC",
+   "diagnosis": "Ionophore toxicity, skeletal muscle, chicken"
+  },
+  {
+   "code": "M-T02",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "TOXIC",
+   "diagnosis": "Cassia sp. toxicity, skeletal muscle, ox"
+  },
+  {
+   "code": "M-T03",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "TOXIC",
+   "diagnosis": "Hypervitaminosis D, bone, rabbit"
+  },
+  {
+   "code": "M-T04",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "TOXIC",
+   "diagnosis": "Fluoride toxicity, skull, teeth, rat"
+  },
+  {
+   "code": "M-T05",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "TOXIC",
+   "diagnosis": "Quinolone-induced arthropathy, femur, articular cartilage, dog"
+  },
+  {
+   "code": "M-T06",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "TOXIC",
+   "diagnosis": "Tibial dyschondroplasia, tibia, chicken"
+  },
+  {
+   "code": "M-V01",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "VIRAL",
+   "diagnosis": "Bluetongue, skeletal muscle, sheep"
+  },
+  {
+   "code": "M-V02",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "VIRAL",
+   "diagnosis": "Caprine arthritis-encephalitis, joint capsule, goat"
+  },
+  {
+   "code": "M-V03",
+   "system": "MUSCULOSKELETAL",
+   "etiology": "VIRAL",
+   "diagnosis": "Avian osteopetrosis, long bone, chicken"
+  },
+  {
+   "code": "N-B01",
+   "system": "NERVOUS",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Focal symmetric encephalomalacia, brain, sheep"
+  },
+  {
+   "code": "N-B02A",
+   "system": "NERVOUS",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Edema disease, brain, pig"
+  },
+  {
+   "code": "N-B02B",
+   "system": "NERVOUS",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Edema disease, brain, pig"
+  },
+  {
+   "code": "N-B03",
+   "system": "NERVOUS",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Thrombotic meningoencephalitis (TME), brain, steer"
+  },
+  {
+   "code": "N-B04",
+   "system": "NERVOUS",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Listeriosis, brain, cow"
+  },
+  {
+   "code": "N-B05",
+   "system": "NERVOUS",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Sporadic bovine encephalomyelitis, brain, calf"
+  },
+  {
+   "code": "N-B06",
+   "system": "NERVOUS",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Cerebral mycobacteriosis, brain, monkey"
+  },
+  {
+   "code": "N-B07",
+   "system": "NERVOUS",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Brucellosis, brain, calf"
+  },
+  {
+   "code": "N-B08A",
+   "system": "NERVOUS",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Streptococcal meningitis, brain, guinea pig"
+  },
+  {
+   "code": "N-B08B",
+   "system": "NERVOUS",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Streptococcal meningitis, brain, non-human primate"
+  },
+  {
+   "code": "N-B09",
+   "system": "NERVOUS",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Rocky Mountain Spotted Fever, brain, dog"
+  },
+  {
+   "code": "N-B10",
+   "system": "NERVOUS",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Enterococcus infection, brain, chicken"
+  },
+  {
+   "code": "N-F01B",
+   "system": "NERVOUS",
+   "etiology": "FUNGAL",
+   "diagnosis": "Histoplasmosis, brain, dog"
+  },
+  {
+   "code": "N-F02B",
+   "system": "NERVOUS",
+   "etiology": "FUNGAL",
+   "diagnosis": "Cryptococcosis, brain, dog"
+  },
+  {
+   "code": "N-F03A",
+   "system": "NERVOUS",
+   "etiology": "FUNGAL",
+   "diagnosis": "Cerebral ochroconiasis, brain, chick"
+  },
+  {
+   "code": "N-F04",
+   "system": "NERVOUS",
+   "etiology": "FUNGAL",
+   "diagnosis": "Cerebral phaeohyphomycosis, brain, elephant"
+  },
+  {
+   "code": "N-F05",
+   "system": "NERVOUS",
+   "etiology": "FUNGAL",
+   "diagnosis": "Cerebral encephalitozoonosis, Cerebrum, Rabbit"
+  },
+  {
+   "code": "N-M01",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Cerebellar cortical abiotrophy, brain, dog"
+  },
+  {
+   "code": "N-M02",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Cervical vertebral stenotic myelopathy, brain, horse"
+  },
+  {
+   "code": "N-M03",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Fibrocartilaginous embolic myelopathy, spinal cord, dog"
+  },
+  {
+   "code": "N-M04A",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Degenerative myelopathy, spinal cord, dog"
+  },
+  {
+   "code": "N-M04B",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Inherited necrotizing myelopathy of Afghan hounds, spinal cord, dog"
+  },
+  {
+   "code": "N-M05",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Hereditary neuraxial edema, brain, calf"
+  },
+  {
+   "code": "N-M06",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Progressive ataxia of Charolais cattle, brain, cow"
+  },
+  {
+   "code": "N-M07",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Equine degenerative myeloencephalopathy, brain, horse"
+  },
+  {
+   "code": "N-M08A",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Scrapie, brain, ewe"
+  },
+  {
+   "code": "N-M08B",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Transmissible mink encephalopathy, brain, mink"
+  },
+  {
+   "code": "N-M09",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Bovine spongiform encephalopathy, brain, cow"
+  },
+  {
+   "code": "N-M10",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Globoid cell leukodystrophy, spinal cord, dog"
+  },
+  {
+   "code": "N-M11A",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Glycogenosis type II, spinal cord, cow"
+  },
+  {
+   "code": "N-M12A",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Hereditary neuronal ceroid-lipofuscinosis, brain, dog"
+  },
+  {
+   "code": "N-M12B",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Idiopathic neuronal lipofuscinosis, spinal cord, horse"
+  },
+  {
+   "code": "N-M13",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "GM2 gangliosidosis, brain, dog"
+  },
+  {
+   "code": "N-M14A",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Alpha-mannosidosis, brain, calf"
+  },
+  {
+   "code": "N-M14B",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Alpha-mannosidosis, pancreas, lymph node, calf"
+  },
+  {
+   "code": "N-M15",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Cholesterol granuloma, brain, bear"
+  },
+  {
+   "code": "N-M16",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Hereditary unconjugated hyperbilirubinemic neuropathy, brain, rat"
+  },
+  {
+   "code": "N-M17",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Hepatic encephalopathy, brain, liver, dog"
+  },
+  {
+   "code": "N-M18",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Cauda equina syndrome, spinal cord, horse"
+  },
+  {
+   "code": "N-M19",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Idiopathic cerebral venous thrombosis, brain, monkey"
+  },
+  {
+   "code": "N-M20",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Acute idiopathic polyradiculoneuritis, peripheral nerve, dog"
+  },
+  {
+   "code": "N-M21",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Lafora (polyglucosan) bodies, brain, dog"
+  },
+  {
+   "code": "N-M22",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Hypovitaminosis E, brain, turkey"
+  },
+  {
+   "code": "N-M23",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Feline ischemic encephalopathy, brain, cat"
+  },
+  {
+   "code": "N-M24",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Equine motor neuron disease, spinal cord, horse"
+  },
+  {
+   "code": "N-M25",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Cerebral infarction, brain, rat"
+  },
+  {
+   "code": "N-M26",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Granulomatous meningoencephalitis, brain, dog"
+  },
+  {
+   "code": "N-M27A",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Intervertebral disk disease, spinal cord, dog"
+  },
+  {
+   "code": "N-M27B",
+   "system": "NERVOUS",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Inter vertebral disk disease, Spinal Cord, Dog"
+  },
+  {
+   "code": "N-N01A",
+   "system": "NERVOUS",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Astrocytoma, brain, dog"
+  },
+  {
+   "code": "N-N01B",
+   "system": "NERVOUS",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Astrocytoma, Spinal Cord, Cat"
+  },
+  {
+   "code": "N-N02",
+   "system": "NERVOUS",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Oligodendroglioma, brain, dog"
+  },
+  {
+   "code": "N-N03",
+   "system": "NERVOUS",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Ependymoma, brain, cat"
+  },
+  {
+   "code": "N-N04",
+   "system": "NERVOUS",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Glioblastoma multiforme, brain, dog"
+  },
+  {
+   "code": "N-N05",
+   "system": "NERVOUS",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Primitive neuroectodermal tumor, brain, calf"
+  },
+  {
+   "code": "N-N06",
+   "system": "NERVOUS",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Choroid plexus carcinoma, brain, dog"
+  },
+  {
+   "code": "N-N07A",
+   "system": "NERVOUS",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Meningioma - Transitional type, brain, dog"
+  },
+  {
+   "code": "N-N07B",
+   "system": "NERVOUS",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Meningioma - Psammomatous type, brain, dog"
+  },
+  {
+   "code": "N-N08",
+   "system": "NERVOUS",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Ganglioneuroblastoma, retroperitoneal tissue, dog"
+  },
+  {
+   "code": "N-N09",
+   "system": "NERVOUS",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Peripheral nerve sheath tumor, brachial plexus, cow"
+  },
+  {
+   "code": "N-N10",
+   "system": "NERVOUS",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Granular cell meningioma, brain, rat"
+  },
+  {
+   "code": "N-P01",
+   "system": "NERVOUS",
+   "etiology": "PARASITIC",
+   "diagnosis": "Equine protozoal myeloencephalitis, spinal cord, horse"
+  },
+  {
+   "code": "N-P02",
+   "system": "NERVOUS",
+   "etiology": "PARASITIC",
+   "diagnosis": "Toxoplasmosis, brain, dog"
+  },
+  {
+   "code": "N-P03",
+   "system": "NERVOUS",
+   "etiology": "PARASITIC",
+   "diagnosis": "Neosporosis, brain, dog"
+  },
+  {
+   "code": "N-P05",
+   "system": "NERVOUS",
+   "etiology": "PARASITIC",
+   "diagnosis": "Frenkeliosis, brain, mouse"
+  },
+  {
+   "code": "N-P06",
+   "system": "NERVOUS",
+   "etiology": "PARASITIC",
+   "diagnosis": "Leucocytozoonosis, brain, duck"
+  },
+  {
+   "code": "N-P07",
+   "system": "NERVOUS",
+   "etiology": "PARASITIC",
+   "diagnosis": "Babesiosis, brain, ox"
+  },
+  {
+   "code": "N-P08",
+   "system": "NERVOUS",
+   "etiology": "PARASITIC",
+   "diagnosis": "Theileriosis, brain, ox"
+  },
+  {
+   "code": "N-P09",
+   "system": "NERVOUS",
+   "etiology": "PARASITIC",
+   "diagnosis": "Parelaphostrongylosis, brain, sable antelope"
+  },
+  {
+   "code": "N-P10A",
+   "system": "NERVOUS",
+   "etiology": "PARASITIC",
+   "diagnosis": "Parastrongylosis, brain, dog"
+  },
+  {
+   "code": "N-P10B",
+   "system": "NERVOUS",
+   "etiology": "PARASITIC",
+   "diagnosis": "Parastrongylosis, brain, rat"
+  },
+  {
+   "code": "N-P11",
+   "system": "NERVOUS",
+   "etiology": "PARASITIC",
+   "diagnosis": "Halicephalobus gingivalis infection, brain, horse"
+  },
+  {
+   "code": "N-P12A",
+   "system": "NERVOUS",
+   "etiology": "PARASITIC",
+   "diagnosis": "Cysticercosis, brain, dog"
+  },
+  {
+   "code": "N-P12B",
+   "system": "NERVOUS",
+   "etiology": "PARASITIC",
+   "diagnosis": "Cerebral coenurosis, brain, sheep"
+  },
+  {
+   "code": "N-P13",
+   "system": "NERVOUS",
+   "etiology": "PARASITIC",
+   "diagnosis": "Nasitremiasis, brain, dolphin"
+  },
+  {
+   "code": "N-P14",
+   "system": "NERVOUS",
+   "etiology": "PARASITIC",
+   "diagnosis": "Baylisascariasis, brain, dog"
+  },
+  {
+   "code": "N-T01",
+   "system": "NERVOUS",
+   "etiology": "TOXIC",
+   "diagnosis": "Locoism, brain, kidney, horse"
+  },
+  {
+   "code": "N-T02A",
+   "system": "NERVOUS",
+   "etiology": "TOXIC",
+   "diagnosis": "Polioencephalomalacia, brain, cat"
+  },
+  {
+   "code": "N-T02B",
+   "system": "NERVOUS",
+   "etiology": "TOXIC",
+   "diagnosis": "Poliencephalomalacia, brain, ox"
+  },
+  {
+   "code": "N-T04",
+   "system": "NERVOUS",
+   "etiology": "TOXIC",
+   "diagnosis": "Enzootic ataxia, brain, goat"
+  },
+  {
+   "code": "N-T05",
+   "system": "NERVOUS",
+   "etiology": "TOXIC",
+   "diagnosis": "Lead poisoning, brain, ox"
+  },
+  {
+   "code": "N-T06",
+   "system": "NERVOUS",
+   "etiology": "TOXIC",
+   "diagnosis": "Selenium intoxication, spinal cord, pig"
+  },
+  {
+   "code": "N-T07",
+   "system": "NERVOUS",
+   "etiology": "TOXIC",
+   "diagnosis": "Organic mercury intoxication, brain, pig"
+  },
+  {
+   "code": "N-T08A",
+   "system": "NERVOUS",
+   "etiology": "TOXIC",
+   "diagnosis": "Salt intoxication and water deprivation, brain, pig"
+  },
+  {
+   "code": "N-T08B",
+   "system": "NERVOUS",
+   "etiology": "TOXIC",
+   "diagnosis": "Salt intoxication and water deprivation, brain, sheep"
+  },
+  {
+   "code": "N-T09",
+   "system": "NERVOUS",
+   "etiology": "TOXIC",
+   "diagnosis": "Trachyandra divaricata ingestion, brain, sheep"
+  },
+  {
+   "code": "N-T10",
+   "system": "NERVOUS",
+   "etiology": "TOXIC",
+   "diagnosis": "Equine leukoencephalomalacia, brain, horse"
+  },
+  {
+   "code": "N-T11",
+   "system": "NERVOUS",
+   "etiology": "TOXIC",
+   "diagnosis": "Nigropallidal encephalomalacia, brain, horse"
+  },
+  {
+   "code": "N-T12",
+   "system": "NERVOUS",
+   "etiology": "TOXIC",
+   "diagnosis": "Perennial ryegrass staggers, brain, sheep"
+  },
+  {
+   "code": "N-V01",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Bovine viral diarrhea, brain, ox"
+  },
+  {
+   "code": "N-V02",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Bluetongue, brain, sheep"
+  },
+  {
+   "code": "N-V03A",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Avian encephalomyelitis, brain, ckicken"
+  },
+  {
+   "code": "N-V03B",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Avian encephalomyelitis, proventriculus, ventriculus, pancreas, heart, chicken"
+  },
+  {
+   "code": "N-V04A",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Teschen disease, spinal cord and meninges, pig"
+  },
+  {
+   "code": "N-V04B",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Teschen disease, brain, pig"
+  },
+  {
+   "code": "N-V05",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Mouse encephalitis, brain, mouse"
+  },
+  {
+   "code": "N-V06A",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Rabies, brain, sheep"
+  },
+  {
+   "code": "N-V06B",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Rabies, brain, mink"
+  },
+  {
+   "code": "N-V06C",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Rabies, brain, skunk"
+  },
+  {
+   "code": "N-V06D",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Rabies, Ganglion, Ox"
+  },
+  {
+   "code": "N-V07A",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Pseudorabies, brain, pig"
+  },
+  {
+   "code": "N-V07B",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Aujeszky's disease, brain, ox"
+  },
+  {
+   "code": "N-V08",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Marek's disease, peripheral nerves, chicken"
+  },
+  {
+   "code": "N-V09",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Eastern equine encephalitis, brain, horse"
+  },
+  {
+   "code": "N-V09B",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Venezuelan equine encephalomyelitis, brain, horse"
+  },
+  {
+   "code": "N-V10",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Newcastle disease, brain, parrot"
+  },
+  {
+   "code": "N-V11",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Canine distemper, brain, dog"
+  },
+  {
+   "code": "N-V12",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Phocine distemper, brain, seal"
+  },
+  {
+   "code": "N-V13A",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Visna, brain, sheep"
+  },
+  {
+   "code": "N-V13B",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Caprine arthritis-encephalitis, brain, goat"
+  },
+  {
+   "code": "N-V14",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Simian immunodeficiency virus encephalitis, brain, Rhesus monkey"
+  },
+  {
+   "code": "N-V16",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Classical swine fever, brain, pig"
+  },
+  {
+   "code": "N-V17",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Feline infectious peritonitis, brain, cat"
+  },
+  {
+   "code": "N-V18",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Lymphocytic choriomeningitis, brain, mouse"
+  },
+  {
+   "code": "N-V19",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Flaviviral encephalitis, cerebrum, horse"
+  },
+  {
+   "code": "N-V20A",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Psittacine proventricular dilatation syndrome, brain, peripheral nerve, kidney, small intestine, Cockatoo"
+  },
+  {
+   "code": "N-V20B",
+   "system": "NERVOUS",
+   "etiology": "VIRAL",
+   "diagnosis": "Psittacine proventricular dilatation syndrome, heart, liver, Psittacine"
+  },
+  {
+   "code": "P-B01",
+   "system": "PULMONARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Murine respiratory mycoplasmosis, lung, rat"
+  },
+  {
+   "code": "P-B02",
+   "system": "PULMONARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Contagious bovine pleuropneumonia, lung, cow"
+  },
+  {
+   "code": "P-B03",
+   "system": "PULMONARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Mycoplasmal pneumonia of swine, lung, pig"
+  },
+  {
+   "code": "P-B04",
+   "system": "PULMONARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Porcine contagious pleuropneumonia, lung, pig"
+  },
+  {
+   "code": "P-B05",
+   "system": "PULMONARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Corynebacteriosis, lung, rat"
+  },
+  {
+   "code": "P-B06",
+   "system": "PULMONARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Rhodococcal pneumonia, lung, foal"
+  },
+  {
+   "code": "P-B07",
+   "system": "PULMONARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Streptococcal pneumonia, lung, monkey"
+  },
+  {
+   "code": "P-B08",
+   "system": "PULMONARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Glanders, lung, horse"
+  },
+  {
+   "code": "P-B09",
+   "system": "PULMONARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Bordetellosis, lung, guinea pig"
+  },
+  {
+   "code": "P-B10A",
+   "system": "PULMONARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Tuberculosis, lung, monkey"
+  },
+  {
+   "code": "P-B10C",
+   "system": "PULMONARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Tuberculosis, Lung, Goat"
+  },
+  {
+   "code": "P-B11",
+   "system": "PULMONARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Yersiniosis, lung, sheep"
+  },
+  {
+   "code": "P-B12",
+   "system": "PULMONARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Shipping fever, lung, steer"
+  },
+  {
+   "code": "P-B13",
+   "system": "PULMONARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Klebsiella bronchopneumonia, lung, monkey"
+  },
+  {
+   "code": "P-B14",
+   "system": "PULMONARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Brucellosis, lung, calf"
+  },
+  {
+   "code": "P-B15",
+   "system": "PULMONARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Pullorum disease, lung, chick"
+  },
+  {
+   "code": "P-B16",
+   "system": "PULMONARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "CAR bacillary bronchopneumonia, lung, rat"
+  },
+  {
+   "code": "P-B17",
+   "system": "PULMONARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Actinomycosis, pleura, dog"
+  },
+  {
+   "code": "P-B18",
+   "system": "PULMONARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Glasser's disease, lung, heart, pig"
+  },
+  {
+   "code": "P-F01",
+   "system": "PULMONARY",
+   "etiology": "FUNGAL",
+   "diagnosis": "Rhinosporidiosis, nasal mucosa, dog"
+  },
+  {
+   "code": "P-F02",
+   "system": "PULMONARY",
+   "etiology": "FUNGAL",
+   "diagnosis": "Histoplasma capsulatum, lung, Horse"
+  },
+  {
+   "code": "P-F03",
+   "system": "PULMONARY",
+   "etiology": "FUNGAL",
+   "diagnosis": "Pulmonary coccidioidomycosis, lung, otter"
+  },
+  {
+   "code": "P-F04",
+   "system": "PULMONARY",
+   "etiology": "FUNGAL",
+   "diagnosis": "Pulmonary cryptococcosis, lung, dolphin"
+  },
+  {
+   "code": "P-F05",
+   "system": "PULMONARY",
+   "etiology": "FUNGAL",
+   "diagnosis": "Pulmonary blastomycosis, lung, dog"
+  },
+  {
+   "code": "P-F06A",
+   "system": "PULMONARY",
+   "etiology": "FUNGAL",
+   "diagnosis": "Pulmonary aspergillosis, lung, penguin"
+  },
+  {
+   "code": "P-F06B",
+   "system": "PULMONARY",
+   "etiology": "FUNGAL",
+   "diagnosis": "Pulmonary aspergillosis, lung, horse"
+  },
+  {
+   "code": "P-F07",
+   "system": "PULMONARY",
+   "etiology": "FUNGAL",
+   "diagnosis": "Pneumocystosis, lung, rat"
+  },
+  {
+   "code": "P-M01",
+   "system": "PULMONARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Eosinophilic bronchopneumopathy, lung, dog"
+  },
+  {
+   "code": "P-M02",
+   "system": "PULMONARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Bronchiolitis obliterans, lung, dog"
+  },
+  {
+   "code": "P-M03",
+   "system": "PULMONARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Inhalation pneumonia, lung, monkey"
+  },
+  {
+   "code": "P-M04A",
+   "system": "PULMONARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Pulmonary hyalinosis, lung, dog"
+  },
+  {
+   "code": "P-M04B",
+   "system": "PULMONARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Acidophilic macrophage pneumonia, lung, mouse"
+  },
+  {
+   "code": "P-M05",
+   "system": "PULMONARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Exogenous lipid pneumonia (mineral oil), lung, horse"
+  },
+  {
+   "code": "P-M06",
+   "system": "PULMONARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Chronic obstructive pulmonary disease (COPD), lung, pony"
+  },
+  {
+   "code": "P-M07",
+   "system": "PULMONARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Trophoblast embolism, lung, chinchilla"
+  },
+  {
+   "code": "P-M08",
+   "system": "PULMONARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Ethmoid hematoma; progressive hematoma, nasal mucosa, horse"
+  },
+  {
+   "code": "P-N01",
+   "system": "PULMONARY",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Rhabdomyoma, submucosa, dog"
+  },
+  {
+   "code": "P-N02",
+   "system": "PULMONARY",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Pulmonary carcinoma, lung, mouse"
+  },
+  {
+   "code": "P-N03",
+   "system": "PULMONARY",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Granular cell tumor, lung, horse"
+  },
+  {
+   "code": "P-N04",
+   "system": "PULMONARY",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Enzootic intranasal tumor, nasal cavity, ewe"
+  },
+  {
+   "code": "P-N05A",
+   "system": "PULMONARY",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Disseminated histiocytic sarcoma, lung, dog"
+  },
+  {
+   "code": "P-N05B",
+   "system": "PULMONARY",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Feline Pulmonary Langerhans Histiocytosis, lung, cat"
+  },
+  {
+   "code": "P-N06",
+   "system": "PULMONARY",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Mesothelioma, pleura, ox"
+  },
+  {
+   "code": "P-N07",
+   "system": "PULMONARY",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "epithelioid hemangiosarcoma, lung, Kidney, Prostate, Liver, Dog"
+  },
+  {
+   "code": "P-P01",
+   "system": "PULMONARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Pulmonary toxoplasmosis, lung, cat"
+  },
+  {
+   "code": "P-P02",
+   "system": "PULMONARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Dirofilaria immitsis and Angiostrongylus vasorum, lung, dog"
+  },
+  {
+   "code": "P-P03",
+   "system": "PULMONARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Cryptosporidiosis, lung, cockerel"
+  },
+  {
+   "code": "P-P04",
+   "system": "PULMONARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Avian malaria, Lung, Black-footed Penguin"
+  },
+  {
+   "code": "P-P05",
+   "system": "PULMONARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Cytauxzoon felis, lung, cat"
+  },
+  {
+   "code": "P-P06",
+   "system": "PULMONARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Pulmonary amebiasis, lung, cow"
+  },
+  {
+   "code": "P-P07",
+   "system": "PULMONARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Pulmonary paragonimiasis, lung, cat"
+  },
+  {
+   "code": "P-P08",
+   "system": "PULMONARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Mesocestodiasis, lung, dog"
+  },
+  {
+   "code": "P-P09A",
+   "system": "PULMONARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Aelurostrongylosis, lung, cat"
+  },
+  {
+   "code": "P-P09B",
+   "system": "PULMONARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Aelurostrongylosis, lung, cat"
+  },
+  {
+   "code": "P-P10",
+   "system": "PULMONARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Angiostrongylosis, lung, rat"
+  },
+  {
+   "code": "P-P11",
+   "system": "PULMONARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Muelleriasis, lung, goat"
+  },
+  {
+   "code": "P-P12",
+   "system": "PULMONARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Dictyocauliasis, lung, ewe"
+  },
+  {
+   "code": "P-P13",
+   "system": "PULMONARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Parafilaroidiasis, lung, sea lion"
+  },
+  {
+   "code": "P-P14A",
+   "system": "PULMONARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Angiostrongylosis (Andersonstrongylus milksi), lung, dog"
+  },
+  {
+   "code": "P-P14B",
+   "system": "PULMONARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Filaroidiasis (Oslerus osleri), trachea, dog"
+  },
+  {
+   "code": "P-P14C",
+   "system": "PULMONARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Crenosomiasis (Crenosoma vulpis), lung, red panda"
+  },
+  {
+   "code": "P-P15",
+   "system": "PULMONARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Capillariasis, trachea, lung, cat"
+  },
+  {
+   "code": "P-P16",
+   "system": "PULMONARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Syngamiasis, trachea, Herring gull"
+  },
+  {
+   "code": "P-P17A",
+   "system": "PULMONARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Branchial microsporidiosis, gill, Chinook salmon"
+  },
+  {
+   "code": "P-P17B",
+   "system": "PULMONARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Branchial myxosporosis, gill, catfish"
+  },
+  {
+   "code": "P-P18",
+   "system": "PULMONARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Lung mites, lung, monkey"
+  },
+  {
+   "code": "P-P19",
+   "system": "PULMONARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Air sac mite infection, lung, gamebird"
+  },
+  {
+   "code": "P-T01",
+   "system": "PULMONARY",
+   "etiology": "TOXIC",
+   "diagnosis": "Atypical Interstitial Pneumonia, lung, bull"
+  },
+  {
+   "code": "P-T02",
+   "system": "PULMONARY",
+   "etiology": "TOXIC",
+   "diagnosis": "Oxygen toxicosis, lung, monkey"
+  },
+  {
+   "code": "P-T03",
+   "system": "PULMONARY",
+   "etiology": "TOXIC",
+   "diagnosis": "Paraquat toxicity, lung, kidney, dog"
+  },
+  {
+   "code": "P-T04",
+   "system": "PULMONARY",
+   "etiology": "TOXIC",
+   "diagnosis": "Ricin toxicosis, lung, macaque"
+  },
+  {
+   "code": "P-V01",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Canine distemper, lung, bladder, dog"
+  },
+  {
+   "code": "P-V02",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Measles, lung, monkey"
+  },
+  {
+   "code": "P-V03",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Dolphin morbillivirus (DMV), lung, dolphin"
+  },
+  {
+   "code": "P-V04",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Goat plague, lung, goat"
+  },
+  {
+   "code": "P-V05",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Sendai viral pneumonia, lung, mouse"
+  },
+  {
+   "code": "P-V06",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Bovine Respiratory Syncytial Virus (BRSV), lung, ox"
+  },
+  {
+   "code": "P-V07",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Paramyxoviral pneumonia, lung, snake"
+  },
+  {
+   "code": "P-V08",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Caliciviral pneumonia, lung, cat"
+  },
+  {
+   "code": "P-V09A",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Feline viral rhinotracheitis (FVR), lung, liver, kitten"
+  },
+  {
+   "code": "P-V09B",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Feline viral rhinotracheitis (FVR), nasal turbinates and sinuses, kitten"
+  },
+  {
+   "code": "P-V10",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Equine herpesviral pneumonia, lung, foal"
+  },
+  {
+   "code": "P-V11",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Infectious Laryngotracheitis, lung, bronchus, chicken"
+  },
+  {
+   "code": "P-V12",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Cytomegaloviral pneumonia, lung, monkey"
+  },
+  {
+   "code": "P-V13",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Inclusion Body Rhinitis, nasal turbinate, pig"
+  },
+  {
+   "code": "P-V14",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Aleutian mink disease, lung, mink"
+  },
+  {
+   "code": "P-V15",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Feline infectious peritonitis, lung, cat"
+  },
+  {
+   "code": "P-V16",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Pulmonary carcinomatosis, lung, sheep"
+  },
+  {
+   "code": "P-V17A",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Ovine chronic progressive pneumonia (OPP), lung, ewe"
+  },
+  {
+   "code": "P-V17B",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Caprine arthritis encephalitis virus (CAEV), lung, goat"
+  },
+  {
+   "code": "P-V18",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Swine Influenza, lung, pig"
+  },
+  {
+   "code": "P-V19",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Simian Immunodeficiency virus (SIV), lung, monkey"
+  },
+  {
+   "code": "P-V20",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Adenoviral pneumonia, lung, lamb"
+  },
+  {
+   "code": "P-V21",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Canine adenoviral pneumonia, lung, dog"
+  },
+  {
+   "code": "P-V22",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Bovine ephemeral fever (BEF), lung, cow"
+  },
+  {
+   "code": "P-V23",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "African Horse Sickness, lung, colt"
+  },
+  {
+   "code": "P-V24",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Sheep pox, lung, sheep"
+  },
+  {
+   "code": "P-V25",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Porcine reproductive and respiratory syndrome, lung, piglet"
+  },
+  {
+   "code": "P-V26",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Equine paramyxoviral (Hendraviral) pneumonia, lung, horse"
+  },
+  {
+   "code": "P-V27",
+   "system": "PULMONARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Equine multinodular pulmonary fibrosis, lung, horse"
+  },
+  {
+   "code": "R-B01",
+   "system": "REPRODUCTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Epizootic bovine abortion (EBA), liver, kidney, spleen, calf"
+  },
+  {
+   "code": "R-B02",
+   "system": "REPRODUCTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Pyometra, uterus, dog"
+  },
+  {
+   "code": "R-B03A",
+   "system": "REPRODUCTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Brucellosis, testicle, Bison"
+  },
+  {
+   "code": "R-B03B",
+   "system": "REPRODUCTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Brucellosis, fetal liver, lung, ox"
+  },
+  {
+   "code": "R-B03C",
+   "system": "REPRODUCTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Brucellosis, placenta, goat"
+  },
+  {
+   "code": "R-B04",
+   "system": "REPRODUCTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Staphylococcal mastitis, mammary gland, ox"
+  },
+  {
+   "code": "R-B05",
+   "system": "REPRODUCTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Contagious equine metritis, uterus, horse"
+  },
+  {
+   "code": "R-B06",
+   "system": "REPRODUCTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Ureaplasmal abortion, fetal lung, placenta, ox"
+  },
+  {
+   "code": "R-B07",
+   "system": "REPRODUCTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Q Fever, placenta, goat"
+  },
+  {
+   "code": "R-B08",
+   "system": "REPRODUCTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Enzootic abortion of ewes (EAE), placenta, sheep"
+  },
+  {
+   "code": "R-B09",
+   "system": "REPRODUCTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Rabbit syphilis, haired skin, rabbit"
+  },
+  {
+   "code": "R-B10",
+   "system": "REPRODUCTIVE",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Campylobacterial hepatitis, Liver, Sheep"
+  },
+  {
+   "code": "R-F01",
+   "system": "REPRODUCTIVE",
+   "etiology": "FUNGAL",
+   "diagnosis": "Mycotic placentitis, placenta, haired skin, ox"
+  },
+  {
+   "code": "R-M01A",
+   "system": "REPRODUCTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Normal, Uterus and placenta, Cat"
+  },
+  {
+   "code": "R-M01B",
+   "system": "REPRODUCTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Normal, Uterus and placenta, Cat"
+  },
+  {
+   "code": "R-M01C",
+   "system": "REPRODUCTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Normal, Uterus, Sheep"
+  },
+  {
+   "code": "R-M01D",
+   "system": "REPRODUCTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Normal, Placenta, Dog"
+  },
+  {
+   "code": "R-M01E",
+   "system": "REPRODUCTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Normal, Uterus, horse"
+  },
+  {
+   "code": "R-M01F",
+   "system": "REPRODUCTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Normal, placenta, mouse"
+  },
+  {
+   "code": "R-M02",
+   "system": "REPRODUCTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Trophoblastic emboli, lung, chinchilla"
+  },
+  {
+   "code": "R-M03",
+   "system": "REPRODUCTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Subinvolution of placental sites, uterus, dog"
+  },
+  {
+   "code": "R-M04",
+   "system": "REPRODUCTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "True hermaphrodite, ovotestis, dog"
+  },
+  {
+   "code": "R-M05A",
+   "system": "REPRODUCTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Endometriosis, uterus, monkey"
+  },
+  {
+   "code": "R-M05B",
+   "system": "REPRODUCTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Adenomyosis, uterus, cat"
+  },
+  {
+   "code": "R-M06",
+   "system": "REPRODUCTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Sperm granuloma, testicle, dog"
+  },
+  {
+   "code": "R-M07",
+   "system": "REPRODUCTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Endometrial venous aneurysm, uterus, rabbit"
+  },
+  {
+   "code": "R-M08",
+   "system": "REPRODUCTIVE",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Pseudoplacentational endometrial hyperplasia, Uterus, dog"
+  },
+  {
+   "code": "R-N01",
+   "system": "REPRODUCTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Transmissible venereal tumor, penis, dog"
+  },
+  {
+   "code": "R-N02",
+   "system": "REPRODUCTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Sertoli cell tumor & mammary hyperplasia, liver, mammary gland, dog"
+  },
+  {
+   "code": "R-N03",
+   "system": "REPRODUCTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Interstitial cell tumor & seminoma, testicle, dog"
+  },
+  {
+   "code": "R-N04",
+   "system": "REPRODUCTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Interstitial cell tumor & Mesothelioma, testicle, rat"
+  },
+  {
+   "code": "R-N05A",
+   "system": "REPRODUCTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Granulosa cell tumor, ovary, dog"
+  },
+  {
+   "code": "R-N05B",
+   "system": "REPRODUCTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Granulosa cell tumor, ovary, orangutan"
+  },
+  {
+   "code": "R-N05C",
+   "system": "REPRODUCTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Granulosa cell tumor, ovary, horse"
+  },
+  {
+   "code": "R-N06",
+   "system": "REPRODUCTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Dysgerminoma, ovary, maned wolf"
+  },
+  {
+   "code": "R-N07",
+   "system": "REPRODUCTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Uterine adenocarcinoma, uterus, rabbit"
+  },
+  {
+   "code": "R-N08",
+   "system": "REPRODUCTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Teratoma, ovary, mouse"
+  },
+  {
+   "code": "R-N09",
+   "system": "REPRODUCTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Adenoma, clitoral gland, rat"
+  },
+  {
+   "code": "R-N10A",
+   "system": "REPRODUCTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Fibroepithelial hyperplasia, mammary gland, cat"
+  },
+  {
+   "code": "R-N10B",
+   "system": "REPRODUCTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Mammary carcinoma - Tubular, mammary gland, cat"
+  },
+  {
+   "code": "R-N11",
+   "system": "REPRODUCTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Cystic adenomatous hyperplasia of the allantois, allantois, horse"
+  },
+  {
+   "code": "R-N12",
+   "system": "REPRODUCTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Deciduoma, uterus, rat"
+  },
+  {
+   "code": "R-N13A",
+   "system": "REPRODUCTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Ovarian adenocarcinoma, ovary, oviduct, chicken"
+  },
+  {
+   "code": "R-N13B",
+   "system": "REPRODUCTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Ovarian adenocarcinoma, ovary, chicken"
+  },
+  {
+   "code": "R-N14",
+   "system": "REPRODUCTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Malignant myoepithelioma, mammary gland, dog"
+  },
+  {
+   "code": "R-N15A",
+   "system": "REPRODUCTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Benign mixed mammary tumor, mammary gland, dog"
+  },
+  {
+   "code": "R-N15B",
+   "system": "REPRODUCTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Lipid rich mammary carcinoma, mammary gland, dog"
+  },
+  {
+   "code": "R-N16",
+   "system": "REPRODUCTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Choriocarcinoma, Ovary, Mouse"
+  },
+  {
+   "code": "R-N17",
+   "system": "REPRODUCTIVE",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Ovarian papillary carcinoma, ovary, Dog"
+  },
+  {
+   "code": "R-P01",
+   "system": "REPRODUCTIVE",
+   "etiology": "PARASITIC",
+   "diagnosis": "Toxoplasmosis, placenta, sheep"
+  },
+  {
+   "code": "R-V01",
+   "system": "REPRODUCTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Equine viral abortion, lung, liver, adrenal gland, horse"
+  },
+  {
+   "code": "R-V02",
+   "system": "REPRODUCTIVE",
+   "etiology": "VIRAL",
+   "diagnosis": "Bovine herpesvirus type 1, prepuce, ox"
+  },
+  {
+   "code": "S-B01",
+   "system": "SPECIAL_SENSES",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Arizonosis, Eye, turkey"
+  },
+  {
+   "code": "S-F01",
+   "system": "SPECIAL_SENSES",
+   "etiology": "FUNGAL",
+   "diagnosis": "Cryptococcosis, Eye, dog"
+  },
+  {
+   "code": "S-F02",
+   "system": "SPECIAL_SENSES",
+   "etiology": "FUNGAL",
+   "diagnosis": "Blastomycosis, Eye, dog"
+  },
+  {
+   "code": "S-M01",
+   "system": "SPECIAL_SENSES",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Equine recurrent uveitis (ERU), Eye, Horse"
+  },
+  {
+   "code": "S-M02A",
+   "system": "SPECIAL_SENSES",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Otitis media, Middle ear, Rat"
+  },
+  {
+   "code": "S-M02B",
+   "system": "SPECIAL_SENSES",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Otitis externa, Ear canal, dog"
+  },
+  {
+   "code": "S-M03",
+   "system": "SPECIAL_SENSES",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Protothecosis, Eye, Dog"
+  },
+  {
+   "code": "S-M04A",
+   "system": "SPECIAL_SENSES",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Congenital glaucoma, Eye, Rabbit"
+  },
+  {
+   "code": "S-M04B",
+   "system": "SPECIAL_SENSES",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Glaucoma secondary to goniodysgenesis, Eye, Dog"
+  },
+  {
+   "code": "S-M05",
+   "system": "SPECIAL_SENSES",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Retinal dysplasia, Eye, Dog"
+  },
+  {
+   "code": "S-M06",
+   "system": "SPECIAL_SENSES",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Phacoclastic uveitis, Eye, Dog"
+  },
+  {
+   "code": "S-M07",
+   "system": "SPECIAL_SENSES",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Vogt-Koyanagi-Harada-like syndrome, Eye, Dog"
+  },
+  {
+   "code": "S-M08",
+   "system": "SPECIAL_SENSES",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Corneal lipidosis, Eye, Dog"
+  },
+  {
+   "code": "S-M09",
+   "system": "SPECIAL_SENSES",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Pannus keratitis, Eye, Dog"
+  },
+  {
+   "code": "S-M10",
+   "system": "SPECIAL_SENSES",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Nasopharyngeal polyp, Oropharyngeal mucosa, Cat"
+  },
+  {
+   "code": "S-M11",
+   "system": "SPECIAL_SENSES",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Ocular nodular fasciitis, Eye, dog"
+  },
+  {
+   "code": "S-M12",
+   "system": "SPECIAL_SENSES",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Collie Eye Anomaly (CEA), Eye, Dog"
+  },
+  {
+   "code": "S-M13",
+   "system": "SPECIAL_SENSES",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Hypertensive retinopathy, Eye, cat"
+  },
+  {
+   "code": "S-M14",
+   "system": "SPECIAL_SENSES",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Corneal sequestrum, Cornea, Cat"
+  },
+  {
+   "code": "S-M15A",
+   "system": "SPECIAL_SENSES",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Dermoid, Eye, Horse"
+  },
+  {
+   "code": "S-M15B",
+   "system": "SPECIAL_SENSES",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Dermoid, Eye, Dog"
+  },
+  {
+   "code": "S-M16",
+   "system": "SPECIAL_SENSES",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Pre-iridal fibrovascular membrane, Eye, Dog"
+  },
+  {
+   "code": "S-M17",
+   "system": "SPECIAL_SENSES",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Hereditary outer retinal atrophy., Eye, Mouse"
+  },
+  {
+   "code": "S-M18",
+   "system": "SPECIAL_SENSES",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Cataract, eye, Atlantic salmon"
+  },
+  {
+   "code": "S-N01A",
+   "system": "SPECIAL_SENSES",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Squamous cell carcinoma, Conjunctiva, Lymph node, Cow"
+  },
+  {
+   "code": "S-N01B",
+   "system": "SPECIAL_SENSES",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Squamous cell carcinoma, Conjunctiva, horse"
+  },
+  {
+   "code": "S-N02A",
+   "system": "SPECIAL_SENSES",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Uveal melanocytoma, Eye, Dog"
+  },
+  {
+   "code": "S-N02B",
+   "system": "SPECIAL_SENSES",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Diffuse iris melanoma, Eye, Cat"
+  },
+  {
+   "code": "S-N03",
+   "system": "SPECIAL_SENSES",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Lymphoma, Eye, Cat"
+  },
+  {
+   "code": "S-N04",
+   "system": "SPECIAL_SENSES",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Iridociliary adenoma/carcinoma, Eye, Dog"
+  },
+  {
+   "code": "S-N05",
+   "system": "SPECIAL_SENSES",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Lacrimal adenocarcinoma, Lacrimal gland, Cat"
+  },
+  {
+   "code": "S-N06A",
+   "system": "SPECIAL_SENSES",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Ceruminous gland adenoma, Ear canal, Dog"
+  },
+  {
+   "code": "S-N06B",
+   "system": "SPECIAL_SENSES",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Ceruminous gland carcinoma, Pinna, Cat"
+  },
+  {
+   "code": "S-N07",
+   "system": "SPECIAL_SENSES",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Post traumatic ocular sarcoma, Eye, Cat"
+  },
+  {
+   "code": "S-P01",
+   "system": "SPECIAL_SENSES",
+   "etiology": "PARASITIC",
+   "diagnosis": "Fish eye fluke, Eye, White sucker"
+  },
+  {
+   "code": "S-P02",
+   "system": "SPECIAL_SENSES",
+   "etiology": "PARASITIC",
+   "diagnosis": "Psoroptic mange, Pinna, rabbit"
+  },
+  {
+   "code": "S-P03",
+   "system": "SPECIAL_SENSES",
+   "etiology": "PARASITIC",
+   "diagnosis": "Onchocerciasis, Eye, Dog"
+  },
+  {
+   "code": "S-V01",
+   "system": "SPECIAL_SENSES",
+   "etiology": "VIRAL",
+   "diagnosis": "Malignant Catarrhal Fever (MCF), Eye, Cow"
+  },
+  {
+   "code": "S-V02",
+   "system": "SPECIAL_SENSES",
+   "etiology": "VIRAL",
+   "diagnosis": "Coronaviral dacryoadenitis, Eye, Harderian gland, Rat"
+  },
+  {
+   "code": "S-V03",
+   "system": "SPECIAL_SENSES",
+   "etiology": "VIRAL",
+   "diagnosis": "Feline coronaviral uveitis, Eye, Cat"
+  },
+  {
+   "code": "S-V04",
+   "system": "SPECIAL_SENSES",
+   "etiology": "VIRAL",
+   "diagnosis": "Fibropapillomatosis, Eye, Sea turtle"
+  },
+  {
+   "code": "U-B01",
+   "system": "URINARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Lyme disease, kidney, dog"
+  },
+  {
+   "code": "U-B02",
+   "system": "URINARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Actinobacillosis, kidney, foal"
+  },
+  {
+   "code": "U-B03A",
+   "system": "URINARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Leptospirosis, kidney, pig"
+  },
+  {
+   "code": "U-B03B",
+   "system": "URINARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Leptospirosis, kidney, ape"
+  },
+  {
+   "code": "U-B04",
+   "system": "URINARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Ehrlichiosis, kidney, dog"
+  },
+  {
+   "code": "U-B05",
+   "system": "URINARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "White-spotted kidneys of cattle, kidney, calf"
+  },
+  {
+   "code": "U-B06",
+   "system": "URINARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Pulpy kidney disease, kidney, lamb"
+  },
+  {
+   "code": "U-B07",
+   "system": "URINARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Bacterial cystitis, urinary bladder, pig"
+  },
+  {
+   "code": "U-B08",
+   "system": "URINARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Bacterial kidney disease (BKD), posterior kidney, salmon"
+  },
+  {
+   "code": "U-B09",
+   "system": "URINARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Erysipelas, kidney, pig"
+  },
+  {
+   "code": "U-B10",
+   "system": "URINARY",
+   "etiology": "BACTERIAL",
+   "diagnosis": "Bacterial Pyelonephritis, kidney and ureter, dog"
+  },
+  {
+   "code": "U-F01",
+   "system": "URINARY",
+   "etiology": "FUNGAL",
+   "diagnosis": "Renal candidiasis, kidney, killer whale"
+  },
+  {
+   "code": "U-F02",
+   "system": "URINARY",
+   "etiology": "FUNGAL",
+   "diagnosis": "Systemic aspergillosis, kidney, dog"
+  },
+  {
+   "code": "U-F03",
+   "system": "URINARY",
+   "etiology": "FUNGAL",
+   "diagnosis": "Encephalitozoonosis, kidney, urinary bladder, dog"
+  },
+  {
+   "code": "U-M01",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Hypertensive vascular disease, kidney, monkey"
+  },
+  {
+   "code": "U-M02",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Chediak-Higashi Syndrome (CHS), kidney, calf"
+  },
+  {
+   "code": "U-M03A",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Polycystic kidney, kidney, cat"
+  },
+  {
+   "code": "U-M03B",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Polycystic kidney disease, Metanephros, Goldfish"
+  },
+  {
+   "code": "U-M04",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Emphysematous cystitis, urinary bladder, dog"
+  },
+  {
+   "code": "U-M05",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Gilbert syndrome, kidney, ewe"
+  },
+  {
+   "code": "U-M06",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Glomerular amyloidosis, kidney, dog"
+  },
+  {
+   "code": "U-M07",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Familial/Hereditary nephropathy, kidney, dog"
+  },
+  {
+   "code": "U-M08",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Visceral gout, kidney, liver, spleen, pigeon"
+  },
+  {
+   "code": "U-M09",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Diabetes mellitus, kidney, dog"
+  },
+  {
+   "code": "U-M10",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Glomerular lipidosis, kidney, dog"
+  },
+  {
+   "code": "U-M11",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Chronic progressive nephropathy (CPN), kidney, rat"
+  },
+  {
+   "code": "U-M12",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Cloisonne kidney, kidney, goat"
+  },
+  {
+   "code": "U-M13",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Fanconi-like Syndrome, kidney, dog"
+  },
+  {
+   "code": "U-M14",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Glomerulonephritis (GN), kidney, monkey"
+  },
+  {
+   "code": "U-M15A",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Membranous glomerulonephritis (GN), kidney, mouse"
+  },
+  {
+   "code": "U-M15C",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Glomerulonephritis (GN), kidney, dog"
+  },
+  {
+   "code": "U-M16",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Proliferative glomerulonephritis (GN), kidney, ram"
+  },
+  {
+   "code": "U-M17",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Membranoproliferative glomerulonephritis, kidney, lamb"
+  },
+  {
+   "code": "U-M18",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "End stage kidney, kidney, dog"
+  },
+  {
+   "code": "U-M19",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Toxic glomerular vasculopathy, kidney, dog"
+  },
+  {
+   "code": "U-M20",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Exertional rhabdomyolysis, skeletal muscle, kidney, horse"
+  },
+  {
+   "code": "U-M21A",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Acquired alpha-mannosidosis, kidney, rat"
+  },
+  {
+   "code": "U-M21B",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Autosomal recessive hereditary beta-mannosidosis, kidney, calf"
+  },
+  {
+   "code": "U-M22A",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Non-specific renal and hepatic inclusions, kidney, liver, dog"
+  },
+  {
+   "code": "U-M22B",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Non-specific renal inclusions, kidney, monkey"
+  },
+  {
+   "code": "U-M23",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Syncytial cells, kidney, monkey"
+  },
+  {
+   "code": "U-M24",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Chronic polypoid cystitis, urinary bladder, dog"
+  },
+  {
+   "code": "U-M25",
+   "system": "URINARY",
+   "etiology": "METABOLIC_MISC",
+   "diagnosis": "Renal protothecosis, kidney, dog"
+  },
+  {
+   "code": "U-N01A",
+   "system": "URINARY",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Nephroblastoma, kidney, pig"
+  },
+  {
+   "code": "U-N01B",
+   "system": "URINARY",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Nephroblastoma, kidney, macaque"
+  },
+  {
+   "code": "U-N02A",
+   "system": "URINARY",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Renal cell carcinoma, kidney, dog"
+  },
+  {
+   "code": "U-N02B",
+   "system": "URINARY",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Renal cell carcinoma, kidney, rat"
+  },
+  {
+   "code": "U-N03",
+   "system": "URINARY",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Botryoid rhabdomyosarcoma, urinary bladder, dog"
+  },
+  {
+   "code": "U-N04",
+   "system": "URINARY",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Transitional cell carcinoma, urinary bladder, dog"
+  },
+  {
+   "code": "U-N05",
+   "system": "URINARY",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Renal interstitial cell tumor, kidney, dog"
+  },
+  {
+   "code": "U-N06",
+   "system": "URINARY",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Renal mesenchymal tumor, kidney, rat"
+  },
+  {
+   "code": "U-N07",
+   "system": "URINARY",
+   "etiology": "NEOPLASTIC",
+   "diagnosis": "Liposarcoma, kidney, rat"
+  },
+  {
+   "code": "U-P02A",
+   "system": "URINARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Klossiellosis, kidney, guinea pig"
+  },
+  {
+   "code": "U-P02B",
+   "system": "URINARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Klossiellosis, kidney, horse"
+  },
+  {
+   "code": "U-P03",
+   "system": "URINARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Leishmaniasis, kidney, dog"
+  },
+  {
+   "code": "U-P04",
+   "system": "URINARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Sarcocystosis, kidney, cow"
+  },
+  {
+   "code": "U-P05",
+   "system": "URINARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Toxocariasis, kidney, puppy"
+  },
+  {
+   "code": "U-P06",
+   "system": "URINARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Coccidiosis, kidney, loon"
+  },
+  {
+   "code": "U-P07",
+   "system": "URINARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Edesonfilariasis, kidney, adrenal gland, monkey"
+  },
+  {
+   "code": "U-P08",
+   "system": "URINARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Kidney worm of swine, periureteral fibroadipose tissue, pig"
+  },
+  {
+   "code": "U-P09",
+   "system": "URINARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Dioctophymiasis, kidney, dog"
+  },
+  {
+   "code": "U-P10",
+   "system": "URINARY",
+   "etiology": "PARASITIC",
+   "diagnosis": "Trichosomoidiasis, urinary bladder, rat"
+  },
+  {
+   "code": "U-T01",
+   "system": "URINARY",
+   "etiology": "TOXIC",
+   "diagnosis": "Chrysotoxicosis, kidney, rat"
+  },
+  {
+   "code": "U-T02A",
+   "system": "URINARY",
+   "etiology": "TOXIC",
+   "diagnosis": "Lead toxicosis, kidney, liver, baboon"
+  },
+  {
+   "code": "U-T02B",
+   "system": "URINARY",
+   "etiology": "TOXIC",
+   "diagnosis": "Lead toxicosis, kidney, amakihi"
+  },
+  {
+   "code": "U-T03",
+   "system": "URINARY",
+   "etiology": "TOXIC",
+   "diagnosis": "Hypervitaminosis D, kidney, lung, dog"
+  },
+  {
+   "code": "U-T04",
+   "system": "URINARY",
+   "etiology": "TOXIC",
+   "diagnosis": "Chloroform nephrosis, kidney, mouse"
+  },
+  {
+   "code": "U-T05",
+   "system": "URINARY",
+   "etiology": "TOXIC",
+   "diagnosis": "Ethylene Glycol toxicity, kidney, pig"
+  },
+  {
+   "code": "U-T06",
+   "system": "URINARY",
+   "etiology": "TOXIC",
+   "diagnosis": "Oxalate nephrosis, kidney, ewe"
+  },
+  {
+   "code": "U-T07",
+   "system": "URINARY",
+   "etiology": "TOXIC",
+   "diagnosis": "Nephrotoxic tubular necrosis, kidney, dog"
+  },
+  {
+   "code": "U-T08",
+   "system": "URINARY",
+   "etiology": "TOXIC",
+   "diagnosis": "Oxytetracycline toxicosis, kidney, calf"
+  },
+  {
+   "code": "U-T09",
+   "system": "URINARY",
+   "etiology": "TOXIC",
+   "diagnosis": "Renal menadione (Vit K3) toxicosis, kidney, horse"
+  },
+  {
+   "code": "U-T10A",
+   "system": "URINARY",
+   "etiology": "TOXIC",
+   "diagnosis": "Chronic copper toxicity, kidney, sheep"
+  },
+  {
+   "code": "U-T10B",
+   "system": "URINARY",
+   "etiology": "TOXIC",
+   "diagnosis": "Zinc-induced nephrotoxicosis, kidney, dog"
+  },
+  {
+   "code": "U-T11",
+   "system": "URINARY",
+   "etiology": "TOXIC",
+   "diagnosis": "Enzootic hematuria, urinary bladder, cow"
+  },
+  {
+   "code": "U-T12",
+   "system": "URINARY",
+   "etiology": "TOXIC",
+   "diagnosis": "Red maple leaf toxicosis, kidney, horse"
+  },
+  {
+   "code": "U-T13",
+   "system": "URINARY",
+   "etiology": "TOXIC",
+   "diagnosis": "Perirenal edema disease, kidney, pig"
+  },
+  {
+   "code": "U-T14",
+   "system": "URINARY",
+   "etiology": "TOXIC",
+   "diagnosis": "Oak bud poisoning, kidney, calf"
+  },
+  {
+   "code": "U-T15",
+   "system": "URINARY",
+   "etiology": "TOXIC",
+   "diagnosis": "Algal toxicosis, kidney, liver, ewe"
+  },
+  {
+   "code": "U-T16",
+   "system": "URINARY",
+   "etiology": "TOXIC",
+   "diagnosis": "Hairy vetch (toxic) nephritis, kidney, cow"
+  },
+  {
+   "code": "U-T17",
+   "system": "URINARY",
+   "etiology": "TOXIC",
+   "diagnosis": "Ricin toxicosis, kidney, pig"
+  },
+  {
+   "code": "U-T18",
+   "system": "URINARY",
+   "etiology": "TOXIC",
+   "diagnosis": "Melamine toxicity, kidney, Dog"
+  },
+  {
+   "code": "U-V01",
+   "system": "URINARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Lucke's tumor of leopard frogs, kidney, frog"
+  },
+  {
+   "code": "U-V02",
+   "system": "URINARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Malignant catarrhal fever (MCF), kidney, haired skin, steer"
+  },
+  {
+   "code": "U-V03",
+   "system": "URINARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Herpesviral nephritis, hepatitis, and pneumonia, kidney, liver, lung, dog"
+  },
+  {
+   "code": "U-V04",
+   "system": "URINARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Betaherpesviral nephritis, kidney, monkey"
+  },
+  {
+   "code": "U-V05",
+   "system": "URINARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Aleutian mink disease, kidney, liver, mink"
+  },
+  {
+   "code": "U-V06",
+   "system": "URINARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Feline infectious peritonitis virus (FIPV), kidney, cat"
+  },
+  {
+   "code": "U-V07",
+   "system": "URINARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Canine distemper, urinary bladder, lung, dog"
+  },
+  {
+   "code": "U-V08",
+   "system": "URINARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Budgerigar fledgling disease (BFD), kidney, budgerigars"
+  },
+  {
+   "code": "U-V09",
+   "system": "URINARY",
+   "etiology": "VIRAL",
+   "diagnosis": "Simian virus 40 infection, kidney, Rhesus monkey"
+  }
+ ]
+}
