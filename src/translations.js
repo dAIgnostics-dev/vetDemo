@@ -76,7 +76,19 @@ export const translations = {
     cls_animal_group: "Animal group",
     cls_system: "Organ system",
     cls_etiology: "Etiology",
-    cls_auto: "— auto —"
+    cls_auto: "— auto —",
+    meta_section: "Header & classification",
+    dictation_label: "Describe the findings",
+    dictation_start: "Dictate findings",
+    dictation_stop: "Stop recording",
+    dictation_placeholder: "Dictate or type what you see under the microscope. Keywords are extracted automatically.",
+    keywords_label: "Keywords",
+    keywords_empty: "No keywords yet — dictate or add them below.",
+    keywords_add_placeholder: "Add a keyword and press Enter…",
+    ui_voice: "Voice",
+    ui_classic: "Classic",
+    ui_switch_to_classic: "Switch to classic layout",
+    ui_switch_to_voice: "Switch to voice layout"
   },
   hr: {
     app_title: "dAIgnostics Studio",
@@ -155,6 +167,18 @@ export const translations = {
     cls_animal_group: "Vrsta životinje",
     cls_system: "Organski sustav",
     cls_etiology: "Etiologija",
-    cls_auto: "— automatski —"
+    cls_auto: "— automatski —",
+    meta_section: "Zaglavlje i klasifikacija",
+    dictation_label: "Opišite nalaz",
+    dictation_start: "Diktiraj nalaz",
+    dictation_stop: "Zaustavi snimanje",
+    dictation_placeholder: "Diktirajte ili upišite što vidite pod mikroskopom. Ključne riječi se izvlače automatski.",
+    keywords_label: "Ključne riječi",
+    keywords_empty: "Još nema ključnih riječi — diktirajte ih ili dodajte ispod.",
+    keywords_add_placeholder: "Dodaj ključnu riječ i pritisni Enter…",
+    ui_voice: "Glasovni",
+    ui_classic: "Klasični",
+    ui_switch_to_classic: "Prebaci na klasični layout",
+    ui_switch_to_voice: "Prebaci na glasovni layout"
   }
 };

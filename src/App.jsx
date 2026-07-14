@@ -22,8 +22,7 @@ import {
   Search,
   Mic,
   MicOff,
-  List,
-  AlignLeft
+  LayoutGrid
 } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -177,6 +176,26 @@ const FIELD_INPUT = { width: '100%', padding: '0.5rem', borderRadius: '6px', bor
 const FIELD_LABEL = { fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.3rem', display: 'block' };
 const SECTION_LABEL = { fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.05em' };
 
+// Sklopivi blok s naslovom, opcionalnim sažetkom i strelicom.
+function Collapsible({ title, subtitle, open, onToggle, children }) {
+  return (
+    <div style={{ border: '1px solid var(--border)', borderRadius: '8px' }}>
+      <button
+        type="button"
+        onClick={onToggle}
+        style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.7rem 0.9rem', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+      >
+        <ChevronRight size={16} style={{ transition: 'transform 0.15s', transform: open ? 'rotate(90deg)' : 'none', flexShrink: 0 }} />
+        <span style={{ ...SECTION_LABEL, marginBottom: 0 }}>{title}</span>
+        {subtitle && !open && (
+          <span style={{ marginLeft: 'auto', fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '60%' }}>{subtitle}</span>
+        )}
+      </button>
+      {open && <div style={{ padding: '0 0.9rem 0.9rem' }}>{children}</div>}
+    </div>
+  );
+}
+
 // Read-only prikaz nalaza (za neselektirane rezultate pretrage).
 function ReportPreview({ report, lang, t }) {
   const langKey = lang === 'en' ? 'en' : 'hr';
@@ -277,106 +296,146 @@ function KlasControls({ value, lang, t, onSelect, onToggleEtiology }) {
   );
 }
 
-// Strukturirani editor nalaza (zaglavlje, klasifikacija, sekcije, numerirana dg, komentar).
+// Strukturirani editor nalaza (metapodaci, sekcije, numerirana dg, komentar).
 function ReportEditor({ report, lang, t, updateZaglavlje, updateKlas, toggleEtiology, updateSection, addSection, removeSection, dgToList, dgToString, updateDgItem, addDgItem, removeDgItem, updateKomentar }) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-      {/* Zaglavlje */}
-      <div>
-        <div style={SECTION_LABEL}>{t('header_section')}</div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-          {ZAGLAVLJE_FIELDS.map((f) => (
-            <div key={f}>
-              <label style={FIELD_LABEL}>{t('z_' + f)}</label>
-              <input
-                value={(report.zaglavlje && report.zaglavlje[f]) || ''}
-                onChange={(e) => updateZaglavlje(f, e.target.value)}
-                style={FIELD_INPUT}
-              />
-            </div>
-          ))}
-        </div>
-      </div>
+  const [metaOpen, setMetaOpen] = useState(false);
+  const [openSection, setOpenSection] = useState(0);
+  const langKey = lang === 'en' ? 'en' : 'hr';
 
-      {/* Klasifikacija */}
-      <div>
-        <div style={SECTION_LABEL}>{t('cls_section')}</div>
-        <KlasControls value={report.klasifikacija} lang={lang} t={t} onSelect={updateKlas} onToggleEtiology={toggleEtiology} />
+  const z = report.zaglavlje || {};
+  const k = report.klasifikacija || {};
+  const metaSummary = [
+    ...ZAGLAVLJE_FIELDS.map((f) => (z[f] || '').trim()).filter(Boolean),
+    k.animal_group && taxLabel('animal_group', k.animal_group, langKey),
+    k.system && taxLabel('system', k.system, langKey),
+    ...(k.etiology || []).map((c) => taxLabel('etiology', c, langKey)),
+  ].filter(Boolean).join(' · ');
+
+  const renderSectionBody = (s, i, dgIsList) => (
+    <>
+      <div style={{ marginBottom: '0.75rem' }}>
+        <label style={FIELD_LABEL}>{t('section_title')}</label>
+        <input
+          value={s.naslov || ''}
+          onChange={(e) => updateSection(i, 'naslov', e.target.value)}
+          placeholder={t('section_title_ph')}
+          style={FIELD_INPUT}
+        />
       </div>
+      <div style={{ marginBottom: '0.75rem' }}>
+        <label style={FIELD_LABEL}>{t('opis_label')}</label>
+        <textarea
+          value={s.opis || ''}
+          onChange={(e) => updateSection(i, 'opis', e.target.value)}
+          style={{ ...FIELD_INPUT, minHeight: '140px', resize: 'vertical', lineHeight: 1.7 }}
+        />
+      </div>
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+          <label style={{ ...FIELD_LABEL, marginBottom: 0 }}>{t('dg_label')}</label>
+          <button
+            className="btn btn-ghost btn-sm"
+            onClick={() => (dgIsList ? dgToString(i) : dgToList(i))}
+            style={{ fontSize: '0.72rem' }}
+          >
+            {dgIsList ? t('dg_to_single') : t('dg_to_list')}
+          </button>
+        </div>
+        {dgIsList ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            {s.dg.map((d, j) => (
+              <div key={j} style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                <span style={{ fontWeight: 700, color: 'var(--text-muted)', minWidth: '1.2rem' }}>{j + 1}.</span>
+                <input
+                  value={d}
+                  onChange={(e) => updateDgItem(i, j, e.target.value)}
+                  style={{ ...FIELD_INPUT, fontWeight: 600 }}
+                />
+                <button className="btn btn-ghost btn-sm" onClick={() => removeDgItem(i, j)} title={t('remove_section')}>
+                  <X size={15} />
+                </button>
+              </div>
+            ))}
+            <div>
+              <button className="btn btn-secondary btn-sm" onClick={() => addDgItem(i)}>
+                <Plus size={15} /> {t('add_dg')}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <input
+            value={s.dg || ''}
+            onChange={(e) => updateSection(i, 'dg', e.target.value)}
+            style={{ ...FIELD_INPUT, fontWeight: 600 }}
+          />
+        )}
+      </div>
+    </>
+  );
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      {/* Metapodaci: zaglavlje + klasifikacija (sklopivo) */}
+      <Collapsible title={t('meta_section')} subtitle={metaSummary} open={metaOpen} onToggle={() => setMetaOpen((o) => !o)}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', paddingTop: '0.25rem' }}>
+          <div>
+            <div style={SECTION_LABEL}>{t('header_section')}</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+              {ZAGLAVLJE_FIELDS.map((f) => (
+                <div key={f}>
+                  <label style={FIELD_LABEL}>{t('z_' + f)}</label>
+                  <input
+                    value={(report.zaglavlje && report.zaglavlje[f]) || ''}
+                    onChange={(e) => updateZaglavlje(f, e.target.value)}
+                    style={FIELD_INPUT}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div style={SECTION_LABEL}>{t('cls_section')}</div>
+            <KlasControls value={report.klasifikacija} lang={lang} t={t} onSelect={updateKlas} onToggleEtiology={toggleEtiology} />
+          </div>
+        </div>
+      </Collapsible>
 
       {/* Sekcije */}
       {(report.sekcije || []).map((s, i) => {
         const dgIsList = Array.isArray(s.dg);
+        const multi = report.sekcije.length > 1;
+
+        // Jedna sekcija → uvijek otvorena, bez accordiona.
+        if (!multi) {
+          return (
+            <div key={i} style={{ border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem' }}>
+              {renderSectionBody(s, i, dgIsList)}
+            </div>
+          );
+        }
+
+        const isOpen = openSection === i;
+        const dgSummary = dgIsList ? s.dg.filter(Boolean).join('; ') : (s.dg || '');
+        const secSubtitle = (s.naslov && s.naslov.trim()) || dgSummary || '';
         return (
-          <div key={i} style={{ border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
-              <div style={SECTION_LABEL}>{t('section_label')} {i + 1}</div>
-              {report.sekcije.length > 1 && (
-                <button className="btn btn-ghost btn-sm" onClick={() => removeSection(i)} title={t('remove_section')}>
-                  <Trash2 size={15} />
-                </button>
-              )}
+          <div key={i} style={{ border: `1px solid ${isOpen ? 'var(--primary)' : 'var(--border)'}`, borderRadius: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.7rem 0.9rem' }}>
+              <button
+                type="button"
+                onClick={() => setOpenSection(isOpen ? -1 : i)}
+                style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', padding: 0 }}
+              >
+                <ChevronRight size={16} style={{ transition: 'transform 0.15s', transform: isOpen ? 'rotate(90deg)' : 'none', flexShrink: 0 }} />
+                <span style={{ ...SECTION_LABEL, marginBottom: 0, flexShrink: 0 }}>{t('section_label')} {i + 1}</span>
+                {secSubtitle && (
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{secSubtitle}</span>
+                )}
+              </button>
+              <button className="btn btn-ghost btn-sm" onClick={() => removeSection(i)} title={t('remove_section')}>
+                <Trash2 size={15} />
+              </button>
             </div>
-
-            <div style={{ marginBottom: '0.75rem' }}>
-              <label style={FIELD_LABEL}>{t('section_title')}</label>
-              <input
-                value={s.naslov || ''}
-                onChange={(e) => updateSection(i, 'naslov', e.target.value)}
-                placeholder={t('section_title_ph')}
-                style={FIELD_INPUT}
-              />
-            </div>
-
-            <div style={{ marginBottom: '0.75rem' }}>
-              <label style={FIELD_LABEL}>{t('opis_label')}</label>
-              <textarea
-                value={s.opis || ''}
-                onChange={(e) => updateSection(i, 'opis', e.target.value)}
-                style={{ ...FIELD_INPUT, minHeight: '140px', resize: 'vertical', lineHeight: 1.7 }}
-              />
-            </div>
-
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
-                <label style={{ ...FIELD_LABEL, marginBottom: 0 }}>{t('dg_label')}</label>
-                <button
-                  className="btn btn-ghost btn-sm"
-                  onClick={() => (dgIsList ? dgToString(i) : dgToList(i))}
-                  style={{ fontSize: '0.72rem' }}
-                >
-                  {dgIsList ? t('dg_to_single') : t('dg_to_list')}
-                </button>
-              </div>
-              {dgIsList ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  {s.dg.map((d, j) => (
-                    <div key={j} style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
-                      <span style={{ fontWeight: 700, color: 'var(--text-muted)', minWidth: '1.2rem' }}>{j + 1}.</span>
-                      <input
-                        value={d}
-                        onChange={(e) => updateDgItem(i, j, e.target.value)}
-                        style={{ ...FIELD_INPUT, fontWeight: 600 }}
-                      />
-                      <button className="btn btn-ghost btn-sm" onClick={() => removeDgItem(i, j)} title={t('remove_section')}>
-                        <X size={15} />
-                      </button>
-                    </div>
-                  ))}
-                  <div>
-                    <button className="btn btn-secondary btn-sm" onClick={() => addDgItem(i)}>
-                      <Plus size={15} /> {t('add_dg')}
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <input
-                  value={s.dg || ''}
-                  onChange={(e) => updateSection(i, 'dg', e.target.value)}
-                  style={{ ...FIELD_INPUT, fontWeight: 600 }}
-                />
-              )}
-            </div>
+            {isOpen && <div style={{ padding: '0 0.9rem 0.9rem' }}>{renderSectionBody(s, i, dgIsList)}</div>}
           </div>
         );
       })}
@@ -581,10 +640,13 @@ function useVoiceInput() {
 function GeneratorContent({ signOut, user }) {
   const [lang, setLang] = useState(localStorage.getItem('vet_lang') || 'en');
   const [details, setDetails] = useState('');
-  const [keywords, setKeywords] = useState(['', '', '']);
+  const [keywords, setKeywords] = useState([]);
+  const [kwDraft, setKwDraft] = useState('');
+  const [uiMode, setUiMode] = useState(localStorage.getItem('vet_ui_mode') || 'voice');
   const [keywordMode, setKeywordMode] = useState(localStorage.getItem('vet_kw_mode') || 'list');
   const [keywordsText, setKeywordsText] = useState('');
   const [cls, setCls] = useState({ animal_group: null, system: null, etiology: [] });
+  const [showClsInput, setShowClsInput] = useState(false);
   const [report, setReport] = useState('');
   const [results, setResults] = useState([]);
   const [resultSource, setResultSource] = useState('');
@@ -600,9 +662,16 @@ function GeneratorContent({ signOut, user }) {
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [userProfile, setUserProfile] = useState({ firstName: '', lastName: '' });
 
-  // Voice input hooks — one for details, one for keywords
+  // Voice input hooks — diktafon (novi layout) + odvojeni mic-ovi (klasični layout)
+  const dictateVoice = useVoiceInput();
   const detailsVoice = useVoiceInput();
   const keywordsVoice = useVoiceInput();
+
+  const toggleUiMode = () => setUiMode((m) => {
+    const next = m === 'voice' ? 'classic' : 'voice';
+    localStorage.setItem('vet_ui_mode', next);
+    return next;
+  });
 
   const t = (key) => translations[lang][key] || key;
 
@@ -644,26 +713,56 @@ function GeneratorContent({ signOut, user }) {
     }
   };
 
-  const handleKeywordChange = (index, value) => {
-    const newKeywords = [...keywords];
-    newKeywords[index] = value;
-    setKeywords(newKeywords);
-  };
+  // ─── Ključne riječi ───
+  const classicSingle = uiMode === 'classic' && keywordMode === 'single';
 
-  const addKeywordField = () => {
-    setKeywords([...keywords, '']);
-  };
-
-  // Aktivna lista keywordsa ovisno o načinu unosa.
-  const getKeywordInputs = () => keywordMode === 'single'
+  const getKeywordInputs = () => classicSingle
     ? keywordsText.split(/[\n,;]+/).map((s) => s.trim()).filter(Boolean)
-    : keywords;
+    : keywords.filter((k) => k.trim());
 
-  const hasKeywordInput = keywordMode === 'single'
+  const hasKeywordInput = classicSingle
     ? keywordsText.trim() !== ''
-    : keywords.some((k) => k.trim() !== '');
+    : keywords.some((k) => k.trim());
 
-  // Prebaci između "jedan po jedan" (list) i "sve u liniji, zarezom" (single).
+  // Dodaj (dedupe, bez praznih). U klasičnom single modu dopisuje u tekst, inače u čipove.
+  const applyVoiceKeywords = (items) => {
+    if (classicSingle) {
+      setKeywordsText((prev) => {
+        const base = prev.trim();
+        const joined = items.map((k) => k.trim()).filter(Boolean).join(', ');
+        if (!joined) return prev;
+        return base ? `${base}, ${joined}` : joined;
+      });
+      return;
+    }
+    setKeywords((prev) => {
+      const out = [...prev];
+      const seen = new Set(out.map((k) => k.trim().toLowerCase()));
+      for (const it of items) {
+        const v = (it || '').trim();
+        if (v && !seen.has(v.toLowerCase())) { seen.add(v.toLowerCase()); out.push(v); }
+      }
+      return out;
+    });
+  };
+
+  const removeKeyword = (index) => setKeywords((prev) => prev.filter((_, i) => i !== index));
+
+  const commitKwDraft = () => {
+    const parts = kwDraft.split(/[,;\n]+/).map((s) => s.trim()).filter(Boolean);
+    if (parts.length) applyVoiceKeywords(parts);
+    setKwDraft('');
+  };
+
+  // ─── Klasični layout: pojedinačna keyword polja + list/single toggle ───
+  const handleKeywordChange = (index, value) => setKeywords((prev) => {
+    const next = [...prev];
+    while (next.length <= index) next.push('');
+    next[index] = value;
+    return next;
+  });
+  const addKeywordField = () => setKeywords((prev) => [...prev, '']);
+
   const toggleKeywordMode = () => {
     if (keywordMode === 'list') {
       setKeywordsText(keywords.map((k) => k.trim()).filter(Boolean).join(', '));
@@ -671,91 +770,82 @@ function GeneratorContent({ signOut, user }) {
       localStorage.setItem('vet_kw_mode', 'single');
     } else {
       const arr = keywordsText.split(/[\n,;]+/).map((s) => s.trim()).filter(Boolean);
-      setKeywords(arr.length ? arr : ['', '', '']);
+      setKeywords(arr);
       setKeywordMode('list');
       localStorage.setItem('vet_kw_mode', 'list');
     }
   };
 
-  // Primijeni keyworde iz glasovnog unosa u aktivni način.
-  const applyVoiceKeywords = (items) => {
-    if (keywordMode === 'single') {
-      setKeywordsText((prev) => {
-        const base = prev.trim();
-        const joined = items.map((k) => k.trim()).filter(Boolean).join(', ');
-        if (!joined) return prev;
-        return base ? `${base}, ${joined}` : joined;
-      });
-    } else {
-      setKeywords((prev) => {
-        const newKw = [...prev];
-        let idx = 0;
-        for (const kw of items) {
-          while (idx < newKw.length && newKw[idx].trim() !== '') idx++;
-          if (idx < newKw.length) newKw[idx] = kw;
-          else newKw.push(kw);
-          idx++;
-        }
-        return newKw;
-      });
-    }
-  };
-
-  // ─── Voice handlers ───
   const handleDetailsVoice = async () => {
-    if (detailsVoice.isRecording) {
-      detailsVoice.stopRecording();
-    } else {
-      const started = await detailsVoice.startRecording(async (audioBlob) => {
-        detailsVoice.setIsProcessing(true);
-        try {
-          // Step 1: Transcribe audio → text
-          const rawText = await transcribeAudioBlob(audioBlob, lang);
-          if (!rawText) { alert(t('voice_error')); return; }
-
-          // Step 2: Clean up with Bedrock
-          const result = await cleanupWithBedrock(rawText, 'details', lang);
-          const cleanText = result?.data || rawText;
-          setDetails(prev => prev ? prev + '\n' + cleanText : cleanText);
-        } catch (err) {
-          console.error('Voice details error:', err);
-          alert(t('voice_error'));
-        } finally {
-          detailsVoice.setIsProcessing(false);
-        }
-      });
-      if (!started) alert(t('voice_not_supported'));
-    }
+    if (detailsVoice.isRecording) { detailsVoice.stopRecording(); return; }
+    const started = await detailsVoice.startRecording(async (audioBlob) => {
+      detailsVoice.setIsProcessing(true);
+      try {
+        const rawText = await transcribeAudioBlob(audioBlob, lang);
+        if (!rawText) { alert(t('voice_error')); return; }
+        const cleaned = await cleanupWithBedrock(rawText, 'details', lang);
+        const cleanText = cleaned?.data || rawText;
+        setDetails((prev) => prev ? prev + '\n' + cleanText : cleanText);
+      } catch (err) {
+        console.error('Voice details error:', err);
+        alert(t('voice_error'));
+      } finally {
+        detailsVoice.setIsProcessing(false);
+      }
+    });
+    if (!started) alert(t('voice_not_supported'));
   };
 
   const handleKeywordsVoice = async () => {
-    if (keywordsVoice.isRecording) {
-      keywordsVoice.stopRecording();
-    } else {
-      const started = await keywordsVoice.startRecording(async (audioBlob) => {
-        keywordsVoice.setIsProcessing(true);
-        try {
-          // Step 1: Transcribe audio → text
-          const rawText = await transcribeAudioBlob(audioBlob, lang);
-          if (!rawText) { alert(t('voice_error')); return; }
+    if (keywordsVoice.isRecording) { keywordsVoice.stopRecording(); return; }
+    const started = await keywordsVoice.startRecording(async (audioBlob) => {
+      keywordsVoice.setIsProcessing(true);
+      try {
+        const rawText = await transcribeAudioBlob(audioBlob, lang);
+        if (!rawText) { alert(t('voice_error')); return; }
+        const kwRes = await cleanupWithBedrock(rawText, 'keywords', lang);
+        if (kwRes?.type === 'keywords' && Array.isArray(kwRes.data)) applyVoiceKeywords(kwRes.data);
+        else applyVoiceKeywords([rawText]);
+      } catch (err) {
+        console.error('Voice keywords error:', err);
+        alert(t('voice_error'));
+      } finally {
+        keywordsVoice.setIsProcessing(false);
+      }
+    });
+    if (!started) alert(t('voice_not_supported'));
+  };
 
-          // Step 2: Extract keywords with Bedrock
-          const result = await cleanupWithBedrock(rawText, 'keywords', lang);
-          if (result?.type === 'keywords' && Array.isArray(result.data)) {
-            applyVoiceKeywords(result.data);
-          } else {
-            // Fallback: use raw transcript
-            applyVoiceKeywords([rawText]);
-          }
-        } catch (err) {
-          console.error('Voice keywords error:', err);
-          alert(t('voice_error'));
-        } finally {
-          keywordsVoice.setIsProcessing(false);
-        }
-      });
-      if (!started) alert(t('voice_not_supported'));
+  // ─── Diktafon: jedan snimak → transkript (details) + izvučene ključne riječi (čipovi) ───
+  const handleDictate = async () => {
+    if (dictateVoice.isRecording) {
+      dictateVoice.stopRecording();
+      return;
     }
+    const started = await dictateVoice.startRecording(async (audioBlob) => {
+      dictateVoice.setIsProcessing(true);
+      try {
+        const rawText = await transcribeAudioBlob(audioBlob, lang);
+        if (!rawText) { alert(t('voice_error')); return; }
+
+        // Transkript → očisti i dodaj u glavno polje
+        const cleaned = await cleanupWithBedrock(rawText, 'details', lang);
+        const cleanText = cleaned?.data || rawText;
+        setDetails((prev) => prev ? prev + '\n' + cleanText : cleanText);
+
+        // Izvuci ključne riječi → čipovi
+        const kwRes = await cleanupWithBedrock(rawText, 'keywords', lang);
+        if (kwRes?.type === 'keywords' && Array.isArray(kwRes.data)) {
+          applyVoiceKeywords(kwRes.data);
+        }
+      } catch (err) {
+        console.error('Dictation error:', err);
+        alert(t('voice_error'));
+      } finally {
+        dictateVoice.setIsProcessing(false);
+      }
+    });
+    if (!started) alert(t('voice_not_supported'));
   };
 
   const generateReport = async () => {
@@ -912,6 +1002,13 @@ function GeneratorContent({ signOut, user }) {
     set.has(code) ? set.delete(code) : set.add(code);
     return { ...p, etiology: [...set] };
   });
+
+  const clsLangKey = lang === 'en' ? 'en' : 'hr';
+  const clsInputSummary = [
+    cls.animal_group && taxLabel('animal_group', cls.animal_group, clsLangKey),
+    cls.system && taxLabel('system', cls.system, clsLangKey),
+    ...cls.etiology.map((c) => taxLabel('etiology', c, clsLangKey)),
+  ].filter(Boolean).join(' · ') || t('cls_auto');
 
   const activeReport = selectedIdx !== null && editedReport
     ? formatReportText(editedReport, lang)
@@ -1131,7 +1228,8 @@ function GeneratorContent({ signOut, user }) {
 
   const resetForm = () => {
     setDetails('');
-    setKeywords(['', '', '']);
+    setKeywords([]);
+    setKwDraft('');
     setKeywordsText('');
     setCls({ animal_group: null, system: null, etiology: [] });
     setReport('');
@@ -1146,8 +1244,9 @@ function GeneratorContent({ signOut, user }) {
 
   const loadFromHistory = (item) => {
     setDetails(item.details || '');
-    setKeywords(item.keywords && item.keywords.length ? item.keywords : ['', '', '']);
-    setKeywordsText((item.keywords || []).join(', '));
+    setKeywords((item.keywords || []).filter((k) => k && k.trim()));
+    setKwDraft('');
+    setKeywordsText((item.keywords || []).filter((k) => k && k.trim()).join(', '));
     setResults([]);
     setResultSource('');
     setSelectedIdx(null);
@@ -1312,10 +1411,22 @@ function GeneratorContent({ signOut, user }) {
             </span>
           </div>
 
+          <button
+            onClick={toggleUiMode}
+            className="btn btn-ghost"
+            title={uiMode === 'voice' ? t('ui_switch_to_classic') : t('ui_switch_to_voice')}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+          >
+            <LayoutGrid size={20} />
+            <span className="hide-mobile" style={{ fontSize: '0.8rem', fontWeight: 600 }}>
+              {uiMode === 'voice' ? t('ui_classic') : t('ui_voice')}
+            </span>
+          </button>
+
           <button onClick={() => setShowHistory(true)} className="btn btn-ghost" title={t('history')}>
             <History size={20} />
           </button>
-          
+
           <div className="lang-toggle" style={{ margin: 0 }}>
             <button className={`lang-btn ${lang === 'en' ? 'active' : ''}`} onClick={() => setLang('en')}>EN</button>
             <button className={`lang-btn ${lang === 'hr' ? 'active' : ''}`} onClick={() => setLang('hr')}>HR</button>
@@ -1334,6 +1445,75 @@ function GeneratorContent({ signOut, user }) {
             {t('clinical_input_subtitle')}
           </p>
 
+          {uiMode === 'voice' ? (
+          <>
+          {/* Diktafon: veterinar ispriča što vidi pod mikroskopom */}
+          <div style={{ marginBottom: '1.25rem' }}>
+            <div className="label-with-mic" style={{ justifyContent: 'space-between' }}>
+              <label className="input-label" style={{ marginBottom: 0 }}>{t('dictation_label')}</label>
+              {dictateVoice.isProcessing && (
+                <span style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 500 }}>{t('voice_processing')}</span>
+              )}
+            </div>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={handleDictate}
+              disabled={dictateVoice.isProcessing}
+              style={{
+                width: '100%', margin: '0.5rem 0 0.75rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                ...(dictateVoice.isRecording ? { background: '#dc2626', borderColor: '#dc2626', color: '#fff' } : {}),
+              }}
+            >
+              {dictateVoice.isProcessing
+                ? <><div className="loading-spinner" /> {t('voice_processing')}</>
+                : dictateVoice.isRecording
+                  ? <><MicOff size={18} /> {t('dictation_stop')}</>
+                  : <><Mic size={18} /> {t('dictation_start')}</>}
+            </button>
+            <textarea
+              className="details-textarea"
+              placeholder={t('dictation_placeholder')}
+              value={details}
+              onChange={(e) => setDetails(e.target.value)}
+            />
+          </div>
+
+          {/* Izvučene ključne riječi (čipovi) */}
+          <div>
+            <label className="input-label">{t('keywords_label')}</label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.5rem', minHeight: '1.5rem' }}>
+              {keywords.length === 0 && (
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{t('keywords_empty')}</span>
+              )}
+              {keywords.map((kw, index) => (
+                <span key={index} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem', fontWeight: 600, background: 'var(--bg-subtle, #f1f5f9)', color: 'var(--text, #0f172a)', padding: '0.28rem 0.35rem 0.28rem 0.65rem', borderRadius: '999px' }}>
+                  {kw}
+                  <button
+                    type="button"
+                    onClick={() => removeKeyword(index)}
+                    title={t('remove_section')}
+                    style={{ display: 'inline-flex', border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text-muted)', padding: 0 }}
+                  >
+                    <X size={14} />
+                  </button>
+                </span>
+              ))}
+            </div>
+            <input
+              type="text"
+              value={kwDraft}
+              onChange={(e) => setKwDraft(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); commitKwDraft(); } }}
+              onBlur={commitKwDraft}
+              placeholder={t('keywords_add_placeholder')}
+              style={{ marginTop: '0.6rem', width: '100%' }}
+            />
+          </div>
+          </>
+          ) : (
+          <>
+          {/* Klasični layout: Case details */}
           <div style={{ marginBottom: '1.5rem' }}>
             <div className="label-with-mic">
               <label className="input-label" style={{ marginBottom: 0 }}>{t('case_details')}</label>
@@ -1344,13 +1524,7 @@ function GeneratorContent({ signOut, user }) {
                 title={detailsVoice.isRecording ? t('voice_input_stop') : t('voice_input_start')}
                 disabled={detailsVoice.isProcessing}
               >
-                {detailsVoice.isProcessing ? (
-                  <div className="mic-spinner" />
-                ) : detailsVoice.isRecording ? (
-                  <MicOff size={15} />
-                ) : (
-                  <Mic size={15} />
-                )}
+                {detailsVoice.isProcessing ? <div className="mic-spinner" /> : detailsVoice.isRecording ? <MicOff size={15} /> : <Mic size={15} />}
               </button>
               {detailsVoice.isProcessing && (
                 <span style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 500 }}>{t('voice_processing')}</span>
@@ -1364,7 +1538,8 @@ function GeneratorContent({ signOut, user }) {
               style={{ marginTop: '0.5rem' }}
             />
           </div>
-          
+
+          {/* Klasični layout: Observations */}
           <div>
             <div className="label-with-mic">
               <label className="input-label" style={{ marginBottom: 0 }}>{t('observations_label')}</label>
@@ -1375,13 +1550,7 @@ function GeneratorContent({ signOut, user }) {
                 title={keywordsVoice.isRecording ? t('voice_input_stop') : t('voice_input_start')}
                 disabled={keywordsVoice.isProcessing}
               >
-                {keywordsVoice.isProcessing ? (
-                  <div className="mic-spinner" />
-                ) : keywordsVoice.isRecording ? (
-                  <MicOff size={15} />
-                ) : (
-                  <Mic size={15} />
-                )}
+                {keywordsVoice.isProcessing ? <div className="mic-spinner" /> : keywordsVoice.isRecording ? <MicOff size={15} /> : <Mic size={15} />}
               </button>
               {keywordsVoice.isProcessing && (
                 <span style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 500 }}>{t('voice_processing')}</span>
@@ -1390,12 +1559,9 @@ function GeneratorContent({ signOut, user }) {
                 type="button"
                 className="btn btn-ghost btn-sm"
                 onClick={toggleKeywordMode}
-                title={keywordMode === 'list' ? t('kw_switch_to_single') : t('kw_switch_to_list')}
-                style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.78rem' }}
+                style={{ marginLeft: 'auto', fontSize: '0.78rem' }}
               >
-                {keywordMode === 'list'
-                  ? <><AlignLeft size={15} /> {t('kw_switch_to_single')}</>
-                  : <><List size={15} /> {t('kw_switch_to_list')}</>}
+                {keywordMode === 'list' ? t('kw_switch_to_single') : t('kw_switch_to_list')}
               </button>
             </div>
 
@@ -1408,14 +1574,12 @@ function GeneratorContent({ signOut, user }) {
                   onChange={(e) => setKeywordsText(e.target.value)}
                   style={{ minHeight: '80px' }}
                 />
-                <p style={{ margin: '0.4rem 0 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  {t('keywords_single_hint')}
-                </p>
+                <p style={{ margin: '0.4rem 0 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t('keywords_single_hint')}</p>
               </div>
             ) : (
               <>
                 <div className="keyword-inputs" style={{ marginTop: '0.5rem' }}>
-                  {keywords.map((kw, index) => (
+                  {(keywords.length ? keywords : ['', '', '']).map((kw, index) => (
                     <input
                       key={index}
                       type="text"
@@ -1433,31 +1597,40 @@ function GeneratorContent({ signOut, user }) {
               </>
             )}
           </div>
+          </>
+          )}
 
           <div style={{ marginTop: '1.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', marginBottom: '0.5rem' }}>
-              <label className="input-label" style={{ marginBottom: 0 }}>{t('cls_section')}</label>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t('cls_optional_hint')}</span>
-            </div>
-            <KlasControls value={cls} lang={lang} t={t} onSelect={clsSelect} onToggleEtiology={clsToggleEtiology} />
+            <Collapsible
+              title={`${t('cls_section')} ${t('cls_optional_hint')}`}
+              subtitle={clsInputSummary}
+              open={showClsInput}
+              onToggle={() => setShowClsInput((o) => !o)}
+            >
+              <div style={{ paddingTop: '0.25rem' }}>
+                <KlasControls value={cls} lang={lang} t={t} onSelect={clsSelect} onToggleEtiology={clsToggleEtiology} />
+              </div>
+            </Collapsible>
           </div>
 
-          <button
-            className="btn btn-primary"
-            style={{ width: '100%', marginTop: '2rem' }}
-            onClick={generateReport}
-            disabled={loading || searchLoading || (!hasKeywordInput && !details)}
-          >
-            {loading ? <div className="loading-spinner"></div> : <><Send size={18} /> {t('generate_btn')}</>}
-          </button>
-          <button
-            className="btn btn-secondary"
-            style={{ width: '100%', marginTop: '0.75rem' }}
-            onClick={searchDatabase}
-            disabled={searchLoading || loading || (!hasKeywordInput && !details)}
-          >
-            {searchLoading ? <div className="loading-spinner"></div> : <><Search size={18} /> {t('search_btn')}</>}
-          </button>
+          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '2rem' }}>
+            <button
+              className="btn btn-primary"
+              style={{ flex: 2 }}
+              onClick={generateReport}
+              disabled={loading || searchLoading || (!hasKeywordInput && !details)}
+            >
+              {loading ? <div className="loading-spinner"></div> : <><Send size={18} /> {t('generate_btn')}</>}
+            </button>
+            <button
+              className="btn btn-secondary"
+              style={{ flex: 1 }}
+              onClick={searchDatabase}
+              disabled={searchLoading || loading || (!hasKeywordInput && !details)}
+            >
+              {searchLoading ? <div className="loading-spinner"></div> : <><Search size={18} /> {t('search_btn')}</>}
+            </button>
+          </div>
         </section>
 
         {results.length > 0 && (
