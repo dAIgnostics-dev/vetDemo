@@ -66,7 +66,17 @@ export const translations = {
     add_section: "Add section",
     remove_section: "Remove",
     comment_label: "Comment",
-    comment_ph: "Differential diagnosis, sample limitations, recommendations (optional)"
+    comment_ph: "Differential diagnosis, sample limitations, recommendations (optional)",
+    kw_switch_to_single: "Single line",
+    kw_switch_to_list: "One per row",
+    keywords_single_placeholder: "e.g. subcutis, neutrophilic, infiltrative, mitoses",
+    keywords_single_hint: "Separate keywords with commas.",
+    cls_section: "Classification",
+    cls_optional_hint: "(optional — model fills the rest)",
+    cls_animal_group: "Animal group",
+    cls_system: "Organ system",
+    cls_etiology: "Etiology",
+    cls_auto: "— auto —"
   },
   hr: {
     app_title: "dAIgnostics Studio",
@@ -135,6 +145,16 @@ export const translations = {
     add_section: "Dodaj sekciju",
     remove_section: "Ukloni",
     comment_label: "Komentar",
-    comment_ph: "Diferencijalna dijagnoza, ograničenja uzorka, preporuke (opcionalno)"
+    comment_ph: "Diferencijalna dijagnoza, ograničenja uzorka, preporuke (opcionalno)",
+    kw_switch_to_single: "Jedna linija",
+    kw_switch_to_list: "Jedan po redu",
+    keywords_single_placeholder: "npr. subkutis, neutrofilan, infiltrativno, mitoze",
+    keywords_single_hint: "Odvoji ključne riječi zarezom.",
+    cls_section: "Klasifikacija",
+    cls_optional_hint: "(opcionalno — model popuni ostalo)",
+    cls_animal_group: "Vrsta životinje",
+    cls_system: "Organski sustav",
+    cls_etiology: "Etiologija",
+    cls_auto: "— automatski —"
   }
 };

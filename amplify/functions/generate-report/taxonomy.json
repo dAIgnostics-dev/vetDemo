@@ -1,0 +1,39 @@
+{
+  "_source": "JPC Veterinary Systemic Pathology Online (VSPO) — https://www.askjpc.org/vspo/",
+  "_note": "Klasifikacijski šifrarnici izvučeni iz JPC VSPO pretraživača. Koriste se za klasifikaciju/zaglavlje nalaza. 'code' je stabilna vrijednost; 'en'/'hr' su labeli za prikaz.",
+  "system": [
+    { "code": "CARDIOVASCULAR", "en": "Cardiovascular", "hr": "Kardiovaskularni" },
+    { "code": "DIGESTIVE", "en": "Digestive", "hr": "Probavni" },
+    { "code": "ENDOCRINE", "en": "Endocrine", "hr": "Endokrini" },
+    { "code": "HEMOLYMPHATIC", "en": "Hemolymphatic", "hr": "Hemolimfatički" },
+    { "code": "INTEGUMENT", "en": "Integument", "hr": "Koža (integument)" },
+    { "code": "MUSCULOSKELETAL", "en": "Musculoskeletal", "hr": "Mišićno-koštani" },
+    { "code": "NERVOUS", "en": "Nervous", "hr": "Živčani" },
+    { "code": "PULMONARY", "en": "Pulmonary", "hr": "Dišni (pulmonalni)" },
+    { "code": "REPRODUCTIVE", "en": "Reproductive", "hr": "Reproduktivni" },
+    { "code": "SPECIAL_SENSES", "en": "Special senses", "hr": "Osjetila" },
+    { "code": "URINARY", "en": "Urinary", "hr": "Mokraćni" }
+  ],
+  "animal_group": [
+    { "code": "AVIAN", "en": "Avian", "hr": "Ptice" },
+    { "code": "BOVINE", "en": "Bovine", "hr": "Goveda" },
+    { "code": "CANINE", "en": "Canine", "hr": "Psi" },
+    { "code": "EQUINE", "en": "Equine", "hr": "Konji" },
+    { "code": "FELINE", "en": "Feline", "hr": "Mačke" },
+    { "code": "PORCINE", "en": "Porcine", "hr": "Svinje" },
+    { "code": "PRIMATE", "en": "Primate", "hr": "Primati" },
+    { "code": "RABBIT", "en": "Rabbit", "hr": "Kunići" },
+    { "code": "RODENT", "en": "Rodent", "hr": "Glodavci" },
+    { "code": "SMALL_RUMINANT", "en": "Small ruminant", "hr": "Mali preživači" },
+    { "code": "OTHER", "en": "Other", "hr": "Ostalo" }
+  ],
+  "etiology": [
+    { "code": "BACTERIAL", "en": "Bacterial", "hr": "Bakterijska" },
+    { "code": "FUNGAL", "en": "Fungal", "hr": "Gljivična" },
+    { "code": "METABOLIC_MISC", "en": "Metabolic & Misc", "hr": "Metabolička i ostalo" },
+    { "code": "NEOPLASTIC", "en": "Neoplastic", "hr": "Neoplastična" },
+    { "code": "PARASITIC", "en": "Parasitic", "hr": "Parazitarna" },
+    { "code": "TOXIC", "en": "Toxic", "hr": "Toksična" },
+    { "code": "VIRAL", "en": "Viral", "hr": "Virusna" }
+  ]
+}

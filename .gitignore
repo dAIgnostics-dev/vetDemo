@@ -29,3 +29,6 @@ dist-ssr
 .amplify
 amplify_outputs*
 amplifyconfiguration*
+
+__pycache__/
+*.pyc

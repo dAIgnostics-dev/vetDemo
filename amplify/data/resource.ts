@@ -22,6 +22,9 @@ const schema = a.schema({
       keywords: a.string().array(),
       details: a.string(),
       lang: a.string(),
+      animalGroup: a.string(),
+      system: a.string(),
+      etiology: a.string(),
     })
     .returns(a.string())
     .handler(a.handler.function(generateReport))

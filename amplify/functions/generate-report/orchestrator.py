@@ -36,6 +36,33 @@ from hybrid_router import (
 
 SONNET_MODEL_ID = os.environ.get("SONNET_MODEL_ID", "us.anthropic.claude-haiku-4-5-20251001-v1:0")
 
+# ---------- Klasifikacijski šifrarnik (JPC VSPO) ----------
+_TAX_PATH = Path(__file__).parent / "taxonomy.json"
+try:
+    with _TAX_PATH.open(encoding="utf-8") as _f:
+        TAXONOMY = json.load(_f)
+except Exception as _e:  # pragma: no cover
+    print(f"[orchestrator] Ne mogu učitati taxonomy.json: {_e}")
+    TAXONOMY = {"system": [], "animal_group": [], "etiology": []}
+
+
+def _tax_codes(kind: str) -> list[str]:
+    return [x["code"] for x in TAXONOMY.get(kind, []) if isinstance(x, dict) and x.get("code")]
+
+
+def _normalize_klas(klas: Optional[dict]) -> dict:
+    klas = klas or {}
+    ag = klas.get("animal_group")
+    sy = klas.get("system")
+    et = klas.get("etiology")
+    if isinstance(et, str):
+        et = [e.strip() for e in et.split(",") if e.strip()]
+    return {
+        "animal_group": ag if ag else None,
+        "system": sy if sy else None,
+        "etiology": [str(e).strip() for e in (et or []) if str(e).strip()],
+    }
+
 
 def _strip_dg_suffix(opis: str) -> str:
     """Ukloni 'Dg.:...' s kraja opisa ako postoji (duplikat jer se dg prikazuje odvojeno)."""
@@ -47,6 +74,7 @@ def _flat_to_report(dg, opis: str, komentar: Optional[str] = None) -> dict:
     return {
         "vrsta_nalaza": None,
         "zaglavlje": {},
+        "klasifikacija": {"animal_group": None, "system": None, "etiology": []},
         "sekcije": [{"naslov": None, "opis": _strip_dg_suffix(opis or ""), "dg": dg}],
         "komentar": komentar,
     }
@@ -120,8 +148,23 @@ PRIMJER 1 (izlaz):
 {"jezik":"hr","vrsta_nalaza":"histopatologija","zaglavlje":{"oznaka_uzorka":"HP 1005/13","vrsta_uzorka":"bioptat kože","datum":"12.03.2013."},"sekcije":[{"naslov":"Koža","opis":"Dostavljeni uzorak kože zahvaćen je dermalnom, ekspanzivnom, dobro ograničenom neinkapsuliranom tvorbom koja zauzima približno 70% dermisa u presjeku i ne dopire do rubova ekscizije. Tumor je građen od gusto zbijenih isprepletenih snopova i virova vretenastih stanica uloženih u oskudnu fibroznu stromu. Stanice su vretenaste, nejasnih granica, s umjerenom količinom svijetle citoplazme te ovalnom do nepravilnom jezgrom i jednom do dvije jezgrice. Prisutan je blag pleomorfizam, a mitoze variraju od 0 do 1 na 10 HPF. Ne uočavaju se nekroza niti vaskularni emboli.","dg":"Fibrosarcoma subcutis, stupanj malignosti II."}],"komentar":"Preporučamo provjeru potpunosti ekscizije i kliničko praćenje."}
 
 PRIMJER 2 (izlaz, po organima + numerirana dg + engleski):
-{"jezik":"en","vrsta_nalaza":"histopatologija","zaglavlje":{"vrsta_uzorka":"gastrointestinal biopsies"},"sekcije":[{"naslov":"Stomach","opis":"Sections of gastric mucosa show a locally extensive, moderate infiltrate expanding the lamina propria and separating the glands, composed predominantly of small mature lymphocytes and plasma cells with fewer neutrophils. The superficial mucosa shows glandular atrophy with reduced gland density and mild fibrosis of the lamina propria.","dg":["Chronic lymphoplasmacytic gastritis, moderate, diffuse","Mucosal atrophy, moderate"]},{"naslov":"Small intestine","opis":"Sections of duodenum show villous blunting and fusion with a moderate, diffuse lymphoplasmacytic infiltrate expanding the lamina propria between the crypts. Crypts are mildly hyperplastic and the surface epithelium is preserved.","dg":"Chronic lymphoplasmacytic duodenitis, moderate, diffuse."}],"komentar":"The changes are consistent with canine chronic inflammatory bowel disease (IBD). Clinical correlation and, if indicated, follow-up biopsies are recommended."}
+{"jezik":"en","vrsta_nalaza":"histopatologija","zaglavlje":{"vrsta_uzorka":"gastrointestinal biopsies"},"klasifikacija":{"animal_group":"CANINE","system":"DIGESTIVE","etiology":[]},"sekcije":[{"naslov":"Stomach","opis":"Sections of gastric mucosa show a locally extensive, moderate infiltrate expanding the lamina propria and separating the glands, composed predominantly of small mature lymphocytes and plasma cells with fewer neutrophils. The superficial mucosa shows glandular atrophy with reduced gland density and mild fibrosis of the lamina propria.","dg":["Chronic lymphoplasmacytic gastritis, moderate, diffuse","Mucosal atrophy, moderate"]},{"naslov":"Small intestine","opis":"Sections of duodenum show villous blunting and fusion with a moderate, diffuse lymphoplasmacytic infiltrate expanding the lamina propria between the crypts. Crypts are mildly hyperplastic and the surface epithelium is preserved.","dg":"Chronic lymphoplasmacytic duodenitis, moderate, diffuse."}],"komentar":"The changes are consistent with canine chronic inflammatory bowel disease (IBD). Clinical correlation and, if indicated, follow-up biopsies are recommended."}
 """
+
+# Dodatak prompta: klasifikacijski šifrarnik (JPC VSPO). Model dodaje top-level "klasifikacija".
+_TAX_BLOCK = (
+    "\nKLASIFIKACIJA — dodaj u izlaz kao top-level polje "
+    '"klasifikacija": {"animal_group": <code|null>, "system": <code|null>, "etiology": [<code>, ...]}.\n'
+    "Koristi TOČNO ove kodove (velika slova, bez prijevoda):\n"
+    f"- animal_group (jedan ili null): {', '.join(_tax_codes('animal_group'))}\n"
+    f"- system (jedan ili null): {', '.join(_tax_codes('system'))}\n"
+    f"- etiology (nula ili više): {', '.join(_tax_codes('etiology'))}\n"
+    "Zaključi vrijednosti iz keywordsa i Case detailsa. Ako nema dovoljno podataka, stavi null "
+    "(odnosno [] za etiology) — ne izmišljaj. Ako je u unosu naveden 'Klasifikacija override' za neko "
+    "polje, upotrijebi TOČNO tu vrijednost umjesto vlastite procjene.\n"
+)
+
+SYSTEM_PROMPT = SYSTEM_PROMPT + _TAX_BLOCK
 
 
 class Orchestrator:
@@ -150,7 +193,7 @@ class Orchestrator:
         print("[orchestrator] Router nije pronašao podudaranje — search_only mod, nema fallbacka.")
         return {"source": "none", "results": []}
 
-    def query(self, keywords: list[str], details: str = "", lang: str = "hr") -> dict:
+    def query(self, keywords: list[str], details: str = "", lang: str = "hr", klas: Optional[dict] = None) -> dict:
         """
         Generiraj nalaz direktno putem modela (bez pretraživanja baze).
 
@@ -161,7 +204,17 @@ class Orchestrator:
             }
         """
         print("[orchestrator] Generiram nalaz putem modela...")
-        report = self._call_sonnet(keywords, details=details, lang=lang)
+        klas = _normalize_klas(klas)
+        report = self._call_sonnet(keywords, details=details, lang=lang, klas=klas)
+
+        # Override pobjeđuje: ono što je doktor eksplicitno odabrao ima prednost pred procjenom modela.
+        k = report.setdefault("klasifikacija", {"animal_group": None, "system": None, "etiology": []})
+        if klas.get("animal_group"):
+            k["animal_group"] = klas["animal_group"]
+        if klas.get("system"):
+            k["system"] = klas["system"]
+        if klas.get("etiology"):
+            k["etiology"] = klas["etiology"]
 
         new_entry = self._write_back(keywords, report)
         self.retriever.add_entry(new_entry)
@@ -169,14 +222,26 @@ class Orchestrator:
 
         return {"source": "sonnet", "results": [report]}
 
-    def _call_sonnet(self, keywords: list[str], details: str = "", lang: str = "hr") -> dict:
+    def _call_sonnet(self, keywords: list[str], details: str = "", lang: str = "hr", klas: Optional[dict] = None) -> dict:
         kw_str = ", ".join(kw.strip() for kw in keywords if kw.strip())
         lang = "en" if str(lang).lower().startswith("en") else "hr"
         system_prompt = SYSTEM_PROMPT.replace("{jezik}", lang)
+
+        klas = _normalize_klas(klas)
+        override_parts = []
+        if klas.get("animal_group"):
+            override_parts.append(f"animal_group={klas['animal_group']}")
+        if klas.get("system"):
+            override_parts.append(f"system={klas['system']}")
+        if klas.get("etiology"):
+            override_parts.append(f"etiology={','.join(klas['etiology'])}")
+        override_str = "; ".join(override_parts) if override_parts else "(nema)"
+
         prompt_text = (
             f"jezik: {lang}\n"
             f"Case details: {details.strip()}\n"
-            f"Keywords: {kw_str}\n\n"
+            f"Keywords: {kw_str}\n"
+            f"Klasifikacija override: {override_str}\n\n"
             "Vrati SAMO JSON objekt prema shemi."
         )
 
@@ -227,6 +292,7 @@ class Orchestrator:
             "jezik": parsed.get("jezik", lang),
             "vrsta_nalaza": parsed.get("vrsta_nalaza"),
             "zaglavlje": parsed.get("zaglavlje") or {},
+            "klasifikacija": _normalize_klas(parsed.get("klasifikacija")),
             "sekcije": norm_sekcije,
             "komentar": parsed.get("komentar"),
         }
@@ -311,12 +377,17 @@ def lambda_handler(event, context):
     keywords: list[str] = args.get("keywords") or []
     details: str = args.get("details") or ""
     lang: str = args.get("lang") or "hr"
+    klas = {
+        "animal_group": args.get("animalGroup") or "",
+        "system": args.get("system") or "",
+        "etiology": args.get("etiology") or "",
+    }
 
     action = args.get("action") or event.get("info", {}).get("fieldName", "")
 
     if action == "search" or action == "searchDatabase":
         result = _get_orchestrator().search(keywords)
     else:
-        result = _get_orchestrator().query(keywords, details=details, lang=lang)
+        result = _get_orchestrator().query(keywords, details=details, lang=lang, klas=klas)
 
     return json.dumps(result, ensure_ascii=False)

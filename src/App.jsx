@@ -21,7 +21,9 @@ import {
   ShieldCheck,
   Search,
   Mic,
-  MicOff
+  MicOff,
+  List,
+  AlignLeft
 } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -31,6 +33,7 @@ import { TranscribeStreamingClient, StartStreamTranscriptionCommand } from '@aws
 import '@aws-amplify/ui-react/styles.css';
 import outputs from '../amplify_outputs.json';
 import { translations } from './translations';
+import taxonomy from '../amplify/functions/generate-report/taxonomy.json';
 import './index.css';
 
 Amplify.configure(outputs);
@@ -42,6 +45,51 @@ const BEDROCK_MODEL_ID = 'us.anthropic.claude-haiku-4-5-20251001-v1:0';
 
 // ─── Structured report helpers (novi izlazni format: zaglavlje / sekcije / komentar) ───
 
+// ─── Klasifikacija (JPC VSPO šifrarnik) ───
+const TAX = taxonomy;
+const EMPTY_KLAS = { animal_group: null, system: null, etiology: [] };
+
+function taxLabel(kind, code, lang) {
+  if (!code) return '';
+  const item = (TAX[kind] || []).find((x) => x.code === code);
+  return item ? (item[lang] || item.en || code) : code;
+}
+
+function normalizeKlas(k) {
+  k = k || {};
+  let et = k.etiology;
+  if (typeof et === 'string') et = et.split(',').map((s) => s.trim()).filter(Boolean);
+  return {
+    animal_group: k.animal_group || null,
+    system: k.system || null,
+    etiology: Array.isArray(et) ? et.filter(Boolean) : [],
+  };
+}
+
+// Izvuci keyword-like pojmove iz slobodnog teksta Case detailsa.
+// Uzima kratke, zarezom / točka-zarezom / novim redom odvojene termine (do 4 riječi),
+// pa prozne rečenice (duge klauzule) preskače da ne stvara smeće.
+function parseKeywordsFromDetails(text) {
+  if (!text || typeof text !== 'string') return [];
+  return text
+    .split(/[\n,;]+/)
+    .map((s) => s.trim().replace(/^[-•*\d.]+\s*/, '').trim())
+    .filter((s) => s.length > 0 && s.length <= 40 && s.split(/\s+/).length <= 4);
+}
+
+// Spoji eksplicitne keyworde iz polja s onima izvučenim iz Case detailsa (bez duplikata).
+function buildEffectiveKeywords(keywordInputs, details) {
+  const explicit = (keywordInputs || []).map((k) => (k || '').trim()).filter(Boolean);
+  const fromDetails = parseKeywordsFromDetails(details);
+  const seen = new Set();
+  const out = [];
+  for (const k of [...explicit, ...fromDetails]) {
+    const key = k.toLowerCase();
+    if (!seen.has(key)) { seen.add(key); out.push(k); }
+  }
+  return out;
+}
+
 // Normaliziraj bilo koji odgovor (novi rich ili stari plosnati {opis,dg}) u jedinstveni oblik.
 function normalizeReport(r) {
   if (!r || typeof r !== 'object') return null;
@@ -50,6 +98,7 @@ function normalizeReport(r) {
       return {
         vrsta_nalaza: r.vrsta_nalaza || null,
         zaglavlje: r.zaglavlje || {},
+        klasifikacija: normalizeKlas(r.klasifikacija),
         sekcije: [{ naslov: '', opis: r.opis || '', dg: r.dg ?? '' }],
         komentar: r.komentar || '',
       };
@@ -64,6 +113,7 @@ function normalizeReport(r) {
   return {
     vrsta_nalaza: r.vrsta_nalaza || null,
     zaglavlje: r.zaglavlje || {},
+    klasifikacija: normalizeKlas(r.klasifikacija),
     sekcije,
     komentar: r.komentar || '',
   };
@@ -81,9 +131,17 @@ function formatReportText(report, lang) {
   if (!report) return '';
   const en = lang === 'en';
   const lines = [];
+  const langKey = en ? 'en' : 'hr';
   const z = report.zaglavlje || {};
   const zLine = ZAGLAVLJE_FIELDS.map((f) => (z[f] || '').trim()).filter(Boolean).join(' · ');
-  if (zLine) { lines.push(zLine, ''); }
+  if (zLine) { lines.push(zLine); }
+  const k = report.klasifikacija || {};
+  const kParts = [];
+  if (k.animal_group) kParts.push(taxLabel('animal_group', k.animal_group, langKey));
+  if (k.system) kParts.push(taxLabel('system', k.system, langKey));
+  if (k.etiology && k.etiology.length) kParts.push(k.etiology.map((c) => taxLabel('etiology', c, langKey)).join(', '));
+  if (kParts.length) lines.push(kParts.join(' · '));
+  if (zLine || kParts.length) lines.push('');
   (report.sekcije || []).forEach((s) => {
     if (s.naslov && s.naslov.trim()) lines.push(`${s.naslov.trim()}:`);
     if (s.opis && s.opis.trim()) lines.push(s.opis.trim());
@@ -121,13 +179,26 @@ const SECTION_LABEL = { fontSize: '0.72rem', fontWeight: 700, color: 'var(--text
 
 // Read-only prikaz nalaza (za neselektirane rezultate pretrage).
 function ReportPreview({ report, lang, t }) {
+  const langKey = lang === 'en' ? 'en' : 'hr';
   const z = report.zaglavlje || {};
   const zLine = ZAGLAVLJE_FIELDS.map((f) => (z[f] || '').trim()).filter(Boolean).join(' · ');
   const dgLabel = lang === 'en' ? 'Dx:' : 'Dg.:';
+  const k = report.klasifikacija || {};
+  const kChips = [];
+  if (k.animal_group) kChips.push(taxLabel('animal_group', k.animal_group, langKey));
+  if (k.system) kChips.push(taxLabel('system', k.system, langKey));
+  (k.etiology || []).forEach((c) => kChips.push(taxLabel('etiology', c, langKey)));
   return (
     <div>
       {zLine && (
-        <p style={{ margin: '0 0 0.75rem', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>{zLine}</p>
+        <p style={{ margin: '0 0 0.5rem', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>{zLine}</p>
+      )}
+      {kChips.length > 0 && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', marginBottom: '0.75rem' }}>
+          {kChips.map((c, i) => (
+            <span key={i} style={{ fontSize: '0.72rem', fontWeight: 600, background: 'var(--bg-subtle, #f1f5f9)', color: 'var(--text-muted)', padding: '0.15rem 0.5rem', borderRadius: '999px' }}>{c}</span>
+          ))}
+        </div>
       )}
       {(report.sekcije || []).map((s, i) => (
         <div key={i} style={{ marginBottom: '1rem' }}>
@@ -157,8 +228,57 @@ function ReportPreview({ report, lang, t }) {
   );
 }
 
-// Strukturirani editor nalaza (zaglavlje, sekcije, numerirana dg, komentar).
-function ReportEditor({ report, lang, t, updateZaglavlje, updateSection, addSection, removeSection, dgToList, dgToString, updateDgItem, addDgItem, removeDgItem, updateKomentar }) {
+// Kontrole klasifikacije (JPC VSPO) — koriste se i za override unos i za uređivanje nalaza.
+function KlasControls({ value, lang, t, onSelect, onToggleEtiology }) {
+  const langKey = lang === 'en' ? 'en' : 'hr';
+  const v = value || EMPTY_KLAS;
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+        <div>
+          <label style={FIELD_LABEL}>{t('cls_animal_group')}</label>
+          <select value={v.animal_group || ''} onChange={(e) => onSelect('animal_group', e.target.value || null)} style={FIELD_INPUT}>
+            <option value="">{t('cls_auto')}</option>
+            {TAX.animal_group.map((o) => <option key={o.code} value={o.code}>{o[langKey] || o.en}</option>)}
+          </select>
+        </div>
+        <div>
+          <label style={FIELD_LABEL}>{t('cls_system')}</label>
+          <select value={v.system || ''} onChange={(e) => onSelect('system', e.target.value || null)} style={FIELD_INPUT}>
+            <option value="">{t('cls_auto')}</option>
+            {TAX.system.map((o) => <option key={o.code} value={o.code}>{o[langKey] || o.en}</option>)}
+          </select>
+        </div>
+      </div>
+      <div>
+        <label style={FIELD_LABEL}>{t('cls_etiology')}</label>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+          {TAX.etiology.map((o) => {
+            const active = (v.etiology || []).includes(o.code);
+            return (
+              <button
+                type="button"
+                key={o.code}
+                onClick={() => onToggleEtiology(o.code)}
+                style={{
+                  fontSize: '0.78rem', fontWeight: 600, padding: '0.3rem 0.6rem', borderRadius: '999px',
+                  border: `1px solid ${active ? 'var(--primary)' : 'var(--border)'}`,
+                  background: active ? 'var(--primary)' : 'transparent',
+                  color: active ? '#fff' : 'var(--text-muted)', cursor: 'pointer',
+                }}
+              >
+                {o[langKey] || o.en}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Strukturirani editor nalaza (zaglavlje, klasifikacija, sekcije, numerirana dg, komentar).
+function ReportEditor({ report, lang, t, updateZaglavlje, updateKlas, toggleEtiology, updateSection, addSection, removeSection, dgToList, dgToString, updateDgItem, addDgItem, removeDgItem, updateKomentar }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       {/* Zaglavlje */}
@@ -176,6 +296,12 @@ function ReportEditor({ report, lang, t, updateZaglavlje, updateSection, addSect
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Klasifikacija */}
+      <div>
+        <div style={SECTION_LABEL}>{t('cls_section')}</div>
+        <KlasControls value={report.klasifikacija} lang={lang} t={t} onSelect={updateKlas} onToggleEtiology={toggleEtiology} />
       </div>
 
       {/* Sekcije */}
@@ -456,6 +582,9 @@ function GeneratorContent({ signOut, user }) {
   const [lang, setLang] = useState(localStorage.getItem('vet_lang') || 'en');
   const [details, setDetails] = useState('');
   const [keywords, setKeywords] = useState(['', '', '']);
+  const [keywordMode, setKeywordMode] = useState(localStorage.getItem('vet_kw_mode') || 'list');
+  const [keywordsText, setKeywordsText] = useState('');
+  const [cls, setCls] = useState({ animal_group: null, system: null, etiology: [] });
   const [report, setReport] = useState('');
   const [results, setResults] = useState([]);
   const [resultSource, setResultSource] = useState('');
@@ -525,6 +654,53 @@ function GeneratorContent({ signOut, user }) {
     setKeywords([...keywords, '']);
   };
 
+  // Aktivna lista keywordsa ovisno o načinu unosa.
+  const getKeywordInputs = () => keywordMode === 'single'
+    ? keywordsText.split(/[\n,;]+/).map((s) => s.trim()).filter(Boolean)
+    : keywords;
+
+  const hasKeywordInput = keywordMode === 'single'
+    ? keywordsText.trim() !== ''
+    : keywords.some((k) => k.trim() !== '');
+
+  // Prebaci između "jedan po jedan" (list) i "sve u liniji, zarezom" (single).
+  const toggleKeywordMode = () => {
+    if (keywordMode === 'list') {
+      setKeywordsText(keywords.map((k) => k.trim()).filter(Boolean).join(', '));
+      setKeywordMode('single');
+      localStorage.setItem('vet_kw_mode', 'single');
+    } else {
+      const arr = keywordsText.split(/[\n,;]+/).map((s) => s.trim()).filter(Boolean);
+      setKeywords(arr.length ? arr : ['', '', '']);
+      setKeywordMode('list');
+      localStorage.setItem('vet_kw_mode', 'list');
+    }
+  };
+
+  // Primijeni keyworde iz glasovnog unosa u aktivni način.
+  const applyVoiceKeywords = (items) => {
+    if (keywordMode === 'single') {
+      setKeywordsText((prev) => {
+        const base = prev.trim();
+        const joined = items.map((k) => k.trim()).filter(Boolean).join(', ');
+        if (!joined) return prev;
+        return base ? `${base}, ${joined}` : joined;
+      });
+    } else {
+      setKeywords((prev) => {
+        const newKw = [...prev];
+        let idx = 0;
+        for (const kw of items) {
+          while (idx < newKw.length && newKw[idx].trim() !== '') idx++;
+          if (idx < newKw.length) newKw[idx] = kw;
+          else newKw.push(kw);
+          idx++;
+        }
+        return newKw;
+      });
+    }
+  };
+
   // ─── Voice handlers ───
   const handleDetailsVoice = async () => {
     if (detailsVoice.isRecording) {
@@ -566,26 +742,10 @@ function GeneratorContent({ signOut, user }) {
           // Step 2: Extract keywords with Bedrock
           const result = await cleanupWithBedrock(rawText, 'keywords', lang);
           if (result?.type === 'keywords' && Array.isArray(result.data)) {
-            setKeywords(prev => {
-              const newKw = [...prev];
-              let idx = 0;
-              for (const kw of result.data) {
-                while (idx < newKw.length && newKw[idx].trim() !== '') idx++;
-                if (idx < newKw.length) newKw[idx] = kw;
-                else newKw.push(kw);
-                idx++;
-              }
-              return newKw;
-            });
+            applyVoiceKeywords(result.data);
           } else {
-            // Fallback: put raw transcript in first empty slot
-            setKeywords(prev => {
-              const newKw = [...prev];
-              const empty = newKw.findIndex(k => k.trim() === '');
-              if (empty >= 0) newKw[empty] = rawText;
-              else newKw.push(rawText);
-              return newKw;
-            });
+            // Fallback: use raw transcript
+            applyVoiceKeywords([rawText]);
           }
         } catch (err) {
           console.error('Voice keywords error:', err);
@@ -604,9 +764,12 @@ function GeneratorContent({ signOut, user }) {
     setNoDbResults(false);
     try {
       const { data, errors } = await client.mutations.generateReport({
-        keywords: keywords.filter(k => k.trim() !== ''),
+        keywords: buildEffectiveKeywords(getKeywordInputs(), details),
         details: details,
-        lang: lang
+        lang: lang,
+        animalGroup: cls.animal_group || '',
+        system: cls.system || '',
+        etiology: (cls.etiology || []).join(',')
       });
 
       if (errors) {
@@ -662,7 +825,7 @@ function GeneratorContent({ signOut, user }) {
     try {
       const { data, errors } = await client.graphql({
         query: `mutation SearchDatabase($keywords: [String], $action: String) { searchDatabase(keywords: $keywords, action: $action) }`,
-        variables: { keywords: keywords.filter(k => k.trim() !== ''), action: 'search' }
+        variables: { keywords: buildEffectiveKeywords(getKeywordInputs(), details), action: 'search' }
       });
       if (errors) {
         console.error('GraphQL errors:', errors);
@@ -732,6 +895,23 @@ function GeneratorContent({ signOut, user }) {
     if (r.sekcije[i].dg.length === 0) r.sekcije[i].dg = '';
   });
   const updateKomentar = (value) => patchReport((r) => { r.komentar = value; });
+  const updateKlas = (field, value) => patchReport((r) => {
+    r.klasifikacija = { ...(r.klasifikacija || EMPTY_KLAS), [field]: value };
+  });
+  const toggleEtiology = (code) => patchReport((r) => {
+    const k = r.klasifikacija = { ...(r.klasifikacija || EMPTY_KLAS) };
+    const set = new Set(k.etiology || []);
+    set.has(code) ? set.delete(code) : set.add(code);
+    k.etiology = [...set];
+  });
+
+  // Override handleri za klasifikaciju u formi unosa.
+  const clsSelect = (field, value) => setCls((p) => ({ ...p, [field]: value }));
+  const clsToggleEtiology = (code) => setCls((p) => {
+    const set = new Set(p.etiology);
+    set.has(code) ? set.delete(code) : set.add(code);
+    return { ...p, etiology: [...set] };
+  });
 
   const activeReport = selectedIdx !== null && editedReport
     ? formatReportText(editedReport, lang)
@@ -842,11 +1022,17 @@ function GeneratorContent({ signOut, user }) {
 
         const z = editedReport.zaglavlje || {};
         const zLine = ZAGLAVLJE_FIELDS.map((f) => (z[f] || '').trim()).filter(Boolean).join(' · ');
-        if (zLine) {
-          htmlContent += `
-            <div style="margin-bottom: 20px;">
-              <p style="margin: 0; font-size: 13px; font-weight: 600; color: #475569;">${esc(zLine)}</p>
-            </div>`;
+        const langKey = en ? 'en' : 'hr';
+        const kl = editedReport.klasifikacija || {};
+        const kParts = [];
+        if (kl.animal_group) kParts.push(taxLabel('animal_group', kl.animal_group, langKey));
+        if (kl.system) kParts.push(taxLabel('system', kl.system, langKey));
+        if (kl.etiology && kl.etiology.length) kParts.push(kl.etiology.map((c) => taxLabel('etiology', c, langKey)).join(', '));
+        if (zLine || kParts.length) {
+          htmlContent += `<div style="margin-bottom: 20px;">`;
+          if (zLine) htmlContent += `<p style="margin: 0 0 4px 0; font-size: 13px; font-weight: 600; color: #475569;">${esc(zLine)}</p>`;
+          if (kParts.length) htmlContent += `<p style="margin: 0; font-size: 12px; color: #64748b;">${esc(kParts.join(' · '))}</p>`;
+          htmlContent += `</div>`;
         }
 
         (editedReport.sekcije || []).forEach((s) => {
@@ -946,6 +1132,8 @@ function GeneratorContent({ signOut, user }) {
   const resetForm = () => {
     setDetails('');
     setKeywords(['', '', '']);
+    setKeywordsText('');
+    setCls({ animal_group: null, system: null, etiology: [] });
     setReport('');
     setResults([]);
     setResultSource('');
@@ -958,7 +1146,8 @@ function GeneratorContent({ signOut, user }) {
 
   const loadFromHistory = (item) => {
     setDetails(item.details || '');
-    setKeywords(item.keywords || []);
+    setKeywords(item.keywords && item.keywords.length ? item.keywords : ['', '', '']);
+    setKeywordsText((item.keywords || []).join(', '));
     setResults([]);
     setResultSource('');
     setSelectedIdx(null);
@@ -1197,30 +1386,67 @@ function GeneratorContent({ signOut, user }) {
               {keywordsVoice.isProcessing && (
                 <span style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 500 }}>{t('voice_processing')}</span>
               )}
-            </div>
-            <div className="keyword-inputs" style={{ marginTop: '0.5rem' }}>
-              {keywords.map((kw, index) => (
-                <input
-                  key={index}
-                  type="text"
-                  placeholder={`${t('observation_placeholder')} ${index + 1}...`}
-                  value={kw}
-                  onChange={(e) => handleKeywordChange(index, e.target.value)}
-                />
-              ))}
-            </div>
-            <div style={{ marginTop: '0.75rem' }}>
-              <button className="btn btn-secondary btn-sm" onClick={addKeywordField} title={t('add_observation')}>
-                <Plus size={16} /> {t('add_observation')}
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={toggleKeywordMode}
+                title={keywordMode === 'list' ? t('kw_switch_to_single') : t('kw_switch_to_list')}
+                style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.78rem' }}
+              >
+                {keywordMode === 'list'
+                  ? <><AlignLeft size={15} /> {t('kw_switch_to_single')}</>
+                  : <><List size={15} /> {t('kw_switch_to_list')}</>}
               </button>
             </div>
+
+            {keywordMode === 'single' ? (
+              <div style={{ marginTop: '0.5rem' }}>
+                <textarea
+                  className="details-textarea"
+                  placeholder={t('keywords_single_placeholder')}
+                  value={keywordsText}
+                  onChange={(e) => setKeywordsText(e.target.value)}
+                  style={{ minHeight: '80px' }}
+                />
+                <p style={{ margin: '0.4rem 0 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                  {t('keywords_single_hint')}
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="keyword-inputs" style={{ marginTop: '0.5rem' }}>
+                  {keywords.map((kw, index) => (
+                    <input
+                      key={index}
+                      type="text"
+                      placeholder={`${t('observation_placeholder')} ${index + 1}...`}
+                      value={kw}
+                      onChange={(e) => handleKeywordChange(index, e.target.value)}
+                    />
+                  ))}
+                </div>
+                <div style={{ marginTop: '0.75rem' }}>
+                  <button className="btn btn-secondary btn-sm" onClick={addKeywordField} title={t('add_observation')}>
+                    <Plus size={16} /> {t('add_observation')}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+
+          <div style={{ marginTop: '1.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', marginBottom: '0.5rem' }}>
+              <label className="input-label" style={{ marginBottom: 0 }}>{t('cls_section')}</label>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t('cls_optional_hint')}</span>
+            </div>
+            <KlasControls value={cls} lang={lang} t={t} onSelect={clsSelect} onToggleEtiology={clsToggleEtiology} />
           </div>
 
           <button
             className="btn btn-primary"
             style={{ width: '100%', marginTop: '2rem' }}
             onClick={generateReport}
-            disabled={loading || searchLoading || (keywords.every(k => k.trim() === '') && !details)}
+            disabled={loading || searchLoading || (!hasKeywordInput && !details)}
           >
             {loading ? <div className="loading-spinner"></div> : <><Send size={18} /> {t('generate_btn')}</>}
           </button>
@@ -1228,7 +1454,7 @@ function GeneratorContent({ signOut, user }) {
             className="btn btn-secondary"
             style={{ width: '100%', marginTop: '0.75rem' }}
             onClick={searchDatabase}
-            disabled={searchLoading || loading || (keywords.every(k => k.trim() === '') && !details)}
+            disabled={searchLoading || loading || (!hasKeywordInput && !details)}
           >
             {searchLoading ? <div className="loading-spinner"></div> : <><Search size={18} /> {t('search_btn')}</>}
           </button>
@@ -1296,6 +1522,8 @@ function GeneratorContent({ signOut, user }) {
                         lang={lang}
                         t={t}
                         updateZaglavlje={updateZaglavlje}
+                        updateKlas={updateKlas}
+                        toggleEtiology={toggleEtiology}
                         updateSection={updateSection}
                         addSection={addSection}
                         removeSection={removeSection}
