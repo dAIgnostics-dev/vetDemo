@@ -71,18 +71,36 @@ function jpcPrefix(klas) {
 function jpcTokens(s) {
   return (String(s || '').toLowerCase().match(/[a-z]+/g) || []).filter((w) => w.length > 3);
 }
-// Najbliži konkretni JPC slučaj unutar prefiksa (po preklapanju riječi s dijagnozom).
+// Engleske riječi za vrstu kako se pojavljuju u JPC dijagnozama (za bolje poklapanje slučaja).
+const JPC_SPECIES = {
+  AVIAN: ['chicken', 'turkey', 'quail', 'pigeon', 'owl', 'cockatoo', 'duck', 'goose', 'bird', 'psittacine'],
+  BOVINE: ['ox', 'cow', 'calf', 'bull', 'steer', 'bovine', 'cattle'],
+  CANINE: ['dog', 'canine', 'puppy'],
+  EQUINE: ['horse', 'foal', 'equine', 'pony', 'mare', 'stallion'],
+  FELINE: ['cat', 'feline', 'kitten'],
+  PORCINE: ['pig', 'swine', 'piglet', 'boar', 'porcine'],
+  PRIMATE: ['monkey', 'macaque', 'baboon', 'chimpanzee', 'tamarin', 'primate', 'rhesus', 'cynomolgus'],
+  RABBIT: ['rabbit'],
+  RODENT: ['mouse', 'rat', 'guinea', 'hamster', 'gerbil', 'rodent'],
+  SMALL_RUMINANT: ['sheep', 'goat', 'ewe', 'lamb', 'ram'],
+  OTHER: [],
+};
+// Najbliži konkretni JPC slučaj unutar prefiksa — prema preklapanju riječi s dijagnozom
+// i podudaranju vrste životinje (species). Species poklapanje nosi bonus da se kod
+// razriješi na stvarni case code i kad je proza kratka.
 function jpcClosest(klas, dgText) {
   const prefix = jpcPrefix(klas);
-  if (!prefix || !dgText) return null;
+  if (!prefix) return null;
   const cand = (jpcCases.cases || []).filter((c) => c.code.startsWith(prefix));
   if (!cand.length) return null;
-  const qt = new Set(jpcTokens(dgText));
-  if (!qt.size) return null;
+  const qt = new Set(jpcTokens(dgText || ''));
+  const species = JPC_SPECIES[klas && klas.animal_group] || [];
   let best = null, bestScore = 0;
   for (const c of cand) {
+    const dl = c.diagnosis.toLowerCase();
     let sc = 0;
     for (const tkn of jpcTokens(c.diagnosis)) if (qt.has(tkn)) sc++;
+    if (species.some((sp) => dl.includes(sp))) sc += 2;
     if (sc > bestScore) { bestScore = sc; best = c; }
   }
   return bestScore >= 2 ? best : null;
@@ -1615,18 +1633,6 @@ function GeneratorContent({ signOut, user }) {
           <div style={{ marginBottom: '1.5rem' }}>
             <div className="label-with-mic">
               <label className="input-label" style={{ marginBottom: 0 }}>{t('case_details')}</label>
-              <button
-                type="button"
-                className={`mic-btn ${detailsVoice.isRecording ? 'recording' : ''} ${detailsVoice.isProcessing ? 'processing' : ''}`}
-                onClick={handleDetailsVoice}
-                title={detailsVoice.isRecording ? t('voice_input_stop') : t('voice_input_start')}
-                disabled={detailsVoice.isProcessing}
-              >
-                {detailsVoice.isProcessing ? <div className="mic-spinner" /> : detailsVoice.isRecording ? <MicOff size={15} /> : <Mic size={15} />}
-              </button>
-              {detailsVoice.isProcessing && (
-                <span style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 500 }}>{t('voice_processing')}</span>
-              )}
             </div>
             <textarea
               className="details-textarea"
@@ -1641,18 +1647,6 @@ function GeneratorContent({ signOut, user }) {
           <div>
             <div className="label-with-mic">
               <label className="input-label" style={{ marginBottom: 0 }}>{t('observations_label')}</label>
-              <button
-                type="button"
-                className={`mic-btn ${keywordsVoice.isRecording ? 'recording' : ''} ${keywordsVoice.isProcessing ? 'processing' : ''}`}
-                onClick={handleKeywordsVoice}
-                title={keywordsVoice.isRecording ? t('voice_input_stop') : t('voice_input_start')}
-                disabled={keywordsVoice.isProcessing}
-              >
-                {keywordsVoice.isProcessing ? <div className="mic-spinner" /> : keywordsVoice.isRecording ? <MicOff size={15} /> : <Mic size={15} />}
-              </button>
-              {keywordsVoice.isProcessing && (
-                <span style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 500 }}>{t('voice_processing')}</span>
-              )}
               <button
                 type="button"
                 className="btn btn-ghost btn-sm"

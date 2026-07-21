@@ -50,6 +50,17 @@ def _tax_codes(kind: str) -> list[str]:
     return [x["code"] for x in TAXONOMY.get(kind, []) if isinstance(x, dict) and x.get("code")]
 
 
+def _tax_label(kind: str, code: str, lang: str = "hr") -> str:
+    """Vrati čitljivu oznaku (hr/en) za dani kod; fallback na sam kod."""
+    if not code:
+        return ""
+    key = "en" if str(lang).lower().startswith("en") else "hr"
+    for x in TAXONOMY.get(kind, []):
+        if isinstance(x, dict) and x.get("code") == code:
+            return x.get(key) or x.get("en") or code
+    return code
+
+
 def _normalize_klas(klas: Optional[dict]) -> dict:
     klas = klas or {}
     ag = klas.get("animal_group")
@@ -113,6 +124,15 @@ STROGO PRAVILO IZLAZA:
   }
 - "sekcije" ima najmanje jedan element. Opcionalna polja koja nemaju vrijednost IZOSTAVI (ne šalji prazne stringove).
 - Ne izmišljaj vrijednosti zaglavlja, veličine, broj mitoza ni postotke kojih nema u unosu.
+
+ČINJENICE IZ UNOSA SU MJERODAVNE — bez obzira dolaze li iz "Zadane činjenice" (dropdown) ili su
+spomenute u Case details / Keywords (slobodni tekst). Izvuci vrstu životinje, organski sustav i
+etiologiju iz TEKSTA ako nisu eksplicitno zadane, i onda ih dosljedno provuci kroz cijeli nalaz:
+- Vrsta životinje: spomeni je u uvodnoj rečenici opisa i uskladi "vrsta_uzorka" u zaglavlju
+  (npr. "bioptat kože psa"). Nikad ne pretpostavljaj drugu vrstu od navedene.
+- Organski sustav: sijelo/organ u opisu i dijagnozi moraju odgovarati tom sustavu.
+- Popuni i top-level "klasifikacija" istim vrijednostima (kodovima) koje si upotrijebio u tekstu.
+- Sve što je korisnik naveo u Case details preuzmi doslovno; ne mijenjaj ni ne izmišljaj te podatke.
 
 JEZIK: Cijeli izlaz piši na jeziku "{jezik}" (hr = hrvatski, en = engleski).
 Latinske/internacionalne nazive dijagnoza koristi gdje su ustaljeni (npr. Seminoma testis, Fibrosarcoma subcutis, Mastocytoma) i ostavi ih istima u oba jezika.
@@ -229,19 +249,27 @@ class Orchestrator:
 
         klas = _normalize_klas(klas)
         override_parts = []
+        override_facts = []
         if klas.get("animal_group"):
             override_parts.append(f"animal_group={klas['animal_group']}")
+            override_facts.append(f"vrsta životinje: {_tax_label('animal_group', klas['animal_group'], lang)}")
         if klas.get("system"):
             override_parts.append(f"system={klas['system']}")
+            override_facts.append(f"organski sustav: {_tax_label('system', klas['system'], lang)}")
         if klas.get("etiology"):
             override_parts.append(f"etiology={','.join(klas['etiology'])}")
+            override_facts.append(
+                "etiologija: " + ", ".join(_tax_label('etiology', c, lang) for c in klas['etiology'])
+            )
         override_str = "; ".join(override_parts) if override_parts else "(nema)"
+        facts_str = "; ".join(override_facts) if override_facts else "(nema)"
 
         prompt_text = (
             f"jezik: {lang}\n"
             f"Case details: {details.strip()}\n"
             f"Keywords: {kw_str}\n"
-            f"Klasifikacija override: {override_str}\n\n"
+            f"Klasifikacija override: {override_str}\n"
+            f"Zadane činjenice (POŠTUJ ih doslovno, nemoj ih izmišljati ni proturječiti im): {facts_str}\n\n"
             "Vrati SAMO JSON objekt prema shemi."
         )
 
