@@ -27,8 +27,7 @@ import {
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { fetchUserAttributes, updateUserAttributes, updatePassword, fetchAuthSession } from 'aws-amplify/auth';
-import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
-import { TranscribeStreamingClient, StartStreamTranscriptionCommand } from '@aws-sdk/client-transcribe-streaming';
+import { startLiveTranscription } from './lib/liveTranscribe';
 import '@aws-amplify/ui-react/styles.css';
 import outputs from '../amplify_outputs.json';
 import { translations } from './translations';
@@ -41,7 +40,12 @@ const client = generateClient();
 
 // ─── Constants ───
 const AWS_REGION = 'us-east-1';
-const BEDROCK_MODEL_ID = 'us.anthropic.claude-haiku-4-5-20251001-v1:0';
+// Ime Transcribe custom vocabulary-ja (vidi scripts/create_transcribe_vocabulary.py).
+// Namjerno prazno po defaultu: nepostojeci vocabulary rusi cijelu streaming sesiju,
+// pa se ukljucuje tek kad je stvarno kreiran i u stanju READY.
+const TRANSCRIBE_VOCABULARY_HR = import.meta.env.VITE_TRANSCRIBE_VOCABULARY_HR || '';
+// Koliko cekati nakon zadnjeg finaliziranog segmenta prije ekstrakcije polja.
+const EXTRACT_DEBOUNCE_MS = 1500;
 
 // ─── Structured report helpers (novi izlazni format: zaglavlje / sekcije / komentar) ───
 
@@ -551,181 +555,115 @@ function ReportEditor({ report, lang, t, updateZaglavlje, updateKlas, toggleEtio
   );
 }
 
-// ─── Audio helpers: convert MediaRecorder output → PCM for Transcribe ───
-function downsampleBuffer(buffer, inputRate, outputRate) {
-  if (inputRate === outputRate) return buffer;
-  const ratio = inputRate / outputRate;
-  const newLength = Math.round(buffer.length / ratio);
-  const result = new Float32Array(newLength);
-  for (let i = 0; i < newLength; i++) {
-    const srcIdx = i * ratio;
-    const lo = Math.floor(srcIdx);
-    const hi = Math.min(lo + 1, buffer.length - 1);
-    const frac = srcIdx - lo;
-    result[i] = buffer[lo] * (1 - frac) + buffer[hi] * frac;
-  }
-  return result;
-}
+// ─── Glasovni diktat: kontinuirani Transcribe streaming + inkrementalna ekstrakcija ───
+//
+// Tok: mikrofon → Transcribe (uživo) → finalizirani segmenti se nižu u transkript
+// → debounced poziv extractFields mutacije (Lambda/Bedrock) → popunjena polja obrasca.
+// Bedrock se namjerno više NE zove iz preglednika — ide kroz Lambdu.
+function useLiveDictation({ lang, onExtract }) {
+  const [isListening, setIsListening] = useState(false);
+  const [isExtracting, setIsExtracting] = useState(false);
+  const [partial, setPartial] = useState('');
 
-function float32ToInt16(float32) {
-  const int16 = new Int16Array(float32.length);
-  for (let i = 0; i < float32.length; i++) {
-    const s = Math.max(-1, Math.min(1, float32[i]));
-    int16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
-  }
-  return int16;
-}
+  const sessionRef = useRef(null);
+  const transcriptRef = useRef('');
+  const timerRef = useRef(null);
+  const inFlightRef = useRef(false);
 
-// ─── Amazon Transcribe Streaming: audio blob → text ───
-async function transcribeAudioBlob(audioBlob, lang) {
-  const session = await fetchAuthSession();
-  const credentials = session.credentials;
-  if (!credentials) throw new Error('No credentials');
+  // Refovi da callbackovi unutar žive sesije uvijek vide aktualne vrijednosti.
+  const langRef = useRef(lang);
+  langRef.current = lang;
+  const onExtractRef = useRef(onExtract);
+  onExtractRef.current = onExtract;
 
-  const transcribeClient = new TranscribeStreamingClient({
-    region: AWS_REGION,
-    credentials,
-  });
-
-  // Decode audio blob to PCM via AudioContext
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  const arrayBuffer = await audioBlob.arrayBuffer();
-  const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-  const mono = audioBuffer.getChannelData(0);
-  const pcm16kHz = downsampleBuffer(mono, audioBuffer.sampleRate, 16000);
-  const pcmInt16 = float32ToInt16(pcm16kHz);
-  const pcmBytes = new Uint8Array(pcmInt16.buffer);
-  audioCtx.close();
-
-  // Stream audio to Transcribe in chunks
-  const CHUNK = 4096;
-  async function* audioStream() {
-    for (let i = 0; i < pcmBytes.length; i += CHUNK) {
-      yield { AudioEvent: { AudioChunk: pcmBytes.slice(i, i + CHUNK) } };
+  const runExtraction = useCallback(async () => {
+    const transcript = transcriptRef.current.trim();
+    if (!transcript) return;
+    // Ako prethodni poziv još traje, ne preskačemo update — samo ga odgodimo.
+    if (inFlightRef.current) {
+      timerRef.current = setTimeout(runExtraction, EXTRACT_DEBOUNCE_MS);
+      return;
     }
-  }
-
-  const command = new StartStreamTranscriptionCommand({
-    LanguageCode: lang === 'hr' ? 'hr-HR' : 'en-US',
-    MediaEncoding: 'pcm',
-    MediaSampleRateHertz: 16000,
-    AudioStream: audioStream(),
-  });
-
-  const response = await transcribeClient.send(command);
-
-  let transcript = '';
-  for await (const event of response.TranscriptResultStream) {
-    const results = event.TranscriptEvent?.Transcript?.Results || [];
-    for (const r of results) {
-      if (!r.IsPartial) {
-        transcript += (r.Alternatives?.[0]?.Transcript || '') + ' ';
-      }
-    }
-  }
-  return transcript.trim();
-}
-
-// ─── Bedrock text cleanup (transcribed text → clean text / keywords) ───
-async function cleanupWithBedrock(rawText, mode, lang) {
-  try {
-    const session = await fetchAuthSession();
-    const credentials = session.credentials;
-    if (!credentials) throw new Error('No credentials');
-
-    const bedrockClient = new BedrockRuntimeClient({
-      region: AWS_REGION,
-      credentials,
-    });
-
-    let systemPrompt, userMessage;
-    if (mode === 'details') {
-      systemPrompt = 'You are a veterinary medical transcription assistant. Clean up raw speech-to-text into a professional, concise veterinary case description. Fix grammar, remove filler words (um, uh, like, so), and format properly. Preserve ALL clinical information. Return ONLY the cleaned text, nothing else.';
-      userMessage = `Clean up this dictated veterinary case description. The text is in ${lang === 'hr' ? 'Croatian' : 'English'}. Return ONLY the cleaned professional text:\n\n${rawText}`;
-    } else {
-      systemPrompt = 'You are a veterinary keyword extraction assistant. Extract individual clinical keywords or observations from raw speech-to-text. Return ONLY a JSON array of strings. Examples: ["limping", "elevated temperature", "loss of appetite"]. Remove filler words and duplicates. Return ONLY the JSON array, no other text.';
-      userMessage = `Extract clinical keywords from this dictated text. The text is in ${lang === 'hr' ? 'Croatian' : 'English'}. Return ONLY a JSON array:\n\n${rawText}`;
-    }
-
-    const body = JSON.stringify({
-      anthropic_version: 'bedrock-2023-05-31',
-      max_tokens: 1024,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userMessage }],
-    });
-
-    const command = new InvokeModelCommand({
-      modelId: BEDROCK_MODEL_ID,
-      contentType: 'application/json',
-      accept: 'application/json',
-      body: new TextEncoder().encode(body),
-    });
-
-    const response = await bedrockClient.send(command);
-    const responseBody = JSON.parse(new TextDecoder().decode(response.body));
-    const resultText = responseBody.content?.[0]?.text || '';
-
-    if (mode === 'keywords') {
-      const match = resultText.match(/\[[\s\S]*?\]/);
-      if (match) return { type: 'keywords', data: JSON.parse(match[0]) };
-      return { type: 'keywords', data: resultText.split(',').map(k => k.trim().replace(/^["']|["']$/g, '')).filter(Boolean) };
-    }
-    return { type: 'text', data: resultText.trim() };
-  } catch (err) {
-    console.error('Bedrock cleanup error:', err);
-    return null;
-  }
-}
-
-// ─── Cross-browser voice input hook using MediaRecorder ───
-function useVoiceInput() {
-  const [isRecording, setIsRecording] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const recorderRef = useRef(null);
-  const chunksRef = useRef([]);
-  const streamRef = useRef(null);
-  const onResultRef = useRef(null);
-
-  const startRecording = useCallback(async (onResult) => {
+    inFlightRef.current = true;
+    setIsExtracting(true);
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      streamRef.current = stream;
-      const recorder = new MediaRecorder(stream);
-      chunksRef.current = [];
-      onResultRef.current = onResult;
+      const { data, errors } = await client.mutations.extractFields({
+        transcript,
+        lang: langRef.current,
+      });
+      if (errors) {
+        console.error('extractFields GraphQL errors:', errors);
+        return;
+      }
+      const parsed = typeof data === 'string' ? JSON.parse(data) : data;
+      if (parsed?.error) {
+        console.error('extractFields error:', parsed.error);
+        return;
+      }
+      if (parsed) onExtractRef.current?.(parsed);
+    } catch (err) {
+      // Ekstrakcija je pomoćni korak — neuspjeh ne smije prekinuti diktat.
+      console.error('extractFields failed:', err);
+    } finally {
+      inFlightRef.current = false;
+      setIsExtracting(false);
+    }
+  }, []);
 
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) chunksRef.current.push(e.data);
-      };
+  const schedule = useCallback(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(runExtraction, EXTRACT_DEBOUNCE_MS);
+  }, [runExtraction]);
 
-      recorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: recorder.mimeType });
-        if (streamRef.current) {
-          streamRef.current.getTracks().forEach(t => t.stop());
-          streamRef.current = null;
-        }
-        setIsRecording(false);
-        if (blob.size > 0 && onResultRef.current) onResultRef.current(blob);
-      };
+  const start = useCallback(async () => {
+    try {
+      const session = await fetchAuthSession();
+      const credentials = session.credentials;
+      if (!credentials) throw new Error('No credentials');
 
-      recorderRef.current = recorder;
-      recorder.start();
-      setIsRecording(true);
+      transcriptRef.current = '';
+      sessionRef.current = await startLiveTranscription({
+        credentials,
+        region: AWS_REGION,
+        languageCode: langRef.current === 'hr' ? 'hr-HR' : 'en-US',
+        vocabularyName: langRef.current === 'hr' ? TRANSCRIBE_VOCABULARY_HR : '',
+        onPartial: (text) => setPartial(text),
+        onFinal: (text) => {
+          setPartial('');
+          transcriptRef.current = `${transcriptRef.current} ${text}`.trim();
+          schedule();
+        },
+        onError: (err) => console.error('Transcribe stream error:', err),
+      });
+      setIsListening(true);
       return true;
     } catch (err) {
-      console.error('Microphone access error:', err);
-      setIsRecording(false);
+      console.error('Live dictation start failed:', err);
+      setIsListening(false);
       return false;
     }
-  }, []);
+  }, [schedule]);
 
-  const stopRecording = useCallback(() => {
-    if (recorderRef.current && recorderRef.current.state !== 'inactive') {
-      recorderRef.current.stop();
+  const stop = useCallback(async () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
     }
+    const session = sessionRef.current;
+    sessionRef.current = null;
+    if (session) await session.stop();
+    setIsListening(false);
+    setPartial('');
+    // Završni prolaz nad cijelim transkriptom — hvata i zadnji segment.
+    await runExtraction();
+  }, [runExtraction]);
+
+  useEffect(() => () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    if (sessionRef.current) sessionRef.current.stop();
   }, []);
 
-  return { isRecording, isProcessing, setIsProcessing, startRecording, stopRecording };
+  return { isListening, isExtracting, partial, start, stop };
 }
 
 function GeneratorContent({ signOut, user }) {
@@ -753,10 +691,8 @@ function GeneratorContent({ signOut, user }) {
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [userProfile, setUserProfile] = useState({ firstName: '', lastName: '' });
 
-  // Voice input hooks — diktafon (novi layout) + odvojeni mic-ovi (klasični layout)
-  const dictateVoice = useVoiceInput();
-  const detailsVoice = useVoiceInput();
-  const keywordsVoice = useVoiceInput();
+  // Zaglavlje izvučeno iz diktata; ima prednost pred automatskim defaultima.
+  const [voiceZaglavlje, setVoiceZaglavlje] = useState(null);
 
   const toggleUiMode = () => setUiMode((m) => {
     const next = m === 'voice' ? 'classic' : 'voice';
@@ -837,6 +773,26 @@ function GeneratorContent({ signOut, user }) {
     });
   };
 
+  // Rezultat ekstrakcije → polja obrasca. Poziva se dok doktor još diktira.
+  const applyExtraction = (fields) => {
+    if (fields.details) setDetails(fields.details);
+    if (Array.isArray(fields.keywords) && fields.keywords.length) applyVoiceKeywords(fields.keywords);
+
+    const k = fields.klasifikacija || {};
+    setCls((prev) => ({
+      animal_group: k.animal_group || prev.animal_group,
+      system: k.system || prev.system,
+      etiology: (k.etiology && k.etiology.length) ? k.etiology : prev.etiology,
+    }));
+
+    const z = fields.zaglavlje || {};
+    if (z.oznaka_uzorka || z.vrsta_uzorka || z.datum) {
+      setVoiceZaglavlje((prev) => ({ ...(prev || {}), ...Object.fromEntries(Object.entries(z).filter(([, v]) => v)) }));
+    }
+  };
+
+  const dictation = useLiveDictation({ lang, onExtract: applyExtraction });
+
   const removeKeyword = (index) => setKeywords((prev) => prev.filter((_, i) => i !== index));
 
   const commitKwDraft = () => {
@@ -867,75 +823,13 @@ function GeneratorContent({ signOut, user }) {
     }
   };
 
-  const handleDetailsVoice = async () => {
-    if (detailsVoice.isRecording) { detailsVoice.stopRecording(); return; }
-    const started = await detailsVoice.startRecording(async (audioBlob) => {
-      detailsVoice.setIsProcessing(true);
-      try {
-        const rawText = await transcribeAudioBlob(audioBlob, lang);
-        if (!rawText) { alert(t('voice_error')); return; }
-        const cleaned = await cleanupWithBedrock(rawText, 'details', lang);
-        const cleanText = cleaned?.data || rawText;
-        setDetails((prev) => prev ? prev + '\n' + cleanText : cleanText);
-      } catch (err) {
-        console.error('Voice details error:', err);
-        alert(t('voice_error'));
-      } finally {
-        detailsVoice.setIsProcessing(false);
-      }
-    });
-    if (!started) alert(t('voice_not_supported'));
-  };
-
-  const handleKeywordsVoice = async () => {
-    if (keywordsVoice.isRecording) { keywordsVoice.stopRecording(); return; }
-    const started = await keywordsVoice.startRecording(async (audioBlob) => {
-      keywordsVoice.setIsProcessing(true);
-      try {
-        const rawText = await transcribeAudioBlob(audioBlob, lang);
-        if (!rawText) { alert(t('voice_error')); return; }
-        const kwRes = await cleanupWithBedrock(rawText, 'keywords', lang);
-        if (kwRes?.type === 'keywords' && Array.isArray(kwRes.data)) applyVoiceKeywords(kwRes.data);
-        else applyVoiceKeywords([rawText]);
-      } catch (err) {
-        console.error('Voice keywords error:', err);
-        alert(t('voice_error'));
-      } finally {
-        keywordsVoice.setIsProcessing(false);
-      }
-    });
-    if (!started) alert(t('voice_not_supported'));
-  };
-
-  // ─── Diktafon: jedan snimak → transkript (details) + izvučene ključne riječi (čipovi) ───
+  // ─── Diktafon: start/stop žive sesije ───
   const handleDictate = async () => {
-    if (dictateVoice.isRecording) {
-      dictateVoice.stopRecording();
+    if (dictation.isListening) {
+      await dictation.stop();
       return;
     }
-    const started = await dictateVoice.startRecording(async (audioBlob) => {
-      dictateVoice.setIsProcessing(true);
-      try {
-        const rawText = await transcribeAudioBlob(audioBlob, lang);
-        if (!rawText) { alert(t('voice_error')); return; }
-
-        // Transkript → očisti i dodaj u glavno polje
-        const cleaned = await cleanupWithBedrock(rawText, 'details', lang);
-        const cleanText = cleaned?.data || rawText;
-        setDetails((prev) => prev ? prev + '\n' + cleanText : cleanText);
-
-        // Izvuci ključne riječi → čipovi
-        const kwRes = await cleanupWithBedrock(rawText, 'keywords', lang);
-        if (kwRes?.type === 'keywords' && Array.isArray(kwRes.data)) {
-          applyVoiceKeywords(kwRes.data);
-        }
-      } catch (err) {
-        console.error('Dictation error:', err);
-        alert(t('voice_error'));
-      } finally {
-        dictateVoice.setIsProcessing(false);
-      }
-    });
+    const started = await dictation.start();
     if (!started) alert(t('voice_not_supported'));
   };
 
@@ -1110,7 +1004,8 @@ function GeneratorContent({ signOut, user }) {
     const seq = parseInt(localStorage.getItem('vet_hp_seq') || '1', 10) || 1;
     const sampleText = `${getKeywordInputs().join(' ')} ${details}`;
 
-    const z = { ...(rep.zaglavlje || {}) };
+    // Ono što je doktor izdiktirao ima prednost pred automatskim defaultima.
+    const z = { ...(rep.zaglavlje || {}), ...(voiceZaglavlje || {}) };
     if (!z.oznaka_uzorka) z.oznaka_uzorka = `HP ${seq}/${yy}`;
     if (!z.datum) z.datum = new Date().toLocaleDateString(lang === 'hr' ? 'hr-HR' : 'en-GB');
     if (!z.doktor) z.doktor = doctor;
@@ -1567,26 +1462,33 @@ function GeneratorContent({ signOut, user }) {
           <div style={{ marginBottom: '1.25rem' }}>
             <div className="label-with-mic" style={{ justifyContent: 'space-between' }}>
               <label className="input-label" style={{ marginBottom: 0 }}>{t('dictation_label')}</label>
-              {dictateVoice.isProcessing && (
-                <span style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 500 }}>{t('voice_processing')}</span>
+              {dictation.isExtracting && (
+                <span style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 500 }}>{t('dictation_extracting')}</span>
               )}
             </div>
             <button
               type="button"
               className="btn btn-primary"
               onClick={handleDictate}
-              disabled={dictateVoice.isProcessing}
               style={{
                 width: '100%', margin: '0.5rem 0 0.75rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-                ...(dictateVoice.isRecording ? { background: '#dc2626', borderColor: '#dc2626', color: '#fff' } : {}),
+                ...(dictation.isListening ? { background: '#dc2626', borderColor: '#dc2626', color: '#fff' } : {}),
               }}
             >
-              {dictateVoice.isProcessing
-                ? <><div className="loading-spinner" /> {t('voice_processing')}</>
-                : dictateVoice.isRecording
-                  ? <><MicOff size={18} /> {t('dictation_stop')}</>
-                  : <><Mic size={18} /> {t('dictation_start')}</>}
+              {dictation.isListening
+                ? <><MicOff size={18} /> {t('dictation_stop')}</>
+                : <><Mic size={18} /> {t('dictation_start')}</>}
             </button>
+            {/* Živi transkript: hipoteza koja se još mijenja dok doktor govori. */}
+            {dictation.isListening && (
+              <div style={{
+                margin: '0 0 0.75rem', padding: '0.5rem 0.65rem', minHeight: '2.2rem',
+                borderRadius: '6px', border: '1px dashed var(--border)',
+                fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic',
+              }}>
+                {dictation.partial || t('dictation_listening')}
+              </div>
+            )}
             <textarea
               className="details-textarea"
               placeholder={t('dictation_placeholder')}

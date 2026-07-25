@@ -9,6 +9,7 @@ lerna-debug.log*
 _login.txt
 PROJECT_OVERVIEW.md
 test.txt
+demo_slucajevi.txt
 
 node_modules
 dist

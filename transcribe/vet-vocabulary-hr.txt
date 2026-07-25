@@ -1,0 +1,146 @@
+Phrase	SoundsLike	IPA	DisplayAs
+Seminoma-testis			Seminoma testis
+Fibrosarcoma-subcutis			Fibrosarcoma subcutis
+Mastocytoma			
+Histiocytoma			
+Lymphoma			
+Adenocarcinoma			
+Adenoma			
+Carcinoma			
+Sarcoma			
+Osteosarcoma			
+Chondrosarcoma			
+Hemangiosarcoma			
+Hemangioma			
+Melanoma			
+Melanocytoma			
+Papilloma			
+Lipoma			
+Liposarcoma			
+Fibroma			
+Leiomyoma			
+Leiomyosarcoma			
+Trichoblastoma			
+Plasmacytoma			
+Seminoma			
+Sertolioma			
+Insulinoma			
+Thymoma			
+Squamous-cell-carcinoma			Squamous cell carcinoma
+Transitional-cell-carcinoma			Transitional cell carcinoma
+Carcinoma-in-situ			Carcinoma in situ
+Gastritis			
+Enteritis			
+Duodenitis			
+Colitis			
+Dermatitis			
+Hepatitis			
+Nephritis			
+Cystitis			
+Pneumonia			
+Bronchopneumonia			
+Myocarditis			
+Meningitis			
+Encephalitis			
+Otitis			
+Pancreatitis			
+Peritonitis			
+Pyometra			
+Pyogranuloma			
+Panniculitis			
+Osteomyelitis			
+Mastitis			
+Endometritis			
+Prostatitis			
+dermis			
+epidermis			
+subkutis			
+hipodermis			
+lamina-propria			lamina propria
+tunica-muscularis			tunica muscularis
+mukoza			
+submukoza			
+seroza			
+stroma			
+parenhim			
+intersticij			
+alveole			
+bronhiole			
+glomerul			
+tubuli			
+hepatociti			
+kripte			
+resice			
+folikul			
+kapsula			
+nekroza			
+apoptoza			
+fibroza			
+skleroza			
+hiperplazija			
+displazija			
+metaplazija			
+anaplazija			
+atrofija			
+hipertrofija			
+edem			
+hiperemija			
+kongestija			
+hemoragija			
+tromboza			
+embolus			
+infarkt			
+granulom			
+apsces			
+ulceracija			
+erozija			
+hiperkeratoza			
+parakeratoza			
+akantoza			
+amiloidoza			
+kalcifikacija			
+kolikvacija			
+pleomorfizam			
+anizocitoza			
+anizokarioza			
+mitoza			
+mitoze			
+mitotski-indeks			mitotski indeks
+jezgrica			
+jezgrice			
+citoplazma			
+kromatin			
+eozinofili			
+neutrofili			
+limfociti			
+makrofagi			
+mastociti			
+fibroblasti			
+miofibroblasti			
+kolagen			
+plazma-stanice			plazma stanice
+divovske-stanice			divovske stanice
+vretenaste-stanice			vretenaste stanice
+limfoplazmocitni			
+piogranulomatozni			
+eozinofilni			
+bioptat			
+ekscizija			
+incizija			
+punktat			
+obdukcija			
+nekropsija			
+resekcijski-rub			resekcijski rub
+rubovi-ekscizije			rubovi ekscizije
+parafinski-blok			parafinski blok
+imunohistokemija			
+histopatologija			
+citologija			
+hemalaun-eozin			hemalaun-eozin
+H.P.F.			HPF
+H.E.			HE
+I.H.K.			IHK
+P.A.S.			PAS
+H.P.			HP
+J.P.C.			JPC
+F.N.A.			FNA

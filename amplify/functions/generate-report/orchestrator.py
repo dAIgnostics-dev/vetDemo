@@ -34,7 +34,7 @@ from hybrid_router import (
     get_retriever,
 )
 
-SONNET_MODEL_ID = os.environ.get("SONNET_MODEL_ID", "us.anthropic.claude-haiku-4-5-20251001-v1:0")
+SONNET_MODEL_ID = os.environ.get("SONNET_MODEL_ID", "us.anthropic.claude-sonnet-5")
 
 # ---------- Klasifikacijski šifrarnik (JPC VSPO) ----------
 _TAX_PATH = Path(__file__).parent / "taxonomy.json"
@@ -276,6 +276,10 @@ class Orchestrator:
         body = json.dumps({
             "anthropic_version": "bedrock-2023-05-31",
             "max_tokens": 1500,
+            # Sonnet 5 uključuje adaptive thinking kad se polje izostavi. Nalaz je
+            # strukturirani JSON fiksne sheme, pa thinking samo troši output tokene
+            # i jede max_tokens budžet dijeljen s odgovorom.
+            "thinking": {"type": "disabled"},
             "system": [
                 {
                     "type": "text",
@@ -292,7 +296,13 @@ class Orchestrator:
             contentType="application/json",
             accept="application/json",
         )
-        text = json.loads(resp["body"].read())["content"][0]["text"].strip()
+        payload = json.loads(resp["body"].read())
+        u = payload.get("usage", {})
+        print(
+            f"[orchestrator] usage: in={u.get('input_tokens')} out={u.get('output_tokens')} "
+            f"cache_write={u.get('cache_creation_input_tokens')} cache_read={u.get('cache_read_input_tokens')}"
+        )
+        text = payload["content"][0]["text"].strip()
         match = re.search(r"\{.*\}", text, re.DOTALL)
         if not match:
             raise ValueError(f"Model nije vratio valjan JSON: {text[:200]}")

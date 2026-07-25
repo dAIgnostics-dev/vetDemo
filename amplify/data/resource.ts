@@ -1,5 +1,6 @@
 import { type ClientSchema, a, defineData } from '@aws-amplify/backend';
 import { generateReport } from '../functions/generate-report/resource';
+import { extractFields } from '../functions/extract-fields/resource';
 
 const schema = a.schema({
   DummyModel: a
@@ -38,6 +39,17 @@ const schema = a.schema({
     })
     .returns(a.string())
     .handler(a.handler.function(generateReport))
+    .authorization((allow) => [allow.authenticated()]),
+
+  // Inkrementalna ekstrakcija polja iz diktata (glasovni mod).
+  extractFields: a
+    .mutation()
+    .arguments({
+      transcript: a.string(),
+      lang: a.string(),
+    })
+    .returns(a.string())
+    .handler(a.handler.function(extractFields))
     .authorization((allow) => [allow.authenticated()]),
 });
 

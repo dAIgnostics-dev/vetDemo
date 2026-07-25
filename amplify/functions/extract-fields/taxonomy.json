@@ -1,0 +1,39 @@
+{
+  "_source": "JPC Veterinary Systemic Pathology Online (VSPO) — https://www.askjpc.org/vspo/",
+  "_note": "Klasifikacijski šifrarnici izvučeni iz JPC VSPO pretraživača. 'code' je stabilna vrijednost; 'en'/'hr' su labeli; 'jpc' je slovo u JPC kodu (npr. INTEGUMENT+NEOPLASTIC → 'I'+'N' → prefiks 'I-N'). animal_group nema JPC slovo (JPC kod ne kodira vrstu).",
+  "system": [
+    { "code": "CARDIOVASCULAR", "jpc": "C", "en": "Cardiovascular", "hr": "Kardiovaskularni" },
+    { "code": "DIGESTIVE", "jpc": "D", "en": "Digestive", "hr": "Probavni" },
+    { "code": "ENDOCRINE", "jpc": "E", "en": "Endocrine", "hr": "Endokrini" },
+    { "code": "HEMOLYMPHATIC", "jpc": "H", "en": "Hemolymphatic", "hr": "Hemolimfatički" },
+    { "code": "INTEGUMENT", "jpc": "I", "en": "Integument", "hr": "Koža (integument)" },
+    { "code": "MUSCULOSKELETAL", "jpc": "M", "en": "Musculoskeletal", "hr": "Mišićno-koštani" },
+    { "code": "NERVOUS", "jpc": "N", "en": "Nervous", "hr": "Živčani" },
+    { "code": "PULMONARY", "jpc": "P", "en": "Pulmonary", "hr": "Dišni (pulmonalni)" },
+    { "code": "REPRODUCTIVE", "jpc": "R", "en": "Reproductive", "hr": "Reproduktivni" },
+    { "code": "SPECIAL_SENSES", "jpc": "S", "en": "Special senses", "hr": "Osjetila" },
+    { "code": "URINARY", "jpc": "U", "en": "Urinary", "hr": "Mokraćni" }
+  ],
+  "animal_group": [
+    { "code": "AVIAN", "en": "Avian", "hr": "Ptice" },
+    { "code": "BOVINE", "en": "Bovine", "hr": "Goveda" },
+    { "code": "CANINE", "en": "Canine", "hr": "Psi" },
+    { "code": "EQUINE", "en": "Equine", "hr": "Konji" },
+    { "code": "FELINE", "en": "Feline", "hr": "Mačke" },
+    { "code": "PORCINE", "en": "Porcine", "hr": "Svinje" },
+    { "code": "PRIMATE", "en": "Primate", "hr": "Primati" },
+    { "code": "RABBIT", "en": "Rabbit", "hr": "Kunići" },
+    { "code": "RODENT", "en": "Rodent", "hr": "Glodavci" },
+    { "code": "SMALL_RUMINANT", "en": "Small ruminant", "hr": "Mali preživači" },
+    { "code": "OTHER", "en": "Other", "hr": "Ostalo" }
+  ],
+  "etiology": [
+    { "code": "BACTERIAL", "jpc": "B", "en": "Bacterial", "hr": "Bakterijska" },
+    { "code": "FUNGAL", "jpc": "F", "en": "Fungal", "hr": "Gljivična" },
+    { "code": "METABOLIC_MISC", "jpc": "M", "en": "Metabolic & Misc", "hr": "Metabolička i ostalo" },
+    { "code": "NEOPLASTIC", "jpc": "N", "en": "Neoplastic", "hr": "Neoplastična" },
+    { "code": "PARASITIC", "jpc": "P", "en": "Parasitic", "hr": "Parazitarna" },
+    { "code": "TOXIC", "jpc": "T", "en": "Toxic", "hr": "Toksična" },
+    { "code": "VIRAL", "jpc": "V", "en": "Viral", "hr": "Virusna" }
+  ]
+}
