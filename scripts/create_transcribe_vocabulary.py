@@ -15,6 +15,7 @@ Nakon sto status prijedje u READY, ime vokabulara postavite u frontendu kao
 VITE_TRANSCRIBE_VOCABULARY_HR (vidi src/lib/liveTranscribe.js).
 """
 import argparse
+import json
 import sys
 import time
 from pathlib import Path
@@ -25,6 +26,21 @@ from botocore.exceptions import ClientError
 DEFAULT_NAME = "vet-hr"
 DEFAULT_FILE = Path(__file__).resolve().parent.parent / "transcribe" / "vet-vocabulary-hr.txt"
 LANGUAGE_CODE = "hr-HR"
+OUTPUTS_FILE = Path(__file__).resolve().parent.parent / "amplify_outputs.json"
+
+
+def default_region() -> str:
+    """Regija backenda iz amplify_outputs.json.
+
+    Custom vocabulary je vezan uz regiju: ako se kreira drugdje nego sto
+    frontend streama, Transcribe ga ne nadje i cijela sesija padne. Zato se
+    default vuce iz istog izvora kao TRANSCRIBE_REGION u src/App.jsx.
+    """
+    try:
+        with open(OUTPUTS_FILE, encoding="utf-8") as fh:
+            return json.load(fh)["auth"]["aws_region"]
+    except (OSError, KeyError, ValueError):
+        return "us-east-1"
 
 
 def upload(s3, bucket: str, key: str, path: Path) -> str:
@@ -68,7 +84,11 @@ def main() -> int:
     ap.add_argument("--key", default="transcribe/vet-vocabulary-hr.txt")
     ap.add_argument("--name", default=DEFAULT_NAME, help=f"ime vokabulara (default: {DEFAULT_NAME})")
     ap.add_argument("--file", default=str(DEFAULT_FILE))
-    ap.add_argument("--region", default="us-east-1")
+    ap.add_argument(
+        "--region",
+        default=default_region(),
+        help="mora odgovarati regiji s koje frontend streama (default: iz amplify_outputs.json)",
+    )
     args = ap.parse_args()
 
     path = Path(args.file)

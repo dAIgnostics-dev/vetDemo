@@ -22,6 +22,7 @@ import {
   Search,
   Mic,
   MicOff,
+  AlertCircle,
   LayoutGrid
 } from 'lucide-react';
 import { jsPDF } from 'jspdf';
@@ -39,7 +40,13 @@ Amplify.configure(outputs);
 const client = generateClient();
 
 // ─── Constants ───
-const AWS_REGION = 'us-east-1';
+// Transcribe streama izravno iz preglednika, pa mu region moramo dati rucno.
+// Vuce se iz amplify_outputs.json da ne odluta od backenda — hardkodirani
+// us-east-1 je znacio da svaki audio chunk ide preko Atlantika bez potrebe.
+// Override postoji za slucaj da regija backenda ne podrzava trazeni jezik:
+// custom vocabulary je vezan uz regiju, pa VITE_TRANSCRIBE_REGION mora
+// odgovarati onome s kojim je pokrenut scripts/create_transcribe_vocabulary.py.
+const TRANSCRIBE_REGION = import.meta.env.VITE_TRANSCRIBE_REGION || outputs.auth.aws_region;
 // Ime Transcribe custom vocabulary-ja (vidi scripts/create_transcribe_vocabulary.py).
 // Namjerno prazno po defaultu: nepostojeci vocabulary rusi cijelu streaming sesiju,
 // pa se ukljucuje tek kad je stvarno kreiran i u stanju READY.
@@ -560,10 +567,41 @@ function ReportEditor({ report, lang, t, updateZaglavlje, updateKlas, toggleEtio
 // Tok: mikrofon → Transcribe (uživo) → finalizirani segmenti se nižu u transkript
 // → debounced poziv extractFields mutacije (Lambda/Bedrock) → popunjena polja obrasca.
 // Bedrock se namjerno više NE zove iz preglednika — ide kroz Lambdu.
+// Prevodi AWS/preglednik gresku u poruku koja doktoru kaze sto dalje.
+// Vraca kljuc prijevoda + tehnicki detalj (detalj je za nas, ne za korisnika).
+function describeDictationError(err) {
+  const name = err?.name || '';
+  const detail = err?.message || String(err);
+
+  // Najcesci uzrok: backend nije deployan pa authenticated role nema
+  // transcribe:StartStreamTranscription (vidi amplify/backend.ts).
+  if (name === 'AccessDeniedException' || name === 'NotAuthorizedException') {
+    return { key: 'dictation_error_denied', detail };
+  }
+  // getUserMedia: korisnik je odbio mikrofon ili ga je preglednik blokirao.
+  if (name === 'NotAllowedError' || name === 'SecurityError') {
+    return { key: 'dictation_error_mic', detail };
+  }
+  if (name === 'NotFoundError' || name === 'NotReadableError') {
+    return { key: 'dictation_error_no_mic', detail };
+  }
+  // navigator.mediaDevices ne postoji izvan secure contexta (http na ne-localhost).
+  if (err instanceof TypeError && /mediaDevices|getUserMedia/.test(detail)) {
+    return { key: 'dictation_error_insecure', detail };
+  }
+  if (name === 'BadRequestException') {
+    return { key: 'dictation_error_config', detail };
+  }
+  return { key: 'dictation_error_generic', detail };
+}
+
 function useLiveDictation({ lang, onExtract }) {
   const [isListening, setIsListening] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
   const [partial, setPartial] = useState('');
+  // Streaming puca asinkrono, nakon sto je start() vec vratio. Bez ovoga takav
+  // pad zavrsi samo u konzoli, a doktor gleda u "Slusam..." koje nikad nista ne da.
+  const [error, setError] = useState(null);
 
   const sessionRef = useRef(null);
   const transcriptRef = useRef('');
@@ -616,6 +654,7 @@ function useLiveDictation({ lang, onExtract }) {
   }, [runExtraction]);
 
   const start = useCallback(async () => {
+    setError(null);
     try {
       const session = await fetchAuthSession();
       const credentials = session.credentials;
@@ -624,7 +663,7 @@ function useLiveDictation({ lang, onExtract }) {
       transcriptRef.current = '';
       sessionRef.current = await startLiveTranscription({
         credentials,
-        region: AWS_REGION,
+        region: TRANSCRIBE_REGION,
         languageCode: langRef.current === 'hr' ? 'hr-HR' : 'en-US',
         vocabularyName: langRef.current === 'hr' ? TRANSCRIBE_VOCABULARY_HR : '',
         onPartial: (text) => setPartial(text),
@@ -633,13 +672,21 @@ function useLiveDictation({ lang, onExtract }) {
           transcriptRef.current = `${transcriptRef.current} ${text}`.trim();
           schedule();
         },
-        onError: (err) => console.error('Transcribe stream error:', err),
+        // Stize tek nakon sto je start() vratio true, pa sesiju gasimo odavde.
+        onError: (err) => {
+          console.error('Transcribe stream error:', err);
+          sessionRef.current = null;
+          setIsListening(false);
+          setPartial('');
+          setError(describeDictationError(err));
+        },
       });
       setIsListening(true);
       return true;
     } catch (err) {
       console.error('Live dictation start failed:', err);
       setIsListening(false);
+      setError(describeDictationError(err));
       return false;
     }
   }, [schedule]);
@@ -663,7 +710,7 @@ function useLiveDictation({ lang, onExtract }) {
     if (sessionRef.current) sessionRef.current.stop();
   }, []);
 
-  return { isListening, isExtracting, partial, start, stop };
+  return { isListening, isExtracting, partial, error, start, stop };
 }
 
 function GeneratorContent({ signOut, user }) {
@@ -829,8 +876,9 @@ function GeneratorContent({ signOut, user }) {
       await dictation.stop();
       return;
     }
-    const started = await dictation.start();
-    if (!started) alert(t('voice_not_supported'));
+    // Neuspjeh se prikazuje inline (dictation.error) — alert je i prekidao rad
+    // i uvijek krivio mikrofon, cak i kad je uzrok bio IAM ili region.
+    await dictation.start();
   };
 
   const generateReport = async () => {
@@ -1479,6 +1527,24 @@ function GeneratorContent({ signOut, user }) {
                 ? <><MicOff size={18} /> {t('dictation_stop')}</>
                 : <><Mic size={18} /> {t('dictation_start')}</>}
             </button>
+            {/* Pad streaminga stiže asinkrono — bez ovoga ostane samo u konzoli. */}
+            {dictation.error && !dictation.isListening && (
+              <div style={{
+                margin: '0 0 0.75rem', padding: '0.6rem 0.75rem',
+                borderRadius: '6px', border: '1px solid #fecaca', background: '#fef2f2',
+                fontSize: '0.85rem', color: '#991b1b',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.45rem' }}>
+                  <AlertCircle size={16} style={{ flexShrink: 0, marginTop: '0.1rem' }} />
+                  <span style={{ fontWeight: 500 }}>{t(dictation.error.key)}</span>
+                </div>
+                {dictation.error.detail && (
+                  <div style={{ marginTop: '0.35rem', paddingLeft: '2.05rem', fontSize: '0.75rem', opacity: 0.75, wordBreak: 'break-word' }}>
+                    {dictation.error.detail}
+                  </div>
+                )}
+              </div>
+            )}
             {/* Živi transkript: hipoteza koja se još mijenja dok doktor govori. */}
             {dictation.isListening && (
               <div style={{
