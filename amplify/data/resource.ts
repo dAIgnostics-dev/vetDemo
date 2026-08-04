@@ -1,5 +1,6 @@
 import { type ClientSchema, a, defineData } from '@aws-amplify/backend';
 import { generateReport } from '../functions/generate-report/resource';
+import { extractReferral } from '../functions/extract-referral/resource';
 
 const schema = a.schema({
   DummyModel: a
@@ -23,6 +24,16 @@ const schema = a.schema({
     })
     .returns(a.string())
     .handler(a.handler.function(generateReport))
+    .authorization((allow) => [allow.authenticated()]),
+
+  extractReferral: a
+    .mutation()
+    .arguments({
+      imageBase64: a.string().required(),
+      pdfText: a.string(),
+    })
+    .returns(a.json())
+    .handler(a.handler.function(extractReferral))
     .authorization((allow) => [allow.authenticated()]),
 });
 

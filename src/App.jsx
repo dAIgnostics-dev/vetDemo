@@ -18,7 +18,8 @@ import {
   User,
   Globe,
   Lock,
-  ShieldCheck
+  ShieldCheck,
+  ScanLine
 } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -26,6 +27,7 @@ import { fetchUserAttributes, updateUserAttributes, updatePassword } from 'aws-a
 import '@aws-amplify/ui-react/styles.css';
 import outputs from '../amplify_outputs.json';
 import { translations } from './translations';
+import ReferralOcr from './ReferralOcr';
 import './index.css';
 
 Amplify.configure(outputs);
@@ -33,6 +35,7 @@ const client = generateClient();
 
 function GeneratorContent({ signOut, user }) {
   const [lang, setLang] = useState(localStorage.getItem('vet_lang') || 'en');
+  const [activeTab, setActiveTab] = useState('generator');
   const [details, setDetails] = useState('');
   const [keywords, setKeywords] = useState(['', '', '']);
   const [report, setReport] = useState('');
@@ -454,7 +457,22 @@ function GeneratorContent({ signOut, user }) {
           <h1 className="hide-mobile" style={{ fontSize: '1.25rem' }}>dAIgnostics Studio VetNarrative</h1>
         </div>
         
-        <div style={{ flex: 1 }}></div>
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+          <div className="tab-toggle">
+            <button
+              className={`tab-btn ${activeTab === 'generator' ? 'active' : ''}`}
+              onClick={() => setActiveTab('generator')}
+            >
+              <Stethoscope size={16} /> {t('tab_generator')}
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'referral' ? 'active' : ''}`}
+              onClick={() => setActiveTab('referral')}
+            >
+              <ScanLine size={16} /> {t('tab_referral')}
+            </button>
+          </div>
+        </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <div className="user-pill" onClick={() => setShowProfile(true)}>
@@ -481,7 +499,14 @@ function GeneratorContent({ signOut, user }) {
         </div>
       </header>
 
-      <main className={`main-content ${report ? 'with-report' : ''}`}>
+      <main className="main-content" hidden={activeTab !== 'referral'}>
+        <ReferralOcr lang={lang} />
+      </main>
+
+      <main
+        className={`main-content ${report ? 'with-report' : ''}`}
+        hidden={activeTab !== 'generator'}
+      >
         <section className="card keyword-section">
           <h2>{t('clinical_input')}</h2>
           <p style={{ marginBottom: '1.5rem', color: 'var(--text-muted)' }}>
