@@ -16,6 +16,13 @@ const backend = defineBackend({
   extractFields
 });
 
+// Close public self-registration: only administrators may create accounts.
+// The SignUp API is disabled at the pool level (GDPR/SOC2 access control); the
+// embedded VetDB popup uses a pre-provisioned admin-created account.
+backend.auth.resources.cfnResources.cfnUserPool.adminCreateUserConfig = {
+  allowAdminCreateUserOnly: true,
+};
+
 const generateReportFn = backend.generateReport.resources.lambda as Function;
 
 generateReportFn.addToRolePolicy(

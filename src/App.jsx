@@ -1924,7 +1924,7 @@ export default function App() {
 
   return (
     <div className="auth-wrapper">
-      <Authenticator components={components} formFields={formFields}>
+      <Authenticator hideSignUp components={components} formFields={formFields}>
         {({ signOut, user }) => (
           <GeneratorContent signOut={signOut} user={user} />
         )}
