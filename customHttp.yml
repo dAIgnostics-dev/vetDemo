@@ -1,0 +1,7 @@
+customHeaders:
+  - pattern: '**'
+    headers:
+      # Allow the VetDB exam app to embed this AI report tool in its popup iframe;
+      # block all other origins from framing it.
+      - key: 'Content-Security-Policy'
+        value: "frame-ancestors 'self' https://main.d1kuopd8hj68tn.amplifyapp.com"

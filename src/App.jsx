@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
-import { fetchUserAttributes, updateUserAttributes, updatePassword, fetchAuthSession } from 'aws-amplify/auth';
+import { fetchUserAttributes, updateUserAttributes, updatePassword, fetchAuthSession, signIn, getCurrentUser } from 'aws-amplify/auth';
 import { startLiveTranscription } from './lib/liveTranscribe';
 import '@aws-amplify/ui-react/styles.css';
 import outputs from '../amplify_outputs.json';
@@ -38,6 +38,17 @@ import './index.css';
 
 Amplify.configure(outputs);
 const client = generateClient();
+
+// ─── Embedded (iframe) mode ───
+// When this app runs inside the VetDB exam app's popup, there is no separate
+// login: it auto-signs-in a dedicated embed account and posts the finished
+// report to the parent, which inserts it into the VetDB database. Standalone
+// (non-iframe) use keeps the normal Authenticator.
+const IN_IFRAME = (() => {
+  try { return window.self !== window.top; } catch { return true; }
+})();
+const EMBED_EMAIL = 'embed@vetdb.local';
+const EMBED_PASSWORD = 'EmbedVet1234!';
 
 // ─── Constants ───
 // Transcribe streama izravno iz preglednika, pa mu region moramo dati rucno.
@@ -1770,6 +1781,21 @@ function GeneratorContent({ signOut, user }) {
                     ) : (
                       <ReportPreview report={r} lang={lang} t={t} />
                     )}
+
+                    {IN_IFRAME && isSelected && editedReport && (
+                      <button
+                        className="btn btn-primary"
+                        style={{ marginTop: '1rem', width: '100%' }}
+                        onClick={() =>
+                          window.parent?.postMessage(
+                            { type: 'vetdb:report', report: editedReport, text: formatReportText(editedReport, lang) },
+                            '*'
+                          )
+                        }
+                      >
+                        ✓ Ubaci u VetDB
+                      </button>
+                    )}
                   </div>
                 );
               })}
@@ -1893,6 +1919,9 @@ export default function App() {
     },
   };
 
+  // Embedded in the VetDB popup: auto-login, no Authenticator UI.
+  if (IN_IFRAME) return <EmbeddedApp />;
+
   return (
     <div className="auth-wrapper">
       <Authenticator components={components} formFields={formFields}>
@@ -1902,4 +1931,31 @@ export default function App() {
       </Authenticator>
     </div>
   );
+}
+
+// Auto-signs-in the dedicated embed account (or reuses an existing session),
+// then renders the generator with no visible login. Used only inside the iframe.
+function EmbeddedApp() {
+  const [ready, setReady] = useState(false);
+  const [error, setError] = useState('');
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        try {
+          await getCurrentUser();
+        } catch {
+          await signIn({ username: EMBED_EMAIL, password: EMBED_PASSWORD });
+        }
+        if (alive) setReady(true);
+      } catch (e) {
+        if (alive) setError(e?.message || String(e));
+      }
+    })();
+    return () => { alive = false; };
+  }, []);
+  const box = { padding: '2rem', fontFamily: 'system-ui, sans-serif', color: '#475569', textAlign: 'center' };
+  if (error) return <div style={box}>Prijava nije uspjela: {error}</div>;
+  if (!ready) return <div style={box}>Učitavanje…</div>;
+  return <GeneratorContent signOut={() => {}} user={{ signInDetails: { loginId: EMBED_EMAIL } }} />;
 }
