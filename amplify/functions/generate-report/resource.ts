@@ -17,15 +17,20 @@ export const generateReport = defineFunction(
       code: Code.fromAsset(path.resolve(__dirname)),
       timeout: Duration.seconds(60),
       environment: {
-        BEDROCK_REGION: 'us-east-1',
-        SONNET_MODEL_ID: 'us.anthropic.claude-sonnet-5',
+        BEDROCK_REGION: 'eu-north-1',
+        SONNET_MODEL_ID: 'eu.anthropic.claude-sonnet-5',
       },
     });
 
+    // EU-only Bedrock (GDPR — no US transfer). The eu-* ARNs match the EU
+    // inference profiles + their EU foundation-model targets and exclude US.
     fn.addToRolePolicy(new PolicyStatement({
       effect: Effect.ALLOW,
       actions: ['bedrock:InvokeModel'],
-      resources: ['*'],
+      resources: [
+        'arn:aws:bedrock:eu-*::foundation-model/*',
+        'arn:aws:bedrock:eu-*:*:inference-profile/*',
+      ],
     }));
 
     return fn;

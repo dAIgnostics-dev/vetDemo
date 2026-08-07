@@ -5,7 +5,7 @@ Podržava učitavanje baze iz lokalnog fajla (CLI) ili S3 (Lambda).
 Konfiguracija via env varijable:
   BAZA_S3_BUCKET  — S3 bucket za bazu (ako nije postavljen, koristi lokalni fajl)
   BAZA_S3_KEY     — S3 ključ (default: semantic-router/baza.json)
-  BEDROCK_REGION  — region za Bedrock pozive (default: us-east-1)
+  BEDROCK_REGION  — region za Bedrock pozive (default: eu-north-1)
 
 API:
   build_hybrid()  -> HybridRetriever   (koristi env var konfiguraciju)
@@ -35,8 +35,8 @@ if hasattr(sys.stdout, "reconfigure"):
 
 DEFAULT_BAZA = Path(__file__).parent / "baza.json"
 
-# Bedrock cross-region inference — Lambda je u eu-north-1, Bedrock u us-east-1
-BEDROCK_REGION = os.environ.get("BEDROCK_REGION", "us-east-1")
+# Bedrock cross-region inference — EU inference profil (eu.*) usmjerava samo unutar EU regija (GDPR)
+BEDROCK_REGION = os.environ.get("BEDROCK_REGION", "eu-north-1")
 # S3 konfiguracija — postavlja se u Lambda env varijablama
 S3_BUCKET = os.environ.get("BAZA_S3_BUCKET")
 S3_KEY = os.environ.get("BAZA_S3_KEY", "semantic-router/baza.json")

@@ -16,9 +16,9 @@ from pathlib import Path
 
 import boto3
 
-BEDROCK_REGION = os.environ.get("BEDROCK_REGION", "us-east-1")
+BEDROCK_REGION = os.environ.get("BEDROCK_REGION", "eu-north-1")
 # Haiku: ekstrakcija je low-risk korak koji doktor pregledava prije generiranja.
-EXTRACT_MODEL_ID = os.environ.get("EXTRACT_MODEL_ID", "us.anthropic.claude-haiku-4-5-20251001-v1:0")
+EXTRACT_MODEL_ID = os.environ.get("EXTRACT_MODEL_ID", "eu.anthropic.claude-haiku-4-5-20251001-v1:0")
 
 _TAX_PATH = Path(__file__).parent / "taxonomy.json"
 with _TAX_PATH.open(encoding="utf-8") as _f:

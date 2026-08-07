@@ -2,7 +2,7 @@ import json
 import boto3
 
 # Initialize Bedrock client
-bedrock = boto3.client(service_name='bedrock-runtime', region_name='us-east-1')
+bedrock = boto3.client(service_name='bedrock-runtime', region_name='eu-north-1')
 
 # System prompt for Croatian veterinary pathology report generation
 SYSTEM_PROMPT = '''
@@ -90,7 +90,7 @@ def lambda_handler(event, context):
             'Generiraj {"opis": "...", "dg": "..."}.'
         )
 
-        model_id = 'us.anthropic.claude-haiku-4-5-20251001-v1:0'
+        model_id = 'eu.anthropic.claude-haiku-4-5-20251001-v1:0'
 
         request_body = json.dumps({
             "anthropic_version": "bedrock-2023-05-31",

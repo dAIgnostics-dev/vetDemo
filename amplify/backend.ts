@@ -23,8 +23,8 @@ generateReportFn.addToRolePolicy(
     effect: Effect.ALLOW,
     actions: ['bedrock:InvokeModel'],
     resources: [
-      'arn:aws:bedrock:*::foundation-model/*',
-      'arn:aws:bedrock:*:*:inference-profile/*'
+      'arn:aws:bedrock:eu-*::foundation-model/*',
+      'arn:aws:bedrock:eu-*:*:inference-profile/*'
     ],
   })
 );
@@ -49,8 +49,8 @@ extractFieldsFn.addToRolePolicy(
     effect: Effect.ALLOW,
     actions: ['bedrock:InvokeModel'],
     resources: [
-      'arn:aws:bedrock:*::foundation-model/*',
-      'arn:aws:bedrock:*:*:inference-profile/*'
+      'arn:aws:bedrock:eu-*::foundation-model/*',
+      'arn:aws:bedrock:eu-*:*:inference-profile/*'
     ],
   })
 );

@@ -17,8 +17,8 @@ export const extractFields = defineFunction(
       // Okida se dok doktor jos diktira — kratak timeout drzi obrazac responzivnim.
       timeout: Duration.seconds(20),
       environment: {
-        BEDROCK_REGION: 'us-east-1',
-        EXTRACT_MODEL_ID: 'us.anthropic.claude-haiku-4-5-20251001-v1:0',
+        BEDROCK_REGION: 'eu-north-1',
+        EXTRACT_MODEL_ID: 'eu.anthropic.claude-haiku-4-5-20251001-v1:0',
       },
     });
   }

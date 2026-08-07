@@ -4,7 +4,7 @@ Orkestrira tok: keywords → semantic router → (fallback) Sonnet → write-bac
 Konfiguracija via env varijable:
   BAZA_S3_BUCKET  — S3 bucket (obavezno za Lambda; bez njega koristi lokalni fajl)
   BAZA_S3_KEY     — S3 ključ (default: semantic-router/baza.json)
-  BEDROCK_REGION  — region za Bedrock (default: us-east-1)
+  BEDROCK_REGION  — region za Bedrock (default: eu-north-1)
 
 Lambda entry point: orchestrator.lambda_handler
 CLI korištenje:
@@ -34,7 +34,7 @@ from hybrid_router import (
     get_retriever,
 )
 
-SONNET_MODEL_ID = os.environ.get("SONNET_MODEL_ID", "us.anthropic.claude-sonnet-5")
+SONNET_MODEL_ID = os.environ.get("SONNET_MODEL_ID", "eu.anthropic.claude-sonnet-5")
 
 # ---------- Klasifikacijski šifrarnik (JPC VSPO) ----------
 _TAX_PATH = Path(__file__).parent / "taxonomy.json"
